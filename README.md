@@ -2,80 +2,110 @@
 
 Healthcare appointment and clinic management system - Project 1.
 
-## Tech Stack
+## 1. Công nghệ sử dụng
 
 - Frontend: React + Vite
 - Backend: Node.js + Express
-- Database: PostgreSQL (Neon) - cấu hình ở task tiếp theo
+- Database: PostgreSQL (Neon)
+- Node.js: **22.22.2**
 - Version Control: Git + GitHub
-- Node.js: 22.22.2
 
-## Yêu cầu môi trường
+---
 
-Cài đặt:
+## 2. Setup lần đầu
+
+> Chỉ cần thực hiện phần này lần đầu khi setup project trên máy.
+
+### Bước 1 - Cài công cụ
+
+Cần cài:
 
 - Visual Studio Code
 - Git
 - NVM for Windows
 
-Nhóm sử dụng PowerShell trong VS Code Terminal.
+Lưu ý: Không cần cài Node.js riêng. Sau khi cài NVM for Windows, Node.js 22.22.2 sẽ được cài bằng các lệnh bên dưới.
 
-Kiểm tra Git và NVM:
+Sau khi cài xong:
+
+1. Mở Visual Studio Code.
+2. Chọn **Terminal → New Terminal → PowerShell**.
+3. Kiểm tra:
 
 ```powershell
 git --version
 nvm version
 ```
 
-## Cài Node.js
+Nếu cả hai lệnh đều hiện version thì tiếp tục.
 
-Project sử dụng Node.js 22.22.2.
+Nếu báo `not recognized`, dừng lại và gửi ảnh Terminal vào nhóm để được hỗ trợ.
+
+### Bước 2 - Cài đúng Node.js của nhóm
+
+Trong PowerShell:
 
 ```powershell
 nvm install 22.22.2
 nvm use 22.22.2
+```
+
+Kiểm tra:
+
+```powershell
 node --version
 npm --version
 ```
 
-Node setup thành công khi:
+Node phải hiện:
 
 ```text
 v22.22.2
 ```
 
-## Cài đặt project lần đầu
+### Bước 3 - Clone project
 
-### 1. Clone repository
+Chọn thư mục trên máy dùng để chứa project, sau đó:
 
 ```powershell
 git clone https://github.com/Minh08012005/healthcare-appointment-system.git
 cd healthcare-appointment-system
-```
-
-### 2. Chuyển sang develop
-
-```powershell
 git switch develop
 ```
 
-### 3. Cài Frontend
+Kiểm tra:
+
+```powershell
+git branch
+```
+
+Phải thấy dấu `*` tại:
+
+```text
+* develop
+```
+
+### Bước 4 - Cài Frontend
 
 ```powershell
 cd frontend
 npm install
 ```
 
-### 4. Cài Backend
+### Bước 5 - Cài Backend
 
 ```powershell
 cd ..\backend
 npm install
 ```
 
-## Chạy project
+Setup dependency hoàn tất.
 
-Frontend và backend chạy ở hai terminal riêng.
+---
+
+## 3. Chạy project
+
+Frontend và Backend cần chạy ở **2 Terminal riêng** trong VS Code.
 
 ### Terminal 1 - Frontend
 
@@ -86,28 +116,34 @@ cd frontend
 npm run dev
 ```
 
-Frontend chạy thành công khi terminal hiển thị địa chỉ dạng:
+Thành công khi thấy:
 
 ```text
 Local: http://localhost:5173/
 ```
 
+Mở địa chỉ trên bằng trình duyệt và kiểm tra trang React hiển thị.
+
 ### Terminal 2 - Backend
 
-Từ thư mục gốc project:
+Mở thêm một PowerShell Terminal:
 
 ```powershell
 cd backend
 npm run dev
 ```
 
-Backend chạy thành công khi terminal hiển thị:
+Thành công khi thấy:
 
 ```text
 Server running on http://localhost:3000
 ```
 
-Mở `http://localhost:3000` trên trình duyệt.
+Mở:
+
+```text
+http://localhost:3000
+```
 
 Kết quả mong đợi:
 
@@ -117,22 +153,46 @@ Kết quả mong đợi:
 }
 ```
 
-## Cấu trúc project
+---
+
+## 4. Xác nhận Setup PASS
+
+Setup hoàn thành khi đủ cả 3 điều kiện:
+
+- [ ] `node --version` → `v22.22.2`
+- [ ] Frontend chạy được tại `http://localhost:5173/`
+- [ ] Backend chạy được tại `http://localhost:3000/`
+
+Nếu đủ cả 3, nhắn vào nhóm:
+
+```text
+[Tên] - Setup PASS
+```
+
+**Không cần gửi ảnh nếu mọi thứ chạy bình thường.**
+
+Nếu gặp lỗi, chụp toàn bộ Terminal có lỗi và gửi vào nhóm hoặc đưa cho AI để kiểm tra.
+
+---
+
+## 5. Cấu trúc project
 
 ```text
 healthcare-appointment-system/
-├── frontend/        # React + Vite
-├── backend/         # Node.js + Express
+├── frontend/       # React + Vite
+├── backend/        # Node.js + Express
 ├── .gitignore
 ├── .nvmrc
 └── README.md
 ```
 
-## Quy tắc branch cơ bản
+---
+
+## 6. Quy tắc khi bắt đầu một task code
 
 Không code trực tiếp trên `main` hoặc `develop`.
 
-Mỗi task được thực hiện trên feature branch riêng tạo từ `develop`.
+Trước khi làm task:
 
 ```powershell
 git switch develop
@@ -140,11 +200,12 @@ git pull origin develop
 git switch -c feature/<task-id>-<ten-task>
 ```
 
-Sau khi hoàn thành, push feature branch lên GitHub và tạo Pull Request về `develop`.
+Ví dụ:
 
-## Setup được coi là hoàn thành khi
+```powershell
+git switch -c feature/S0-02-neon-schema
+```
 
-- `node --version` trả về `v22.22.2`
-- Frontend chạy được tại `http://localhost:5173`
-- Backend chạy được tại `http://localhost:3000`
-- Không có lỗi làm frontend/backend không thể khởi động
+Sau đó mới bắt đầu code task được giao.
+
+Quy trình chi tiết về Git, GitHub Issue, Pull Request và sử dụng AI sẽ được hướng dẫn trong tài liệu workflow của nhóm.
