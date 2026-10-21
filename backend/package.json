@@ -4,13 +4,20 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test:db": "node scripts/test-db.js",
+    "db:schema": "node scripts/run-schema.js",
+    "db:verify": "node scripts/verify-schema.js",
+    "db:seed": "node scripts/run-seed.js",
+    "db:verify-seed": "node scripts/verify-seed.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^5.3.0"
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
   }
 }
