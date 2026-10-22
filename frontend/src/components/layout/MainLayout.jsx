@@ -6,7 +6,7 @@ import "./MainLayout.css";
 
 function MainLayout({ role, userName, userTitle }) {
   const { pathname } = useLocation();
-  const menu = sidebarMenus[role];
+  const menu = sidebarMenus[role] || { roleLabel: "", items: [] };
   const current = menu.items.find((item) => item.path === pathname);
 
   return (
