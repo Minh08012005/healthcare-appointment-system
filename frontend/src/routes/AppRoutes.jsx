@@ -8,34 +8,48 @@ import DoctorHomePage from "../pages/doctor/DoctorHomePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import LabHomePage from "../pages/lab/LabHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
+import MainLayout from "../components/layout/MainLayout";
 
 function AppRoutes() {
-  return (
-    <Routes>
-      {/* Trang chung */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+    return (
+        <Routes>
+            {/* Trang chung */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-      {/* Bệnh nhân */}
-      <Route path="/patient" element={<PatientHomePage />} />
+            {/* Bệnh nhân */}
+            <Route path="/patient" element={<PatientHomePage />} />
 
-      {/* Bác sĩ */}
-      <Route path="/doctor" element={<DoctorHomePage />} />
+            {/* Bác sĩ */}
+            <Route path="/doctor" element={<DoctorHomePage />} />
 
-      {/* Lễ tân */}
-      <Route path="/receptionist" element={<ReceptionistHomePage />} />
+            {/* Lễ tân */}
+            <Route
+                element={
+                    <MainLayout
+                        role="receptionist"
+                        userName="Nguyễn Minh"
+                        userTitle="Nhân viên lễ tân"
+                    />
+                }
+            >
+                <Route
+                    path="/receptionist"
+                    element={<ReceptionistHomePage />}
+                />
+            </Route>
 
-      {/* Nhân viên phòng xét nghiệm */}
-      <Route path="/lab" element={<LabHomePage />} />
+            {/* Nhân viên phòng xét nghiệm */}
+            <Route path="/lab" element={<LabHomePage />} />
 
-      {/* Quản trị */}
-      <Route path="/admin" element={<AdminHomePage />} />
+            {/* Quản trị */}
+            <Route path="/admin" element={<AdminHomePage />} />
 
-      {/* URL không tồn tại: phải nằm cuối cùng */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
-  );
+            {/* URL không tồn tại: phải nằm cuối cùng */}
+            <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+    );
 }
 
 export default AppRoutes;
