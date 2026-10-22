@@ -1,0 +1,128 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-right: 1px solid var(--border);
+}
+.sidebar__brand {
+  font-size: 20px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.sidebar__sub {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.sidebar__role {
+  align-self: flex-start;
+  margin-top: 15px;
+  padding: 6px 13px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.sidebar__label {
+  margin: 20px 0 9px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sidebar__link {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-left: 14px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+}
+.sidebar__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #9ca3af;
+}
+.sidebar__link.active {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 600;
+}
+.sidebar__link.active .sidebar__dot {
+  background: var(--primary);
+}
+.sidebar__user {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.sidebar__user span {
+  color: var(--text-secondary);
+}
+.sidebar__logout {
+  all: unset;
+  cursor: pointer;
+  margin-top: 8px;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.layout__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  height: 72px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+}
+.topbar__title {
+  font-size: 18px;
+  line-height: 22px;
+}
+.topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.topbar__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.layout__content {
+  flex: 1;
+  padding: 40px;
+  overflow: auto;
+}
