@@ -8,7 +8,7 @@ function ApiTest() {
 
   useEffect(() => {
     apiClient
-      .get('/api/health')
+      .get('/api/integration/check')
       .then((result) => {
         setData(result)
         setStatus('success')
