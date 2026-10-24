@@ -1,4 +1,3 @@
-[C2-04_SLOT_API_CONTRACT (3).md](https://github.com/user-attachments/files/33904796/C2-04_SLOT_API_CONTRACT.3.md)
 # C2-04 — Slot Availability API Contract (UC-007)
 
 - **Trạng thái:** đã implement; đã chạy thật trên PostgreSQL Neon (2026-10-24) các ca `CON_SLOT`, `KHONG_CO_LICH`, lỗi 400 và 404 (xem mục 6).
