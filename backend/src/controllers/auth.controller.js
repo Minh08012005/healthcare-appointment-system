@@ -1,25 +1,47 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const pool = require("../config/db");
+const { getJwtSecret } = require("../config/jwt");
 
 const ROLE_BENH_NHAN = "Bệnh nhân";
 const STATUS_ACTIVE = "HoatDong";
 
-const signToken = (user) =>
-  jwt.sign({ id: user.id, role: user.vai_tro }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
-  });
+const isString = (v) => typeof v === "string";
+const isOptionalString = (v) => v === undefined || v === null || typeof v === "string";
+// Chuỗi rỗng/chỉ khoảng trắng -> null (tránh lưu "" vào cột UNIQUE như email, số điện thoại)
+const cleanOptional = (v) => (isString(v) && v.trim() !== "" ? v.trim() : null);
+
+const signToken = (user, secret) =>
+  jwt.sign({ id: user.id, role: user.vai_tro }, secret, { expiresIn: "1d" });
 
 const register = async (req, res) => {
-  const { username, password, ho_ten, email, so_dien_thoai, ngay_sinh, gioi_tinh, dia_chi } =
-    req.body || {};
+  const body = req.body || {};
+  const { username, password, ho_ten, email, so_dien_thoai, ngay_sinh, gioi_tinh, dia_chi } = body;
 
-  if (!username || !password || !ho_ten) {
+  // 1. Kiểm tra kiểu dữ liệu (bắt buộc là chuỗi)
+  if (!isString(username) || !isString(password) || !isString(ho_ten)) {
+    return res.status(400).json({
+      success: false,
+      message: "username, password và ho_ten là bắt buộc và phải là chuỗi",
+    });
+  }
+  if (![email, so_dien_thoai, ngay_sinh, gioi_tinh, dia_chi].every(isOptionalString)) {
+    return res.status(400).json({
+      success: false,
+      message: "email, so_dien_thoai, ngay_sinh, gioi_tinh, dia_chi phải là chuỗi",
+    });
+  }
+
+  // 2. Trim rồi mới validate; dùng giá trị đã trim khi lưu
+  const usernameTrim = username.trim();
+  const hoTenTrim = ho_ten.trim();
+
+  if (usernameTrim === "" || hoTenTrim === "") {
     return res
       .status(400)
-      .json({ success: false, message: "Thiếu username, password hoặc họ tên" });
+      .json({ success: false, message: "Username và họ tên không được để trống" });
   }
-  if (username.length > 50) {
+  if (usernameTrim.length > 50) {
     return res.status(400).json({ success: false, message: "Username tối đa 50 ký tự" });
   }
   if (password.length < 6 || password.length > 72) {
@@ -48,13 +70,13 @@ const register = async (req, res) => {
     const tk = await client.query(
       `INSERT INTO "TaiKhoan" (ten_dang_nhap, mat_khau, email, so_dien_thoai, vai_tro_id, trang_thai)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-      [username.trim(), hash, email || null, so_dien_thoai || null, role.rows[0].id, STATUS_ACTIVE]
+      [usernameTrim, hash, cleanOptional(email), cleanOptional(so_dien_thoai), role.rows[0].id, STATUS_ACTIVE]
     );
 
     await client.query(
       `INSERT INTO "BenhNhan" (tai_khoan_id, ho_ten, ngay_sinh, gioi_tinh, dia_chi)
        VALUES ($1, $2, $3, $4, $5)`,
-      [tk.rows[0].id, ho_ten.trim(), ngay_sinh || null, gioi_tinh || null, dia_chi || null]
+      [tk.rows[0].id, hoTenTrim, cleanOptional(ngay_sinh), cleanOptional(gioi_tinh), cleanOptional(dia_chi)]
     );
 
     await client.query("COMMIT");
@@ -86,11 +108,25 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { username, password } = req.body || {};
-  if (!username || !password) {
+  const secret = getJwtSecret();
+  if (!secret) {
+    console.error("LỖI CẤU HÌNH: thiếu JWT_SECRET trong backend/.env");
     return res
-      .status(400)
-      .json({ success: false, message: "Thiếu username hoặc password" });
+      .status(500)
+      .json({ success: false, message: "Lỗi cấu hình server: thiếu JWT_SECRET" });
+  }
+
+  const { username, password } = req.body || {};
+  if (
+    !isString(username) ||
+    !isString(password) ||
+    username.trim() === "" ||
+    password === ""
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "username và password là bắt buộc và phải là chuỗi",
+    });
   }
 
   try {
@@ -118,7 +154,7 @@ const login = async (req, res) => {
     return res.json({
       success: true,
       data: {
-        token: signToken(user),
+        token: signToken(user, secret),
         user: { id: user.id, username: user.ten_dang_nhap, role: user.vai_tro },
       },
     });
