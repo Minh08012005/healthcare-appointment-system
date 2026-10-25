@@ -44,7 +44,7 @@ const getSlotKhaDung = async (req, res) => {
               l.trang_thai,
               GREATEST(COALESCE(l.so_slot_online, 0) - COALESCE(l.so_slot_da_dat, 0), 0)
                 AS slot_con_lai,
-              ((l.ngay + l.gio_bat_dau) >
+              ((l.ngay + l.gio_bat_dau) >=
                 (now() AT TIME ZONE 'Asia/Ho_Chi_Minh') + interval '10 minutes')
                 AS con_kip_dat
        FROM "LichKhamBacSi" l

@@ -1,6 +1,6 @@
 # C2-04 — Slot Availability API Contract (UC-007)
 
-- **Trạng thái:** đã implement; đã chạy thật trên PostgreSQL Neon (2026-10-24) các ca `CON_SLOT`, `KHONG_CO_LICH`, lỗi 400 và 404 (xem mục 6).
+- **Trạng thái:** đã implement; đã chạy thật trên PostgreSQL Neon (2026-10-24) các ca `CON_SLOT`, `KHONG_CO_LICH`, lỗi 400 và 404 (xem mục 6). Cập nhật 2026-10-25: đã merge C2-01 → gắn middleware `authenticate` cho endpoint (thiếu/sai token → 401) và chỉnh biên 10 phút từ `>` sang `>=` (đúng 10 phút vẫn đặt được).
 - **Phạm vi:** API **chỉ đọc** cho bệnh nhân xem các khung giờ còn trống của một bác sĩ trong một ngày (UC-007).
 - **KHÔNG thuộc task này:** tạo `DatLichKham`, tăng/giữ/trừ `so_slot_da_dat` (C2-06), QR, hủy lịch, Admin CRUD, Frontend (C2-05).
 - **Phụ thuộc:** dữ liệu `LichKhamBacSi` đã seed ở C2-03.
@@ -17,13 +17,15 @@
 | Envelope lỗi        | `{ "success": false, "message": "..." }`                                |
 | Tên field           | `snake_case`, giống C2-03                                               |
 | Thứ tự danh sách    | `ORDER BY gio_bat_dau` tăng dần                                         |
-| Xác thực            | Chưa gắn middleware auth (nhánh C2-01 chưa merge); sẽ bổ sung sau       |
+| Xác thực            | **Bắt buộc** — header `Authorization: Bearer <JWT>`; thiếu/sai/hết hạn → 401 |
 
 ---
 
 ## 2. `GET /api/slots?bac_si_id=<id>&ngay=<YYYY-MM-DD>`
 
 Lấy các khung giờ còn có thể đặt của một bác sĩ trong một ngày (bước sau khi bệnh nhân chọn bác sĩ và ngày).
+
+**Xác thực:** endpoint được bảo vệ bằng middleware `authenticate` của C2-01 (`backend/src/middlewares/auth.middleware.js`). Bắt buộc gửi `Authorization: Bearer <JWT>` lấy từ `POST /api/auth/login` (UC-007 yêu cầu bệnh nhân đã đăng nhập). `apiClient` ở frontend đã tự gắn token nên C2-05 không phải sửa gì.
 
 | Parameter   | Vị trí | Kiểu               | Bắt buộc | Ghi chú                                      |
 |-------------|--------|--------------------|----------|----------------------------------------------|
@@ -167,6 +169,8 @@ Lấy các khung giờ còn có thể đặt của một bác sĩ trong một ng
 
 | HTTP | Khi nào                                   | Body                                                                          |
 |------|-------------------------------------------|-------------------------------------------------------------------------------|
+| 401  | Thiếu header/token (`Authorization: Bearer ...`) | `{ "success": false, "message": "Chưa đăng nhập" }`                     |
+| 401  | Token sai hoặc đã hết hạn                 | `{ "success": false, "message": "Token không hợp lệ hoặc đã hết hạn" }`        |
 | 400  | `bac_si_id` thiếu / không phải số nguyên > 0 | `{ "success": false, "message": "bac_si_id không hợp lệ" }`                |
 | 400  | `ngay` thiếu / sai định dạng / ngày không tồn tại | `{ "success": false, "message": "ngay không hợp lệ (định dạng YYYY-MM-DD)" }` |
 | 404  | Không có bác sĩ với `bac_si_id` đó        | `{ "success": false, "message": "Không tìm thấy bác sĩ" }`                    |
@@ -184,7 +188,7 @@ slot_con_lai = so_slot_online - so_slot_da_dat
 Một khung giờ được trả trong `slots` khi:
   - trang_thai = 'HoatDong'
   - slot_con_lai > 0
-  - giờ bắt đầu còn cách hiện tại (giờ VN) hơn 10 phút   (điều kiện UC-008, áp dụng khi xem ngày hôm nay)
+  - giờ bắt đầu cách hiện tại (giờ VN) >= 10 phút   (điều kiện UC-008; xem biên bên dưới)
 
 Record 'DaHuy' bị bỏ qua hoàn toàn (coi như không có lịch).
 Record 'HetCho' vẫn tính là "có lịch" nhưng không đặt được (góp vào trạng thái DA_DAY).
@@ -193,6 +197,17 @@ KHONG_CO_LICH : không có record HoatDong/HetCho nào của bác sĩ trong ngà
 DA_DAY        : có record nhưng không record nào đặt được
 CON_SLOT      : còn ít nhất một khung giờ đặt được
 ```
+
+**Biên 10 phút (UC-008: chỉ cấm khi còn *dưới* 10 phút)** — implement bằng `(l.ngay + l.gio_bat_dau) >= (now() AT TIME ZONE 'Asia/Ho_Chi_Minh') + interval '10 minutes'`:
+
+| Khoảng cách từ hiện tại (giờ VN) tới `gio_bat_dau` | Kết quả |
+|---------------------------------------------------|---------|
+| > 10 phút                                         | Được đặt (có trong `slots`) |
+| = 10 phút (đúng 10:00.000)                        | Được đặt (có trong `slots`) |
+| < 10 phút                                         | Bị loại  |
+| Giờ bắt đầu đã qua                               | Bị loại  |
+
+C2-06 khi xác nhận đặt lịch phải dùng **cùng biểu thức** này để tránh lệch kết quả giữa lúc xem và lúc xác nhận.
 
 **API này chỉ đọc.** Không tạo `DatLichKham`, không thay đổi `so_slot_da_dat`. C2-06 phải kiểm tra lại slot khi bệnh nhân xác nhận đặt lịch (vì slot có thể bị người khác đặt giữa lúc xem và lúc xác nhận).
 
@@ -247,4 +262,4 @@ Khi bệnh nhân chọn một khung giờ, giữ lại `lich_kham_id` để gử
 
 - Không tạo `DatLichKham`, không giữ/trừ slot (C2-06).
 - Không có Frontend chọn ngày/slot (C2-05), QR, hủy lịch, Admin CRUD lịch bác sĩ.
-- Chưa có middleware xác thực bệnh nhân (chờ C2-01).
+- Xác thực: dùng lại middleware `authenticate` của C2-01 (đã gắn); C2-04 không tạo auth system riêng.
