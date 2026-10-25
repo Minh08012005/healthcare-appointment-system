@@ -9,7 +9,8 @@
     "db:schema": "node scripts/run-schema.js",
     "db:verify": "node scripts/verify-schema.js",
     "db:seed": "node scripts/run-seed.js",
-    "db:verify-seed": "node scripts/verify-seed.js"
+    "db:verify-seed": "node scripts/verify-seed.js",
+    "api:verify-master": "node scripts/verify-master-api.js"
   },
   "keywords": [],
   "author": "",

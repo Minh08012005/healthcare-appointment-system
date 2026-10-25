@@ -172,3 +172,38 @@ CREATE TABLE IF NOT EXISTS "KetQuaXetNghiem" (
     "file_ket_qua" TEXT,
     "mo_ta" TEXT
 );
+
+-- -----------------------------------------------------------------------------
+-- NHÓM 6: INDEX HỖ TRỢ TRA CỨU CHUYÊN KHOA / BÁC SĨ / LỊCH KHÁM
+-- -----------------------------------------------------------------------------
+-- Quy ước dữ liệu lịch khám (C2-04 dùng để trả slot availability):
+--   - MỖI RECORD "LichKhamBacSi" = 1 bác sĩ + 1 ngày + 1 phòng + 1 KHUNG GIỜ cụ thể.
+--   - "gio_bat_dau"/"gio_ket_thuc" là giới hạn của chính khung giờ đó (dài 1 giờ).
+--   - UC-030: ca sáng 06:00-11:00 và ca chiều 13:00-16:00, slot cách nhau 1 giờ:
+--       06:00-07:00, 07:00-08:00, 08:00-09:00, 09:00-10:00, 10:00-11:00,
+--       13:00-14:00, 14:00-15:00, 15:00-16:00.
+--     KHÔNG lưu record cho cả ca (06:00-11:00 / 13:00-16:00) và KHÔNG chia một record
+--     thành nhiều mốc giờ bên trong.
+--   - "so_slot_toi_da": tổng sức chứa của khung giờ, Admin cấu hình theo UC-031.
+--   - "so_slot_online": phần sức chứa của khung giờ dành cho bệnh nhân online.
+--   - "so_slot_da_dat": số lượt online đã đặt trong chính khung giờ đó.
+--   - Online còn lại = so_slot_online - so_slot_da_dat
+--     (0 <= online còn lại <= so_slot_online <= so_slot_toi_da).
+--   - Phần tiếp đón offline = so_slot_toi_da - so_slot_online.
+--   - "trang_thai": 'HoatDong' (đang mở) | 'DaHuy' (đã hủy) | 'HetCho' (đã đầy)
+--   - UC-008: khung giờ còn dưới 10 phút trước "gio_bat_dau" thì không được đặt
+--     (C2-04/C2-06 kiểm tra; C2-03 chỉ ghi quy ước, không implement booking).
+-- Chỉ thêm index (IF NOT EXISTS) để chạy lại an toàn, không thêm bảng/cột mới.
+
+-- Mỗi bác sĩ chỉ có tối đa 1 ca khám bắt đầu tại cùng một thời điểm trong cùng ngày
+CREATE UNIQUE INDEX IF NOT EXISTS "ux_lichkhambacsi_bacsi_ngay_gio"
+    ON "LichKhamBacSi" ("bac_si_id", "ngay", "gio_bat_dau");
+
+-- Tra cứu lịch khám theo bác sĩ trong một khoảng ngày
+CREATE INDEX IF NOT EXISTS "ix_lichkhambacsi_bacsi_ngay"
+    ON "LichKhamBacSi" ("bac_si_id", "ngay");
+
+-- Lọc bác sĩ theo chuyên khoa (Master API)
+CREATE INDEX IF NOT EXISTS "ix_bacsi_chuyen_khoa"
+    ON "BacSi" ("chuyen_khoa_id");
+
