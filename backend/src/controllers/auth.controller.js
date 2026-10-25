@@ -16,7 +16,18 @@ const signToken = (user, secret) =>
 
 const register = async (req, res) => {
   const body = req.body || {};
-  const { username, password, ho_ten, email, so_dien_thoai, ngay_sinh, gioi_tinh, dia_chi } = body;
+  const {
+    username,
+    password,
+    ho_ten,
+    email,
+    so_dien_thoai,
+    ngay_sinh,
+    gioi_tinh,
+    so_cccd_ho_chieu,
+    ma_bhyt,
+    dia_chi,
+  } = body;
 
   // 1. Kiểm tra kiểu dữ liệu (bắt buộc là chuỗi)
   if (!isString(username) || !isString(password) || !isString(ho_ten)) {
@@ -25,16 +36,24 @@ const register = async (req, res) => {
       message: "username, password và ho_ten là bắt buộc và phải là chuỗi",
     });
   }
-  if (![email, so_dien_thoai, ngay_sinh, gioi_tinh, dia_chi].every(isOptionalString)) {
+  if (
+    ![email, so_dien_thoai, ngay_sinh, gioi_tinh, so_cccd_ho_chieu, ma_bhyt, dia_chi].every(
+      isOptionalString
+    )
+  ) {
     return res.status(400).json({
       success: false,
-      message: "email, so_dien_thoai, ngay_sinh, gioi_tinh, dia_chi phải là chuỗi",
+      message:
+        "email, so_dien_thoai, ngay_sinh, gioi_tinh, so_cccd_ho_chieu, ma_bhyt, dia_chi phải là chuỗi",
     });
   }
 
   // 2. Trim rồi mới validate; dùng giá trị đã trim khi lưu
   const usernameTrim = username.trim();
   const hoTenTrim = ho_ten.trim();
+  // CCCD/BHYT là tuỳ chọn: rỗng/khoảng trắng -> null (cột UNIQUE), còn lại trim
+  const cccdTrim = cleanOptional(so_cccd_ho_chieu);
+  const bhytTrim = cleanOptional(ma_bhyt);
 
   if (usernameTrim === "" || hoTenTrim === "") {
     return res
@@ -48,6 +67,17 @@ const register = async (req, res) => {
     return res
       .status(400)
       .json({ success: false, message: "Mật khẩu phải từ 6 đến 72 ký tự" });
+  }
+  // Giới hạn theo cột schema: so_cccd_ho_chieu VARCHAR(20), ma_bhyt VARCHAR(30)
+  if (cccdTrim && cccdTrim.length > 20) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Số CCCD/Hộ chiếu tối đa 20 ký tự" });
+  }
+  if (bhytTrim && bhytTrim.length > 30) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Mã BHYT tối đa 30 ký tự" });
   }
 
   const client = await pool.connect();
@@ -74,9 +104,17 @@ const register = async (req, res) => {
     );
 
     await client.query(
-      `INSERT INTO "BenhNhan" (tai_khoan_id, ho_ten, ngay_sinh, gioi_tinh, dia_chi)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [tk.rows[0].id, hoTenTrim, cleanOptional(ngay_sinh), cleanOptional(gioi_tinh), cleanOptional(dia_chi)]
+      `INSERT INTO "BenhNhan" (tai_khoan_id, ho_ten, ngay_sinh, gioi_tinh, so_cccd_ho_chieu, ma_bhyt, dia_chi)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        tk.rows[0].id,
+        hoTenTrim,
+        cleanOptional(ngay_sinh),
+        cleanOptional(gioi_tinh),
+        cccdTrim,
+        bhytTrim,
+        cleanOptional(dia_chi),
+      ]
     );
 
     await client.query("COMMIT");
@@ -91,6 +129,9 @@ const register = async (req, res) => {
       if (err.constraint && err.constraint.includes("ten_dang_nhap")) message = "Username đã tồn tại";
       else if (err.constraint && err.constraint.includes("email")) message = "Email đã được sử dụng";
       else if (err.constraint && err.constraint.includes("so_dien_thoai")) message = "Số điện thoại đã được sử dụng";
+      else if (err.constraint && err.constraint.includes("so_cccd_ho_chieu"))
+        message = "Số CCCD/Hộ chiếu đã được sử dụng";
+      else if (err.constraint && err.constraint.includes("ma_bhyt")) message = "Mã BHYT đã được sử dụng";
       return res.status(409).json({ success: false, message });
     }
     if (err.code === "22001") {
