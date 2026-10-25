@@ -9,6 +9,7 @@ import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import LabHomePage from "../pages/lab/LabHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import MainLayout from "../components/layout/MainLayout";
+import ProtectedRoute from "./ProtectedRoute";
 
 function AppRoutes() {
     return (
@@ -18,8 +19,16 @@ function AppRoutes() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
-            {/* Bệnh nhân */}
-            <Route path="/patient" element={<PatientHomePage />} />
+            {/* Bệnh nhân: phải đăng nhập với vai trò Bệnh nhân */}
+            <Route
+                element={
+                    <ProtectedRoute role="Bệnh nhân">
+                        <MainLayout role="patient" />
+                    </ProtectedRoute>
+                }
+            >
+                <Route path="/patient" element={<PatientHomePage />} />
+            </Route>
 
             {/* Bác sĩ */}
             <Route path="/doctor" element={<DoctorHomePage />} />

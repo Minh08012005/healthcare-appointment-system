@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-function Sidebar({ roleLabel, items, userName, userTitle }) {
+function Sidebar({ roleLabel, items, userName, userTitle, onLogout }) {
   return (
     <aside className="sidebar">
       <div className="sidebar__brand">MEDICARE</div>
@@ -20,7 +20,7 @@ function Sidebar({ roleLabel, items, userName, userTitle }) {
       <div className="sidebar__user">
         <strong>{userName}</strong>
         <span>{userTitle}</span>
-        <button className="sidebar__logout" type="button">
+        <button className="sidebar__logout" type="button" onClick={onLogout}>
           Đăng xuất
         </button>
       </div>

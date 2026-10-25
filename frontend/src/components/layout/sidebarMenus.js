@@ -39,4 +39,8 @@ export const sidebarMenus = {
       { path: "/admin/content", label: "Nội dung" },
     ],
   },
+    patient: {
+    roleLabel: "BỆNH NHÂN",
+    items: [{ path: "/patient", label: "Trang chủ", title: "Trang chủ bệnh nhân" }],
+  },
 };
