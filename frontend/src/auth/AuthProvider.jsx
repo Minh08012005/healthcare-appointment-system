@@ -14,7 +14,14 @@ function AuthProvider({ children }) {
     authApi
       .me()
       .then((res) => setUser(res.data.user))
-      .catch(() => clearToken()) // token hết hạn / không hợp lệ
+      .catch((err) => {
+        // Chỉ xoá token khi Backend xác nhận phiên không còn hợp lệ (401/403).
+        // Lỗi mạng / Backend tạm thời không được xoá token, để lần sau thử lại.
+        if (err?.status === 401 || err?.status === 403) {
+          clearToken();
+          setUser(null);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
