@@ -126,3 +126,112 @@
   padding: 40px;
   overflow: auto;
 }
+
+/* ------------------------------------------------------------------
+   Responsive (C2-FIX): mobile/tablet <= 900px.
+   Sidebar rời khỏi luồng layout và trở thành drawer mở bằng nút ☰ ở Topbar,
+   nên không còn chiếm 240px chiều rộng của nội dung như trước.
+   Từ 901px trở lên không có rule nào ở đây áp dụng -> desktop giữ nguyên.
+   ------------------------------------------------------------------ */
+
+/* Ẩn các phần tử chỉ dùng cho mobile ở desktop */
+.sidebar__close,
+.topbar__menu,
+.layout__backdrop {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    width: 260px;
+    max-width: 82vw;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.18);
+  }
+  .sidebar--open {
+    transform: translateX(0);
+  }
+  .sidebar__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: #fff;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .layout__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(15, 23, 42, 0.45);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .layout__backdrop--show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .topbar {
+    height: 56px;
+    padding: 0 16px;
+    gap: 12px;
+    justify-content: flex-start;
+  }
+  .topbar__menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .topbar__title {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 20px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .topbar__user {
+    margin-left: auto;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .layout__content {
+    padding: 16px;
+  }
+}

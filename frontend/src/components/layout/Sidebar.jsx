@@ -1,8 +1,16 @@
 import { NavLink } from "react-router-dom";
 
-function Sidebar({ roleLabel, items, userName, userTitle, onLogout }) {
+function Sidebar({ roleLabel, items, userName, userTitle, onLogout, open = false, onClose }) {
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${open ? " sidebar--open" : ""}`}>
+      <button
+        type="button"
+        className="sidebar__close"
+        onClick={onClose}
+        aria-label="Đóng menu"
+      >
+        ✕
+      </button>
       <div className="sidebar__brand">MEDICARE</div>
       <div className="sidebar__sub">Quản lý khám chữa bệnh</div>
       <span className="sidebar__role">{roleLabel}</span>
@@ -10,7 +18,13 @@ function Sidebar({ roleLabel, items, userName, userTitle, onLogout }) {
       <div className="sidebar__label">MENU</div>
       <nav className="sidebar__nav">
         {items.map((item) => (
-          <NavLink key={item.path} to={item.path} end className="sidebar__link">
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end
+            className="sidebar__link"
+            onClick={onClose}
+          >
             <span className="sidebar__dot" />
             {item.label}
           </NavLink>
