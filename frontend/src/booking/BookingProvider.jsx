@@ -19,9 +19,12 @@ function BookingProvider({ children }) {
   const selectDoctor = (doctor) =>
     setSelection((prev) => ({ ...prev, doctor, date: "", slot: null }));
 
-  // Đổi ngày: xóa giờ đã chọn
+  // Đổi ngày: xóa giờ đã chọn.
+  // Bấm lại chính ngày đang chọn thì giữ nguyên ngày + giờ đã chọn.
   const selectDate = (date) =>
-    setSelection((prev) => ({ ...prev, date, slot: null }));
+    setSelection((prev) =>
+      prev.date === date ? prev : { ...prev, date, slot: null },
+    );
 
   const selectSlot = (slot) => setSelection((prev) => ({ ...prev, slot }));
 

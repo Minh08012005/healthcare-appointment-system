@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import BookingHeader from "./BookingHeader";
 import { BOOKING_PATHS } from "./bookingPaths";
-import { formatFee, getInitials } from "./bookingFormat";
+import { formatFee, formatMonthRange, getInitials } from "./bookingFormat";
 import { useBooking } from "../../../booking/useBooking";
 import { useFetch } from "../../../api/useFetch";
 import "./booking.css";
@@ -94,9 +94,7 @@ function SelectSlotPage() {
         </div>
 
         <div className="booking__section">
-          <h2 className="booking__section-title">
-            Tháng {dateOptions[0].month}, {dateOptions[0].year}
-          </h2>
+          <h2 className="booking__section-title">{formatMonthRange(dateOptions)}</h2>
         </div>
         <div className="booking__days">
           {dateOptions.map((opt) => (
