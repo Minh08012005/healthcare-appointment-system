@@ -10,7 +10,9 @@ import LabHomePage from "../pages/lab/LabHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
-
+import SelectSpecialtyPage from "../pages/patient/booking/SelectSpecialtyPage";
+import SelectDoctorPage from "../pages/patient/booking/SelectDoctorPage";
+import SelectSlotPage from "../pages/patient/booking/SelectSlotPage";
 function AppRoutes() {
     return (
         <Routes>
@@ -20,15 +22,18 @@ function AppRoutes() {
             <Route path="/register" element={<RegisterPage />} />
 
             {/* Bệnh nhân: phải đăng nhập với vai trò Bệnh nhân */}
-            <Route
-                element={
-                    <ProtectedRoute role="Bệnh nhân">
-                        <MainLayout role="patient" />
-                    </ProtectedRoute>
-                }
-            >
-                <Route path="/patient" element={<PatientHomePage />} />
-            </Route>
+<Route
+    element={
+        <ProtectedRoute role="Bệnh nhân">
+            <MainLayout role="patient" />
+        </ProtectedRoute>
+    }
+>
+    <Route path="/patient" element={<PatientHomePage />} />
+    <Route path="/patient/booking/specialty" element={<SelectSpecialtyPage />} />
+    <Route path="/patient/booking/doctor" element={<SelectDoctorPage />} />
+    <Route path="/patient/booking/slot" element={<SelectSlotPage />} />
+</Route>
 
             {/* Bác sĩ */}
             <Route path="/doctor" element={<DoctorHomePage />} />
