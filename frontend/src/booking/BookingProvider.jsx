@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BookingContext } from "./BookingContext";
+import { useAuth } from "../auth/useAuth";
 
 const EMPTY_SELECTION = {
   specialty: null, // { id, ten_chuyen_khoa }
@@ -8,8 +9,28 @@ const EMPTY_SELECTION = {
   slot: null, // { lich_kham_id, phong_kham_id, ten_phong, gio_bat_dau, gio_ket_thuc, slot_con_lai }
 };
 
+// C2-07: thông tin bệnh nhân nhập ở BN11
+const EMPTY_INFO = {
+  su_dung_bhyt: null, // true | false | null (chưa chọn)
+  trieu_chung: "",
+};
+
 function BookingProvider({ children }) {
+  const { user } = useAuth();
+  const userId = user?.id ?? null;
+
   const [selection, setSelection] = useState(EMPTY_SELECTION);
+  const [info, setInfo] = useState(EMPTY_INFO);
+  const [result, setResult] = useState(null); // data trả về từ POST /api/appointments
+
+  // Đổi tài khoản / logout: xóa dữ liệu đặt lịch của người trước
+  const [ownerId, setOwnerId] = useState(userId);
+  if (ownerId !== userId) {
+    setOwnerId(userId);
+    setSelection(EMPTY_SELECTION);
+    setInfo(EMPTY_INFO);
+    setResult(null);
+  }
 
   // Đổi chuyên khoa: xóa bác sĩ, ngày, giờ phía sau
   const selectSpecialty = (specialty) =>
@@ -28,11 +49,35 @@ function BookingProvider({ children }) {
 
   const selectSlot = (slot) => setSelection((prev) => ({ ...prev, slot }));
 
-  const resetBooking = () => setSelection(EMPTY_SELECTION);
+  const updateInfo = (patch) => setInfo((prev) => ({ ...prev, ...patch }));
+
+  // Đặt lịch thành công: lưu kết quả cho BN13, xóa selection để không submit lại
+  const completeBooking = (data) => {
+    setResult(data);
+    setSelection(EMPTY_SELECTION);
+    setInfo(EMPTY_INFO);
+  };
+
+  const resetBooking = () => {
+    setSelection(EMPTY_SELECTION);
+    setInfo(EMPTY_INFO);
+    setResult(null);
+  };
 
   return (
     <BookingContext.Provider
-      value={{ selection, selectSpecialty, selectDoctor, selectDate, selectSlot, resetBooking }}
+      value={{
+        selection,
+        info,
+        result,
+        selectSpecialty,
+        selectDoctor,
+        selectDate,
+        selectSlot,
+        updateInfo,
+        completeBooking,
+        resetBooking,
+      }}
     >
       {children}
     </BookingContext.Provider>

@@ -1,6 +1,25 @@
+// Nhận number (C2-03) hoặc chuỗi NUMERIC "150000.00" (C2-06)
 export function formatFee(fee) {
-  if (fee === null || fee === undefined) return "Chưa cập nhật";
-  return `${fee.toLocaleString("vi-VN")}đ`;
+  if (fee === null || fee === undefined || fee === "") return "Chưa cập nhật";
+  const value = Number(fee);
+  if (Number.isNaN(value)) return "Chưa cập nhật";
+  return `${value.toLocaleString("vi-VN")}đ`;
+}
+
+const LONG_WEEKDAYS = ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+const pad = (n) => String(n).padStart(2, "0");
+
+// "2026-10-20" -> "Thứ Ba, 20/10/2026"
+export function formatDate(iso) {
+  if (!iso) return "—";
+  const [year, month, day] = iso.slice(0, 10).split("-").map(Number);
+  const d = new Date(year, month - 1, day);
+  return `${LONG_WEEKDAYS[d.getDay()]}, ${pad(day)}/${pad(month)}/${year}`;
+}
+
+// "16:25:54" | "16:25" -> "16:25"
+export function formatTime(time) {
+  return time ? time.slice(0, 5) : "—";
 }
 
 // "Trần Thu Hà" -> "TH"

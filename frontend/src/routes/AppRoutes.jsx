@@ -13,6 +13,9 @@ import ProtectedRoute from "./ProtectedRoute";
 import SelectSpecialtyPage from "../pages/patient/booking/SelectSpecialtyPage";
 import SelectDoctorPage from "../pages/patient/booking/SelectDoctorPage";
 import SelectSlotPage from "../pages/patient/booking/SelectSlotPage";
+import PatientInfoPage from "../pages/patient/booking/PatientInfoPage";
+import ConfirmBookingPage from "../pages/patient/booking/ConfirmBookingPage";
+import BookingSuccessPage from "../pages/patient/booking/BookingSuccessPage";
 function AppRoutes() {
     return (
         <Routes>
@@ -33,6 +36,9 @@ function AppRoutes() {
     <Route path="/patient/booking/specialty" element={<SelectSpecialtyPage />} />
     <Route path="/patient/booking/doctor" element={<SelectDoctorPage />} />
     <Route path="/patient/booking/slot" element={<SelectSlotPage />} />
+    <Route path="/patient/booking/patient-info" element={<PatientInfoPage />} />
+    <Route path="/patient/booking/confirm" element={<ConfirmBookingPage />} />
+    <Route path="/patient/booking/success" element={<BookingSuccessPage />} />
 </Route>
 
             {/* Bác sĩ */}
