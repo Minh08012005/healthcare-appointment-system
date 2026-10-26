@@ -16,4 +16,10 @@ const pool = new Pool({
   },
 });
 
+// Bắt lỗi ở mức pool: khi một connection đang idle bị server/Neon ngắt, pg-pool phát
+// 'error' trên pool (makeIdleListener) -> nếu không có listener thì Node sẽ crash process.
+pool.on("error", (err) => {
+  console.error("Lỗi connection pool PostgreSQL:", err.message);
+});
+
 module.exports = pool;

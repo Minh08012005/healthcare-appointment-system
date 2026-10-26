@@ -33,6 +33,16 @@ const createAppointment = async (req, res) => {
   }
 
   const client = await pool.connect();
+  // pg Client phát 'error' khi connection bị đứt giữa chừng; một EventEmitter phát
+  // 'error' mà không có listener sẽ làm Node crash cả process. Vì vậy giữ listener
+  // trong suốt thời gian mượn client từ pool và gỡ ra trước khi release.
+  const onClientError = (err) =>
+    console.error("Lỗi kết nối CSDL khi đặt lịch:", err.message);
+  client.on("error", onClientError);
+
+  // Chỉ set khi transaction lỗi -> client.release(releaseErr) để pool huỷ connection
+  // thay vì trả một connection có thể đã hỏng về pool.
+  let releaseErr = null;
   try {
     await client.query("BEGIN");
 
@@ -155,11 +165,23 @@ const createAppointment = async (req, res) => {
       },
     });
   } catch (err) {
-    await client.query("ROLLBACK");
+    releaseErr = err;
+    // Log lỗi gốc TRƯỚC khi ROLLBACK, để lỗi rollback không che mất nguyên nhân.
     console.error(err);
+    try {
+      await client.query("ROLLBACK");
+    } catch (rollbackErr) {
+      // ROLLBACK cũng lỗi (thường là connection đã chết) -> chỉ log, vẫn trả 500.
+      console.error(
+        "Không ROLLBACK được (connection có thể đã mất):",
+        rollbackErr.message
+      );
+    }
     return res.status(500).json({ success: false, message: "Lỗi server" });
   } finally {
-    client.release();
+    client.removeListener("error", onClientError);
+    // release(err): pg-pool gỡ client khỏi pool và huỷ connection hỏng.
+    client.release(releaseErr);
   }
 };
 
