@@ -16,6 +16,8 @@ import SelectSlotPage from "../pages/patient/booking/SelectSlotPage";
 import PatientInfoPage from "../pages/patient/booking/PatientInfoPage";
 import ConfirmBookingPage from "../pages/patient/booking/ConfirmBookingPage";
 import BookingSuccessPage from "../pages/patient/booking/BookingSuccessPage";
+import AppointmentListPage from "../pages/patient/appointments/AppointmentListPage";
+import AppointmentDetailPage from "../pages/patient/appointments/AppointmentDetailPage";
 function AppRoutes() {
     return (
         <Routes>
@@ -39,6 +41,8 @@ function AppRoutes() {
     <Route path="/patient/booking/patient-info" element={<PatientInfoPage />} />
     <Route path="/patient/booking/confirm" element={<ConfirmBookingPage />} />
     <Route path="/patient/booking/success" element={<BookingSuccessPage />} />
+    <Route path="/patient/appointments" element={<AppointmentListPage />} />
+    <Route path="/patient/appointments/:id" element={<AppointmentDetailPage />} />
 </Route>
 
             {/* Bác sĩ */}
