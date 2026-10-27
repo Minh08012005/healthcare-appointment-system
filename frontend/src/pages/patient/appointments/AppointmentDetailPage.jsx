@@ -27,7 +27,7 @@ function AppointmentDetailPage() {
   const submittingRef = useRef(false); // khóa chống double-click (đồng bộ, không chờ render)
 
   const { data, error, loading, reload } = useFetch(appointmentApi.detailPath(id));
-  const [cancelled, setCancelled] = useState(false); // đã hủy thành công trong phiên này
+  const [cancelledStatus, setCancelledStatus] = useState(null); // trạng thái xác nhận từ API trong phiên này
   const [modalOpen, setModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [modalError, setModalError] = useState("");
@@ -38,8 +38,8 @@ function AppointmentDetailPage() {
 
   // Sau khi hủy: cập nhật ngay UI theo kết quả backend (Đã hủy, QR mất hiệu lực)
   const appointment = data
-    ? cancelled
-      ? { ...data, trang_thai: "Đã hủy", qr_code: null, co_the_huy: false }
+    ? cancelledStatus
+      ? { ...data, trang_thai: cancelledStatus, qr_code: null, co_the_huy: false }
       : data
     : null;
 
@@ -59,8 +59,11 @@ function AppointmentDetailPage() {
     setSubmitting(true);
     setModalError("");
     try {
-      await appointmentApi.cancel(id);
-      setCancelled(true);
+      const response = await appointmentApi.cancel(id);
+      if (response?.success !== true || response?.data?.trang_thai !== "Đã hủy") {
+        throw new Error(response?.message || "Backend chưa xác nhận hủy lịch hẹn. Vui lòng tải lại và thử lại.");
+      }
+      setCancelledStatus(response.data.trang_thai);
       setModalOpen(false);
       setNotice({ type: "success", text: "Đã hủy lịch hẹn thành công. Mã QR không còn hợp lệ." });
     } catch (err) {
