@@ -2,13 +2,12 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import BookingHeader from "./BookingHeader";
 import { BOOKING_PATHS } from "./bookingPaths";
-import { formatFee, formatMonthRange, getInitials } from "./bookingFormat";
+import { formatDate, formatFee, formatMonthRange, getInitials } from "./bookingFormat";
 import { useBooking } from "../../../booking/useBooking";
 import { useFetch } from "../../../api/useFetch";
 import "./booking.css";
 
 const SHORT_WEEKDAYS = ["CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"];
-const LONG_WEEKDAYS = ["Chủ nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
 const pad = (n) => String(n).padStart(2, "0");
 
 // Dải ngày để chọn (hôm nay + 6 ngày tới). Đây chỉ là các ngày, KHÔNG phải slot.
@@ -24,13 +23,6 @@ function buildDateOptions(count) {
       year: d.getFullYear(),
     };
   });
-}
-
-// "2026-10-20" -> "Thứ Ba, 20/10/2026"
-function formatDate(iso) {
-  const [year, month, day] = iso.split("-").map(Number);
-  const d = new Date(year, month - 1, day);
-  return `${LONG_WEEKDAYS[d.getDay()]}, ${pad(day)}/${pad(month)}/${year}`;
 }
 
 function SelectSlotPage() {

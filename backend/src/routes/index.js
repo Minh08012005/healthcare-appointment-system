@@ -5,6 +5,7 @@ const authRoutes = require("./auth.routes");
 const masterRoutes = require("./master.routes");
 const slotRoutes = require("./slot.routes");
 const appointmentManageRoutes = require("./appointmentManage.routes");
+const appointmentRoutes = require("./appointment.routes");
 
 const router = express.Router();
 router.use("/health", healthRoutes);
@@ -13,5 +14,6 @@ router.use("/auth", authRoutes);
 router.use("/master", masterRoutes);
 router.use("/slots", slotRoutes);
 router.use("/appointments", appointmentManageRoutes);
+router.use("/appointments", appointmentRoutes);
 
 module.exports = router;
