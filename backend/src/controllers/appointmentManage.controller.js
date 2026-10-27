@@ -2,6 +2,9 @@ const pool = require("../config/db");
 
 const TRANG_THAI = { DA_DAT: "Đã đặt", DA_HUY: "Đã hủy" };
 const GIO_TOI_THIEU_DE_HUY = 2;
+// UC-010/UC-011: QR mất hiệu lực khi còn dưới 10 phút tới giờ hẹn.
+const CON_HAN_QR_SQL = `((d.ngay_kham + d.gio_kham)
+  - (now() AT TIME ZONE 'Asia/Ho_Chi_Minh') >= interval '10 minutes')`;
 
 // Còn >= 2 giờ tới giờ khám (múi giờ VN) thì mới được hủy
 const DU_GIO_HUY_SQL = `((d.ngay_kham + d.gio_kham)
@@ -15,7 +18,8 @@ const SELECT_LICH = `
          bs.id AS bac_si_id, bs.ho_ten AS bac_si_ten, bs.cap_bac,
          ck.id AS chuyen_khoa_id, ck.ten_chuyen_khoa,
          pk.id AS phong_kham_id, pk.ten_phong,
-         ${DU_GIO_HUY_SQL} AS du_gio_huy
+         ${DU_GIO_HUY_SQL} AS du_gio_huy,
+         ${CON_HAN_QR_SQL} AS con_han_qr
   FROM "DatLichKham" d
   LEFT JOIN "BacSi" bs ON bs.id = d.bac_si_id
   LEFT JOIN "ChuyenKhoa" ck ON ck.id = d.chuyen_khoa_id
@@ -23,8 +27,9 @@ const SELECT_LICH = `
   WHERE d.benh_nhan_id = $1`;
 
 // QR chỉ trả khi lịch còn hiệu lực; co_the_huy cho frontend bật/tắt nút Hủy
-const toDto = ({ qr_code, du_gio_huy, ...r }) => {
-  const conHieuLuc = r.trang_thai === TRANG_THAI.DA_DAT;
+const toDto = ({ qr_code, du_gio_huy, con_han_qr, ...r }) => {
+  const conHieuLuc =
+    r.trang_thai === TRANG_THAI.DA_DAT && con_han_qr === true;
   return {
     ...r,
     qr_code: conHieuLuc ? qr_code : null,
@@ -149,12 +154,15 @@ const huyLich = async (req, res) => {
     ]);
 
     // Trả lại đúng 1 slot, không để âm
-    await client.query(
+    const slotUpdated = await client.query(
       `UPDATE "LichKhamBacSi"
        SET so_slot_da_dat = GREATEST(COALESCE(so_slot_da_dat, 0) - 1, 0)
        WHERE bac_si_id = $1 AND ngay = $2 AND gio_bat_dau = $3;`,
       [lich.bac_si_id, lich.ngay_kham, lich.gio_kham]
     );
+    if (slotUpdated.rowCount !== 1) {
+      throw new Error(`Trả slot thất bại: cập nhật ${slotUpdated.rowCount} dòng`);
+    }
 
     await client.query("COMMIT");
     res.json({
