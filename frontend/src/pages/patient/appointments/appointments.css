@@ -1,0 +1,549 @@
+/* C2-08B — BN14 / BN15. Dùng chung khung .booking (max-width 430px) của booking.css */
+
+/* ---------- Header ---------- */
+.ap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+.ap-header h1 {
+  font-size: 20px;
+  line-height: 26px;
+}
+.ap-detail__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+}
+.ap-detail__header h1 {
+  font-size: 18px;
+  line-height: 24px;
+}
+.ap-back {
+  border: none;
+  background: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* ---------- Buttons ---------- */
+.ap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ap-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.ap-btn--sm {
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.ap-btn--primary {
+  background: #1a62c9;
+  color: #fff;
+}
+.ap-btn--ghost {
+  background: #fff;
+  color: #1f2937;
+  border-color: #d1d5db;
+}
+.ap-btn--danger {
+  background: #dc2626;
+  color: #fff;
+}
+.ap-btn--danger-outline {
+  width: 100%;
+  background: #fdecec;
+  color: #b91c1c;
+  border-color: #f5c2c2;
+}
+
+/* ---------- BN14: danh sách ---------- */
+.ap-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.ap-title-row h2 {
+  font-size: 16px;
+}
+.ap-count {
+  min-width: 22px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1a62c9;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.ap-search {
+  box-sizing: border-box;
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 14px;
+  font-family: inherit;
+}
+.ap-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.ap-tab {
+  flex-shrink: 0;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ap-tab--active {
+  background: #1a62c9;
+  border-color: #1a62c9;
+  color: #fff;
+}
+.ap-result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.ap-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  color: #1a62c9;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ap-item {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+  font-family: inherit;
+}
+.ap-item:hover {
+  border-color: #93b8ee;
+}
+.ap-item__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.ap-item__time {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+}
+.ap-item__doctor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.ap-item__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ap-item__info strong {
+  font-size: 15px;
+}
+.ap-item__info span {
+  font-size: 12px;
+  color: #6b7280;
+}
+.ap-chevron {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #eef3fb;
+  color: #1a62c9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ap-item__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #f4f7fb;
+  font-size: 11px;
+  color: #4b5563;
+}
+.ap-item__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.ap-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1a62c9;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ap-help {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #e8f0fe;
+}
+.ap-help__icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #cfe0fb;
+  color: #1a62c9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ap-help p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #374151;
+}
+.ap-help a {
+  color: #1a62c9;
+  font-weight: 600;
+}
+
+/* ---------- Badge trạng thái ---------- */
+.ap-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ap-badge--booked {
+  background: #dbeafe;
+  color: #1a62c9;
+}
+.ap-badge--cancelled {
+  background: #fdecec;
+  color: #b91c1c;
+}
+.ap-badge--expired {
+  background: #fef3c7;
+  color: #b45309;
+}
+.ap-badge--other {
+  background: #f1f3f6;
+  color: #6b7280;
+}
+
+/* ---------- Loading / lỗi / trống ---------- */
+.ap-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: #6b7280;
+}
+.ap-state h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #1f2937;
+}
+.ap-state p {
+  margin: 0;
+  font-size: 13px;
+}
+.ap-state--error h3 {
+  color: #b91c1c;
+}
+.ap-state__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #eef3fb;
+  color: #1a62c9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ap-state__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ap-state .ap-btn {
+  margin-top: 8px;
+}
+.ap-state__actions .ap-btn {
+  margin-top: 0;
+}
+.ap-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid #dbeafe;
+  border-top-color: #1a62c9;
+  border-radius: 50%;
+  animation: ap-spin 0.8s linear infinite;
+}
+@keyframes ap-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- BN15: chi tiết ---------- */
+.ap-qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.ap-qr-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: stretch;
+}
+.ap-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  color: #1a62c9;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.ap-qr-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 12px;
+  color: #4b5563;
+}
+.ap-qr-invalid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 24px 12px;
+  text-align: center;
+}
+.ap-qr-invalid p {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+.ap-qr-invalid__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fdecec;
+  color: #b91c1c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ap-doctor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: #f4f7fb;
+}
+.ap-doctor div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ap-doctor span:not(.ap-avatar) {
+  font-size: 12px;
+  color: #6b7280;
+}
+.ap-blue {
+  color: #1a62c9;
+}
+.ap-symptom {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f4f7fb;
+}
+.ap-symptom small {
+  font-size: 11px;
+  letter-spacing: 0.3px;
+  color: #6b7280;
+}
+.ap-symptom p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.ap-notice {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+.ap-notice--success {
+  background: #dcfce7;
+  color: #15803d;
+}
+.ap-notice--error {
+  background: #fdecec;
+  color: #b91c1c;
+}
+.ap-cancel-zone {
+  margin-top: 16px;
+}
+.ap-cancel-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 16px 0 10px;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+/* ---------- Popup xác nhận hủy ---------- */
+.ap-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(17, 24, 39, 0.5);
+}
+.ap-modal {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 360px;
+  padding: 24px 20px 20px;
+  border-radius: 18px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+.ap-modal__icon {
+  display: inline-flex;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fdecec;
+  color: #b91c1c;
+  align-items: center;
+  justify-content: center;
+}
+.ap-modal h2 {
+  margin: 12px 0 8px;
+}
+.ap-modal__text {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+}
+.ap-modal__warn {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 12px;
+  text-align: left;
+}
+.ap-modal__error {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fdecec;
+  color: #b91c1c;
+  font-size: 13px;
+  text-align: left;
+}
+.ap-modal__actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.ap-modal__actions .ap-btn {
+  flex: 1;
+}

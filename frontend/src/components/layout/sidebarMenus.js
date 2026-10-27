@@ -41,6 +41,9 @@ export const sidebarMenus = {
   },
     patient: {
     roleLabel: "BỆNH NHÂN",
-    items: [{ path: "/patient", label: "Trang chủ", title: "Trang chủ bệnh nhân" }],
+    items: [
+      { path: "/patient", label: "Trang chủ", title: "Trang chủ bệnh nhân" },
+      { path: "/patient/appointments", label: "Lịch hẹn", title: "Lịch hẹn của tôi" },
+    ],
   },
 };

@@ -6,5 +6,6 @@ export const BOOKING_PATHS = {
   patientInfo: "/patient/booking/patient-info", // BN11
   confirm: "/patient/booking/confirm", // BN12
   success: "/patient/booking/success", // BN13
-  appointments: "/patient/appointments", // BN14 — route FE chưa có (C2-08B), chưa dùng
+  appointments: "/patient/appointments", // BN14 — C2-08B
+  appointmentDetail: (id) => `/patient/appointments/${id}`, // BN15 — C2-08B
 };

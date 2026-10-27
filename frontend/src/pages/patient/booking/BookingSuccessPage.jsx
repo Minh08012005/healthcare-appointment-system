@@ -138,8 +138,15 @@ function BookingSuccessPage() {
           </div>
         </section>
 
-        {/* C2-08B chưa có trang danh sách lịch hẹn -> tạm đưa CTA về trang chủ bệnh nhân. */}
         <div className="bk-actions">
+          <button
+            type="button"
+            className="bk-btn bk-btn--soft"
+            onClick={() => goTo(BOOKING_PATHS.appointments)}
+          >
+            <BookingIcon name="calendar" size={16} />
+            Xem lịch hẹn của tôi
+          </button>
           <button
             type="button"
             className="bk-btn bk-btn--primary"
