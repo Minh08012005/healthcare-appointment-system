@@ -6,5 +6,5 @@ export const BOOKING_PATHS = {
   patientInfo: "/patient/booking/patient-info", // BN11
   confirm: "/patient/booking/confirm", // BN12
   success: "/patient/booking/success", // BN13
-  appointments: "/patient/appointments", // BN14 — thuộc C2-08A, thống nhất path với Nam
+  appointments: "/patient/appointments", // BN14 — route FE chưa có (C2-08B), chưa dùng
 };

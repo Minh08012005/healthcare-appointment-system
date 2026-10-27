@@ -10,8 +10,8 @@ import "./booking.css";
 const MAX_SYMPTOM = 500; // theo Figma BN11 (backend cho tối đa 1000)
 
 const BHYT_OPTIONS = [
-  { value: true, title: "Có dùng", desc: "Giảm chi phí khám", icon: "shield" },
-  { value: false, title: "Không dùng", desc: "Khám dịch vụ tự túc", icon: "cardOff" },
+  { value: true, title: "Có đăng ký", desc: "Xác nhận khi check-in", icon: "shield" },
+  { value: false, title: "Không đăng ký", desc: "Khám dịch vụ tự túc", icon: "cardOff" },
 ];
 
 // BN11 — Nhập thông tin khám
@@ -28,7 +28,7 @@ function PatientInfoPage() {
 
   const handleNext = () => {
     const nextErrors = {};
-    if (info.su_dung_bhyt === null) nextErrors.bhyt = "Vui lòng chọn có hoặc không dùng BHYT.";
+    if (info.su_dung_bhyt === null) nextErrors.bhyt = "Vui lòng chọn có hoặc không đăng ký BHYT.";
     if (!info.trieu_chung.trim()) nextErrors.trieuChung = "Vui lòng nhập lý do khám / triệu chứng.";
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length === 0) navigate(BOOKING_PATHS.confirm);
@@ -70,7 +70,7 @@ function PatientInfoPage() {
         </p>
 
         <label className="bk-label">
-          Sử dụng BHYT <span className="bk-required">*</span>
+          Đăng ký sử dụng BHYT (xác nhận khi check-in) <span className="bk-required">*</span>
         </label>
         <div className="bk-choices">
           {BHYT_OPTIONS.map((opt) => {

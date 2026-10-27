@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import BookingIcon from "./BookingIcons";
 import { BOOKING_PATHS } from "./bookingPaths";
-import { formatDate, formatTime } from "./bookingFormat";
+import { formatDate, formatFee, formatTime } from "./bookingFormat";
 import { useBooking } from "../../../booking/useBooking";
 import "./booking.css";
 
@@ -128,22 +128,23 @@ function BookingSuccessPage() {
             <BookingIcon name="mapPin" size={15} />
             <strong>{room?.ten_phong ?? "Phòng khám chưa cập nhật"}</strong>
           </div>
+          <div className="bk-row">
+            <span>Phí khám (tham khảo)</span>
+            <strong className="bk-accent">{formatFee(appointment.phi_kham)}</strong>
+          </div>
           <div className="bk-checkin">
             <BookingIcon name="shieldCheck" size={15} />
             <span>Check-in tại quầy lễ tân trước giờ hẹn 10 phút để lấy số thứ tự khám.</span>
           </div>
         </section>
 
+        {/* C2-08B chưa có trang danh sách lịch hẹn -> tạm đưa CTA về trang chủ bệnh nhân. */}
         <div className="bk-actions">
           <button
             type="button"
             className="bk-btn bk-btn--primary"
-            onClick={() => goTo(BOOKING_PATHS.appointments)}
+            onClick={() => goTo(BOOKING_PATHS.home)}
           >
-            <BookingIcon name="calendar" size={16} />
-            Xem lịch đã đặt
-          </button>
-          <button type="button" className="bk-btn bk-btn--soft" onClick={() => goTo(BOOKING_PATHS.home)}>
             <BookingIcon name="home" size={16} />
             Về trang chủ
           </button>

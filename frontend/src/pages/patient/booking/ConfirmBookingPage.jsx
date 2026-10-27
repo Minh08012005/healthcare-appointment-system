@@ -155,14 +155,14 @@ function ConfirmBookingPage() {
             </span>
           </div>
           <div className="bk-row">
-            <span>Bảo hiểm y tế (BHYT)</span>
+            <span>Đăng ký BHYT</span>
             {info.su_dung_bhyt ? (
-              <span className="bk-status bk-status--ok">
-                <BookingIcon name="checkCircle" size={12} />
-                Được áp dụng
+              <span className="bk-status">
+                <BookingIcon name="info" size={12} />
+                Đã đăng ký – xác nhận khi check-in
               </span>
             ) : (
-              <span className="bk-status">Không áp dụng</span>
+              <span className="bk-status">Không đăng ký</span>
             )}
           </div>
           <div className="bk-row">
