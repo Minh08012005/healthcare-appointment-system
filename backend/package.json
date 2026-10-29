@@ -11,7 +11,9 @@
     "db:verify": "node scripts/verify-schema.js",
     "db:seed": "node scripts/run-seed.js",
     "db:verify-seed": "node scripts/verify-seed.js",
-    "api:verify-master": "node scripts/verify-master-api.js"
+    "api:verify-master": "node scripts/verify-master-api.js",
+    "api:test-offline": "node scripts/test-offline-checkin.js",
+    "db:seed-offline-demo": "node scripts/seed-offline-demo.js"
   },
   "keywords": [],
   "author": "",
