@@ -69,4 +69,51 @@ const getBacSi = async (req, res) => {
   }
 };
 
-module.exports = { getChuyenKhoa, getBacSi };
+// GET /api/master/phong-kham?chuyen_khoa_id=<id>
+// Trả về danh sách phòng khám (kèm tên chuyên khoa) để Lễ tân chọn phòng khi tiếp nhận Offline (C3-04).
+const getPhongKham = async (req, res) => {
+  const { chuyen_khoa_id } = req.query;
+
+  const params = [];
+  let whereClause = "";
+
+  // chuyen_khoa_id là tùy chọn: không truyền thì trả về tất cả phòng
+  if (chuyen_khoa_id !== undefined) {
+    const chuyenKhoaId = Number(chuyen_khoa_id);
+
+    if (!Number.isInteger(chuyenKhoaId) || chuyenKhoaId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "chuyen_khoa_id không hợp lệ",
+      });
+    }
+
+    params.push(chuyenKhoaId);
+    whereClause = `WHERE pk.chuyen_khoa_id = $1`;
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT pk.id,
+              pk.ten_phong,
+              pk.loai_phong,
+              pk.chuyen_khoa_id,
+              ck.ten_chuyen_khoa
+       FROM "PhongKham" pk
+       LEFT JOIN "ChuyenKhoa" ck ON ck.id = pk.chuyen_khoa_id
+       ${whereClause}
+       ORDER BY pk.id;`,
+      params
+    );
+
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("Lỗi truy vấn danh sách phòng khám:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Không truy vấn được database",
+    });
+  }
+};
+
+module.exports = { getChuyenKhoa, getBacSi, getPhongKham };
