@@ -102,6 +102,16 @@ async function run() {
   await setup();
   check("Có token Lễ tân", !!made.tokenLeTan);
 
+  // ---- API danh sách phòng (cho Lễ tân chọn phòng) ----
+  const rooms = await api("GET", `/master/phong-kham?chuyen_khoa_id=${made.ck1}`);
+  const mine = (rooms.data.data || []).find((x) => x.id === made.phongId);
+  check("GET /master/phong-kham?chuyen_khoa_id -> 200, có phòng và đúng chuyên khoa",
+    rooms.status === 200 && !!mine && (rooms.data.data || []).every((x) => x.chuyen_khoa_id === made.ck1), `(HTTP ${rooms.status})`);
+  check("Phòng trả về có id, ten_phong, loai_phong, ten_chuyen_khoa",
+    !!mine && mine.ten_phong && mine.loai_phong && mine.ten_chuyen_khoa);
+  check("GET /master/phong-kham (không lọc) -> 200", (await api("GET", "/master/phong-kham")).status === 200);
+  check("chuyen_khoa_id sai -> 400", (await api("GET", "/master/phong-kham?chuyen_khoa_id=abc")).status === 400);
+
   // ---- Quyền truy cập ----
   check("Không token -> 401", (await post(body(0), null)).status === 401);
   const bn = await made.registerPatient(1);
