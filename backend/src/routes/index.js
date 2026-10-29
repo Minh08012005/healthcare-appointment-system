@@ -6,6 +6,7 @@ const masterRoutes = require("./master.routes");
 const slotRoutes = require("./slot.routes");
 const appointmentManageRoutes = require("./appointmentManage.routes");
 const appointmentRoutes = require("./appointment.routes");
+const receptionRoutes = require("./reception.routes");
 
 const router = express.Router();
 router.use("/health", healthRoutes);
@@ -15,5 +16,6 @@ router.use("/master", masterRoutes);
 router.use("/slots", slotRoutes);
 router.use("/appointments", appointmentManageRoutes);
 router.use("/appointments", appointmentRoutes);
+router.use("/reception", receptionRoutes);
 
 module.exports = router;
