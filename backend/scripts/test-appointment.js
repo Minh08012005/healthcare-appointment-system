@@ -114,7 +114,7 @@ const cleanup = async () => {
       check("DatLichKham có record", !!row);
       check("Đúng bệnh nhân đang đăng nhập", row && row.benh_nhan_id === benhNhanId0);
       check("Đúng bác sĩ", row && row.bac_si_id === made.bacSiId);
-      check("Trạng thái 'Đã đặt'", row && row.trang_thai === "Đã đặt");
+      check("Trạng thái DA_DAT", row && row.trang_thai === "DA_DAT");
       check("Có qr_code", row && !!row.qr_code);
     }
     check("so_slot_da_dat tăng đúng 1", (await daDat(lichA)) === 1);

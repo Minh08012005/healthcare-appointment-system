@@ -16,6 +16,7 @@ const EXPECTED_TABLES = [
   "KetQuaXetNghiem",
   "TinTuc",
   "QuyTrinhKham",
+  "CauHinhHeThong",
 ];
 
 const REQUIRED_FOREIGN_KEYS = [
@@ -52,8 +53,8 @@ async function verifySchema() {
     const missingTables = EXPECTED_TABLES.filter((t) => !existingTables.includes(t));
     const extraTables = existingTables.filter((t) => !EXPECTED_TABLES.includes(t));
 
-    if (missingTables.length === 0 && extraTables.length === 0 && existingTables.length === 15) {
-      console.log(` [PASS] Đầy đủ chính xác 15 bảng baseline!`);
+    if (missingTables.length === 0 && extraTables.length === 0) {
+      console.log(` [PASS] Đầy đủ ${EXPECTED_TABLES.length} bảng khai báo!`);
     } else {
       if (missingTables.length > 0) {
         console.log(` [FAIL] Thiếu bảng: ${missingTables.join(", ")}`);
@@ -63,8 +64,50 @@ async function verifySchema() {
         console.log(` [CẢNH BÁO] Có bảng ngoài baseline: ${extraTables.join(", ")}`);
         allPass = false;
       }
-      if (existingTables.length !== 15) {
-        console.log(` [FAIL] Số lượng bảng không đúng 15 (hiện tại: ${existingTables.length})`);
+    }
+
+    // Kiểm tra counters/defaults và hàng cấu hình mặc định C3.
+    const columnsRes = await pool.query(`
+      SELECT table_name, column_name, column_default, is_nullable
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND ((table_name = 'HangDoi' AND column_name IN ('so_lan_goi', 'so_lan_bo_luot'))
+          OR table_name = 'CauHinhHeThong');
+    `);
+    const requiredDefaults = {
+      'HangDoi.so_lan_goi': '0',
+      'HangDoi.so_lan_bo_luot': '0',
+      'CauHinhHeThong.ti_le_online': '1',
+      'CauHinhHeThong.ti_le_offline': '1',
+      'CauHinhHeThong.checkin_som_nhat_phut': '60',
+      'CauHinhHeThong.checkin_toi_thieu_phut': '10',
+      'CauHinhHeThong.so_lan_goi_toi_da': '3',
+      'CauHinhHeThong.khoang_cach_goi_phut': '1',
+      'CauHinhHeThong.chu_ky_quet_phut': '1',
+    };
+    for (const [name, defaultValue] of Object.entries(requiredDefaults)) {
+      const [table_name, column_name] = name.split('.');
+      const column = columnsRes.rows.find((row) => row.table_name === table_name && row.column_name === column_name);
+      const actualDefault = column?.column_default?.replace(/::integer$/, '');
+      if (column && column.is_nullable === 'NO' && actualDefault === defaultValue) {
+        console.log(`  [PASS] ${name} NOT NULL DEFAULT ${defaultValue}`);
+      } else {
+        console.log(`  [FAIL] ${name} thiếu hoặc default/nullability không đúng`);
+        allPass = false;
+      }
+    }
+
+    if (existingTables.includes("CauHinhHeThong")) {
+      const configRes = await pool.query(`
+        SELECT 1 FROM "CauHinhHeThong"
+        WHERE ti_le_online = 1 AND ti_le_offline = 1
+          AND checkin_som_nhat_phut = 60 AND checkin_toi_thieu_phut = 10
+          AND so_lan_goi_toi_da = 3 AND khoang_cach_goi_phut = 1
+          AND chu_ky_quet_phut = 1 LIMIT 1;
+      `);
+      if (configRes.rowCount > 0) console.log("  [PASS] CauHinhHeThong có cấu hình mặc định C3");
+      else {
+        console.log("  [FAIL] CauHinhHeThong chưa có hàng cấu hình mặc định C3");
         allPass = false;
       }
     }

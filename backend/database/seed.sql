@@ -7,6 +7,14 @@
 -- Khóa tự nhả khi transaction COMMIT/ROLLBACK (xem scripts/run-seed.js).
 SELECT pg_advisory_xact_lock(20260301);
 
+-- C3-01: một hàng cấu hình mặc định; không ghi đè cấu hình đã có.
+INSERT INTO "CauHinhHeThong"
+    ("ti_le_online", "ti_le_offline", "checkin_som_nhat_phut",
+     "checkin_toi_thieu_phut", "so_lan_goi_toi_da",
+     "khoang_cach_goi_phut", "chu_ky_quet_phut")
+SELECT 1, 1, 60, 10, 3, 1, 1
+WHERE NOT EXISTS (SELECT 1 FROM "CauHinhHeThong");
+
 
 -- -----------------------------------------------------------------------------
 -- 1. Master Data: VaiTro (Các vai trò cơ bản của hệ thống)

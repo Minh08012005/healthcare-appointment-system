@@ -1,6 +1,6 @@
 const pool = require("../config/db");
 
-const TRANG_THAI = { DA_DAT: "Đã đặt", DA_HUY: "Đã hủy" };
+const TRANG_THAI = { DA_DAT: "DA_DAT", DA_HUY: "DA_HUY" };
 const GIO_TOI_THIEU_DE_HUY = 2;
 // UC-010/UC-011: QR mất hiệu lực khi còn dưới 10 phút tới giờ hẹn.
 const CON_HAN_QR_SQL = `((d.ngay_kham + d.gio_kham)

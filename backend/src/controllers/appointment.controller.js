@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const pool = require("../config/db");
 
-const STATUS_DA_DAT = "Đã đặt";
+const STATUS_DA_DAT = "DA_DAT";
 const LICH_ACTIVE = "HoatDong"; // KIỂM TRA: đúng giá trị trang_thai của lịch hoạt động trong DB
 const MIN_SECONDS_BEFORE = 10 * 60; // phải còn >= 10 phút
 const INT_MAX = 2147483647;

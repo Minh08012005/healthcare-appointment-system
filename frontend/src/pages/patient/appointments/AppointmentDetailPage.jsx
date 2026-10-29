@@ -60,7 +60,7 @@ function AppointmentDetailPage() {
     setModalError("");
     try {
       const response = await appointmentApi.cancel(id);
-      if (response?.success !== true || response?.data?.trang_thai !== "Đã hủy") {
+      if (response?.success !== true || response?.data?.trang_thai !== "DA_HUY") {
         throw new Error(response?.message || "Backend chưa xác nhận hủy lịch hẹn. Vui lòng tải lại và thử lại.");
       }
       setCancelledStatus(response.data.trang_thai);

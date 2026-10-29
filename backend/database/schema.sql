@@ -121,6 +121,8 @@ CREATE TABLE IF NOT EXISTS "DatLichKham" (
 );
 
 -- 11. Bảng HangDoi: Hàng đợi thực tế tại phòng khám sau khi check-in hoặc bốc số
+-- C3 contract: loai ONLINE | OFFLINE; trang_thai CHO_KHAM | DANG_GOI |
+-- DANG_KHAM | BO_LUOT | VANG_MAT | DA_XONG.
 CREATE TABLE IF NOT EXISTS "HangDoi" (
     "id" SERIAL PRIMARY KEY,
     "dat_lich_id" INTEGER REFERENCES "DatLichKham"("id"),
@@ -130,7 +132,25 @@ CREATE TABLE IF NOT EXISTS "HangDoi" (
     "bac_si_id" INTEGER REFERENCES "BacSi"("id"),
     "loai" VARCHAR(50),
     "trang_thai" VARCHAR(50),
-    "thoi_gian_check_in" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+    "thoi_gian_check_in" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "so_lan_goi" INTEGER NOT NULL DEFAULT 0,
+    "so_lan_bo_luot" INTEGER NOT NULL DEFAULT 0
+);
+
+-- C3-01: cập nhật bảng đã tồn tại mà không ảnh hưởng dữ liệu hiện có.
+ALTER TABLE "HangDoi"
+    ADD COLUMN IF NOT EXISTS "so_lan_goi" INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS "so_lan_bo_luot" INTEGER NOT NULL DEFAULT 0;
+
+CREATE TABLE IF NOT EXISTS "CauHinhHeThong" (
+    "id" SERIAL PRIMARY KEY,
+    "ti_le_online" INTEGER NOT NULL DEFAULT 1,
+    "ti_le_offline" INTEGER NOT NULL DEFAULT 1,
+    "checkin_som_nhat_phut" INTEGER NOT NULL DEFAULT 60,
+    "checkin_toi_thieu_phut" INTEGER NOT NULL DEFAULT 10,
+    "so_lan_goi_toi_da" INTEGER NOT NULL DEFAULT 3,
+    "khoang_cach_goi_phut" INTEGER NOT NULL DEFAULT 1,
+    "chu_ky_quet_phut" INTEGER NOT NULL DEFAULT 1
 );
 
 -- -----------------------------------------------------------------------------
