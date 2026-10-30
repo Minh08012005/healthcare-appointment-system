@@ -5,15 +5,14 @@ import CheckinNotice from "./CheckinNotice";
 import { parseCccdQr, toIsoDate } from "./cccdQr";
 import "./checkin.css";
 
-// LT-03 / LT-04 — Tiếp nhận bệnh nhân Offline (API C3-04).
-// Quét QR CCCD / nhập tay -> triệu chứng -> chuyên khoa -> phòng -> tiếp nhận -> hiển thị STT.
+// LT-03 (Bước 1: quét QR CCCD) + LT-04 (Bước 2: hồ sơ offline) — API C3-04.
 // Frontend KHÔNG tự cấp STT, KHÔNG tự tạo hàng đợi: STT lấy từ data.queue.stt_hien_thi do Backend trả về.
 
 const EMPTY_FORM = {
   ho_ten: "",
-  so_cccd_ho_chieu: "",
   ngay_sinh: "", // dd/mm/yyyy (hiển thị), gửi lên dạng YYYY-MM-DD
   gioi_tinh: "",
+  so_cccd_ho_chieu: "",
   ma_bhyt: "",
   dia_chi: "",
   trieu_chung: "",
@@ -21,17 +20,17 @@ const EMPTY_FORM = {
   phong_kham_id: "",
 };
 
-// Chỉ kiểm tra định dạng/độ dài khớp với validate của C3-04, không thêm nghiệp vụ
+// Chỉ kiểm tra bắt buộc/định dạng/độ dài khớp với validate của C3-04, không thêm nghiệp vụ
 function validate(form) {
   const errors = {};
   const hoTen = form.ho_ten.trim();
   const soGiayTo = form.so_cccd_ho_chieu.trim();
   const trieuChung = form.trieu_chung.trim();
 
-  if (!hoTen) errors.ho_ten = "Nhập họ tên bệnh nhân";
+  if (!hoTen) errors.ho_ten = "Nhập họ và tên";
   else if (hoTen.length > 100) errors.ho_ten = "Họ tên tối đa 100 ký tự";
 
-  if (!soGiayTo) errors.so_cccd_ho_chieu = "Nhập số CCCD/Hộ chiếu";
+  if (!soGiayTo) errors.so_cccd_ho_chieu = "Nhập số CCCD";
   else if (soGiayTo.length > 20) errors.so_cccd_ho_chieu = "Tối đa 20 ký tự";
 
   if (form.ngay_sinh.trim() && !toIsoDate(form.ngay_sinh)) {
@@ -75,9 +74,9 @@ function errorNotice(err) {
     return { type: "error", title: "Không có quyền tiếp nhận", text: err.message };
   }
   if (err.status === 409) {
-    return { type: "warning", title: "Không thể tiếp nhận", text: err.message };
+    return { type: "warning", title: "Không thể lưu hồ sơ", text: err.message };
   }
-  return { type: "error", title: "Tiếp nhận thất bại", text: err.message };
+  return { type: "error", title: "Lưu hồ sơ thất bại", text: err.message };
 }
 
 function Field({ label, htmlFor, error, children }) {
@@ -102,7 +101,9 @@ function InfoRow({ label, children }) {
 }
 
 function OfflineCheckinPage() {
+  const [step, setStep] = useState(1); // 1 = LT-03 quét CCCD, 2 = LT-04 hồ sơ
   const [form, setForm] = useState(EMPTY_FORM);
+  const [fromQr, setFromQr] = useState(false);
   const [errors, setErrors] = useState({});
   const [notice, setNotice] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -164,14 +165,14 @@ function OfflineCheckinPage() {
     loadRooms(value);
   };
 
-  // QR CCCD chỉ điền thông tin hành chính, giữ nguyên triệu chứng / chuyên khoa / phòng đã chọn
+  // Bước 1: đọc QR CCCD -> điền thông tin hành chính -> sang bước 2
   const handleScan = (text) => {
     const info = parseCccdQr(text);
     if (!info) {
       setNotice({
         type: "error",
-        title: "Không đọc được QR CCCD",
-        text: "Mã QR không đúng định dạng CCCD. Quét lại hoặc nhập thông tin thủ công.",
+        title: "Không đọc được mã QR",
+        text: "Đặt lại CCCD vào khung quét hoặc chọn Nhập thủ công.",
       });
       return;
     }
@@ -179,16 +180,31 @@ function OfflineCheckinPage() {
       ...f,
       ho_ten: info.ho_ten,
       so_cccd_ho_chieu: info.so_cccd,
-      ngay_sinh: info.ngay_sinh || f.ngay_sinh,
-      gioi_tinh: info.gioi_tinh || f.gioi_tinh,
-      dia_chi: info.dia_chi || f.dia_chi,
+      ngay_sinh: info.ngay_sinh,
+      gioi_tinh: info.gioi_tinh,
+      dia_chi: info.dia_chi,
     }));
-    setErrors((e) => ({ ...e, ho_ten: undefined, so_cccd_ho_chieu: undefined, ngay_sinh: undefined }));
+    setErrors({});
+    setFromQr(true);
     setNotice({
       type: "success",
       title: "Đã đọc thông tin CCCD",
-      text: "Kiểm tra lại thông tin, nhập triệu chứng và chọn phòng khám.",
+      text: "Bổ sung triệu chứng và chọn chuyên khoa/phòng.",
     });
+    setStep(2);
+  };
+
+  const goManual = () => {
+    setFromQr(false);
+    setNotice(null);
+    setStep(2);
+  };
+
+  // Quay lại bước 1: giữ dữ liệu đã nhập, chỉ ẩn thông báo/lỗi
+  const goBack = () => {
+    setNotice(null);
+    setErrors({});
+    setStep(1);
   };
 
   const handleSubmit = async (e) => {
@@ -217,26 +233,35 @@ function OfflineCheckinPage() {
   const startNew = () => {
     roomsRequest.current++;
     setForm(EMPTY_FORM);
+    setFromQr(false);
     setErrors({});
     setNotice(null);
     setResult(null);
     setRooms([]);
     setRoomsError("");
     setRoomsLoading(false);
+    setStep(1);
   };
 
+  // Lưu thành công: hiển thị STT Backend cấp
   if (result) {
     const q = result.queue;
     return (
       <div className="ci-page">
-        <CheckinNotice notice={{ type: "success", title: "Tiếp nhận thành công" }} />
+        <CheckinNotice
+          notice={{
+            type: "success",
+            title: "Tiếp nhận thành công",
+            text: `Bệnh nhân đã được đưa vào hàng đợi phòng ${result.room?.ten_phong || ""} với số thứ tự ${q?.stt_hien_thi || ""}.`,
+          }}
+        />
         <section className="ci-card ci-card--center">
           <span className="ci-badge ci-badge--teal">B · Offline</span>
           <span>Số thứ tự</span>
           <div className="ci-stt">{q?.stt_hien_thi}</div>
           <div className="ci-info ci-info--compact">
             <InfoRow label="Bệnh nhân">{result.patient?.ho_ten}</InfoRow>
-            <InfoRow label="CCCD/Hộ chiếu">{result.patient?.so_cccd_ho_chieu}</InfoRow>
+            <InfoRow label="Số CCCD">{result.patient?.so_cccd_ho_chieu}</InfoRow>
             <InfoRow label="Chuyên khoa">{result.specialty?.ten_chuyen_khoa}</InfoRow>
             <InfoRow label="Phòng khám">{result.room?.ten_phong}</InfoRow>
             <InfoRow label="Đang chờ trước">
@@ -253,29 +278,47 @@ function OfflineCheckinPage() {
     );
   }
 
+  // LT-03 — Bước 1/2
+  if (step === 1) {
+    return (
+      <div className="ci-page">
+        <p className="ci-desc">Bước 1/2 · Quét mã QR trên CCCD của bệnh nhân để tự điền thông tin hồ sơ.</p>
+
+        <CheckinNotice notice={notice} />
+
+        <section className="ci-card ci-card--center">
+          <h3 className="ci-card__title">Quét QR trên CCCD</h3>
+          <QrScanner
+            large
+            title="Đưa mặt sau CCCD có mã QR vào khung quét"
+            hint="Thông tin họ tên, ngày sinh, giới tính, số CCCD, địa chỉ sẽ được tự điền"
+            onResult={handleScan}
+          />
+          <button type="button" className="ci-btn ci-btn--outline" onClick={goManual}>
+            Nhập thủ công
+          </button>
+          <p className="ci-help">Dùng khi bệnh nhân không mang CCCD gắn chip hoặc không quét được mã.</p>
+        </section>
+      </div>
+    );
+  }
+
+  // LT-04 — Bước 2/2
   return (
     <div className="ci-page">
-      <p className="ci-desc">
-        Quét mã QR trên CCCD hoặc nhập thông tin bệnh nhân, ghi triệu chứng và chọn phòng khám để cấp số thứ tự.
-      </p>
+      <p className="ci-desc">Bước 2/2 · Kiểm tra thông tin tự điền từ CCCD, nhập triệu chứng và chọn nơi khám.</p>
 
       <CheckinNotice notice={notice} />
 
-      <form className="ci-grid" onSubmit={handleSubmit} noValidate>
+      <form className="ci-stack" onSubmit={handleSubmit} noValidate>
         <section className="ci-card">
-          <h3 className="ci-card__title">Thông tin bệnh nhân</h3>
-          <QrScanner
-            title="Đưa mã QR trên CCCD vào khung quét"
-            hint="Hệ thống tự điền thông tin bệnh nhân"
-            onResult={handleScan}
-          />
-
-          <div className="ci-divider">
-            <span>hoặc nhập thủ công</span>
+          <div className="ci-card__head ci-card__head--left">
+            <h3 className="ci-card__title">Thông tin cá nhân</h3>
+            {fromQr && <span className="ci-badge ci-badge--teal">Tự điền từ CCCD</span>}
           </div>
 
-          <div className="ci-stack">
-            <Field label="Họ tên *" htmlFor="off-ho-ten" error={errors.ho_ten}>
+          <div className="ci-form-grid ci-form-grid--3">
+            <Field label="Họ và tên" htmlFor="off-ho-ten" error={errors.ho_ten}>
               <input
                 id="off-ho-ten"
                 className="ci-input"
@@ -285,133 +328,141 @@ function OfflineCheckinPage() {
                 autoComplete="off"
               />
             </Field>
-            <div className="ci-form-grid ci-form-grid--2">
-              <Field label="Số CCCD/Hộ chiếu *" htmlFor="off-cccd" error={errors.so_cccd_ho_chieu}>
-                <input
-                  id="off-cccd"
-                  className="ci-input"
-                  value={form.so_cccd_ho_chieu}
-                  onChange={(e) => setField("so_cccd_ho_chieu", e.target.value)}
-                  disabled={submitting}
-                  autoComplete="off"
-                />
-              </Field>
-              <Field label="Mã BHYT" htmlFor="off-bhyt" error={errors.ma_bhyt}>
-                <input
-                  id="off-bhyt"
-                  className="ci-input"
-                  value={form.ma_bhyt}
-                  onChange={(e) => setField("ma_bhyt", e.target.value)}
-                  disabled={submitting}
-                  autoComplete="off"
-                />
-              </Field>
-              <Field label="Ngày sinh" htmlFor="off-ngay-sinh" error={errors.ngay_sinh}>
-                <input
-                  id="off-ngay-sinh"
-                  className="ci-input"
-                  value={form.ngay_sinh}
-                  onChange={(e) => setField("ngay_sinh", e.target.value)}
-                  placeholder="dd/mm/yyyy"
-                  disabled={submitting}
-                  autoComplete="off"
-                />
-              </Field>
-              <Field label="Giới tính" htmlFor="off-gioi-tinh">
-                <select
-                  id="off-gioi-tinh"
-                  className="ci-input"
-                  value={form.gioi_tinh}
-                  onChange={(e) => setField("gioi_tinh", e.target.value)}
-                  disabled={submitting}
-                >
-                  <option value="">— Chọn —</option>
-                  <option value="Nam">Nam</option>
-                  <option value="Nữ">Nữ</option>
-                </select>
-              </Field>
-            </div>
-            <Field label="Địa chỉ" htmlFor="off-dia-chi">
+            <Field label="Ngày sinh" htmlFor="off-ngay-sinh" error={errors.ngay_sinh}>
               <input
-                id="off-dia-chi"
+                id="off-ngay-sinh"
                 className="ci-input"
-                value={form.dia_chi}
-                onChange={(e) => setField("dia_chi", e.target.value)}
+                value={form.ngay_sinh}
+                onChange={(e) => setField("ngay_sinh", e.target.value)}
+                placeholder="dd/mm/yyyy"
+                disabled={submitting}
+                autoComplete="off"
+              />
+            </Field>
+            <Field label="Giới tính" htmlFor="off-gioi-tinh">
+              <select
+                id="off-gioi-tinh"
+                className="ci-input"
+                value={form.gioi_tinh}
+                onChange={(e) => setField("gioi_tinh", e.target.value)}
+                disabled={submitting}
+              >
+                <option value="">— Chọn —</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+              </select>
+            </Field>
+          </div>
+
+          <div className="ci-form-grid ci-form-grid--2">
+            <Field label="Số CCCD" htmlFor="off-cccd" error={errors.so_cccd_ho_chieu}>
+              <input
+                id="off-cccd"
+                className="ci-input"
+                value={form.so_cccd_ho_chieu}
+                onChange={(e) => setField("so_cccd_ho_chieu", e.target.value)}
+                disabled={submitting}
+                autoComplete="off"
+              />
+            </Field>
+            <Field label="Mã BHYT" htmlFor="off-bhyt" error={errors.ma_bhyt}>
+              <input
+                id="off-bhyt"
+                className="ci-input"
+                value={form.ma_bhyt}
+                onChange={(e) => setField("ma_bhyt", e.target.value)}
                 disabled={submitting}
                 autoComplete="off"
               />
             </Field>
           </div>
+
+          <Field label="Địa chỉ" htmlFor="off-dia-chi">
+            <input
+              id="off-dia-chi"
+              className="ci-input"
+              value={form.dia_chi}
+              onChange={(e) => setField("dia_chi", e.target.value)}
+              disabled={submitting}
+              autoComplete="off"
+            />
+          </Field>
         </section>
 
         <section className="ci-card">
           <h3 className="ci-card__title">Thông tin khám</h3>
-          <div className="ci-stack">
-            <Field label="Triệu chứng *" htmlFor="off-trieu-chung" error={errors.trieu_chung}>
+
+          <div className="ci-form-grid ci-form-grid--2">
+            <Field label="Triệu chứng" htmlFor="off-trieu-chung" error={errors.trieu_chung}>
               <textarea
                 id="off-trieu-chung"
                 className="ci-input ci-textarea"
                 value={form.trieu_chung}
                 onChange={(e) => setField("trieu_chung", e.target.value)}
                 maxLength={1000}
-                placeholder="VD: Sốt, ho 3 ngày..."
+                placeholder="VD: Đau ngực, khó thở khi gắng sức khoảng 3 ngày nay."
                 disabled={submitting}
               />
             </Field>
 
-            <Field
-              label="Chuyên khoa *"
-              htmlFor="off-chuyen-khoa"
-              error={errors.chuyen_khoa_id || specialtiesError}
-            >
-              <select
-                id="off-chuyen-khoa"
-                className="ci-input"
-                value={form.chuyen_khoa_id}
-                onChange={(e) => handleSpecialtyChange(e.target.value)}
-                disabled={submitting || specialtiesLoading}
+            <div className="ci-stack">
+              <Field
+                label="Chuyên khoa"
+                htmlFor="off-chuyen-khoa"
+                error={errors.chuyen_khoa_id || specialtiesError}
               >
-                <option value="">{specialtiesLoading ? "Đang tải..." : "— Chọn chuyên khoa —"}</option>
-                {specialties.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.ten_chuyen_khoa}
-                  </option>
-                ))}
-              </select>
-            </Field>
+                <select
+                  id="off-chuyen-khoa"
+                  className="ci-input"
+                  value={form.chuyen_khoa_id}
+                  onChange={(e) => handleSpecialtyChange(e.target.value)}
+                  disabled={submitting || specialtiesLoading}
+                >
+                  <option value="">{specialtiesLoading ? "Đang tải..." : "— Chọn chuyên khoa —"}</option>
+                  {specialties.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.ten_chuyen_khoa}
+                    </option>
+                  ))}
+                </select>
+              </Field>
 
-            <Field label="Phòng khám *" htmlFor="off-phong" error={errors.phong_kham_id || roomsError}>
-              <select
-                id="off-phong"
-                className="ci-input"
-                value={form.phong_kham_id}
-                onChange={(e) => setField("phong_kham_id", e.target.value)}
-                disabled={submitting || !form.chuyen_khoa_id || roomsLoading}
-              >
-                <option value="">
-                  {!form.chuyen_khoa_id
-                    ? "Chọn chuyên khoa trước"
-                    : roomsLoading
-                      ? "Đang tải..."
-                      : rooms.length === 0
-                        ? "Chuyên khoa chưa có phòng"
-                        : "— Chọn phòng khám —"}
-                </option>
-                {rooms.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.ten_phong}
+              <Field label="Phòng khám" htmlFor="off-phong" error={errors.phong_kham_id || roomsError}>
+                <select
+                  id="off-phong"
+                  className="ci-input"
+                  value={form.phong_kham_id}
+                  onChange={(e) => setField("phong_kham_id", e.target.value)}
+                  disabled={submitting || !form.chuyen_khoa_id || roomsLoading}
+                >
+                  <option value="">
+                    {!form.chuyen_khoa_id
+                      ? "Chọn chuyên khoa trước"
+                      : roomsLoading
+                        ? "Đang tải..."
+                        : rooms.length === 0
+                          ? "Chuyên khoa chưa có phòng"
+                          : "— Chọn phòng khám —"}
                   </option>
-                ))}
-              </select>
-            </Field>
-
-            <div className="ci-actions ci-actions--end">
-              <button type="submit" className="ci-btn ci-btn--primary" disabled={submitting}>
-                {submitting ? "Đang tiếp nhận..." : "Tiếp nhận & cấp STT"}
-              </button>
+                  {rooms.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.ten_chuyen_khoa ? `${r.ten_phong} – ${r.ten_chuyen_khoa}` : r.ten_phong}
+                    </option>
+                  ))}
+                </select>
+              </Field>
             </div>
           </div>
         </section>
+
+        <div className="ci-actions ci-actions--end">
+          <button type="button" className="ci-btn ci-btn--outline" onClick={goBack} disabled={submitting}>
+            Quay lại
+          </button>
+          <button type="submit" className="ci-btn ci-btn--primary" disabled={submitting}>
+            {submitting ? "Đang lưu..." : "Lưu hồ sơ"}
+          </button>
+        </div>
       </form>
     </div>
   );
