@@ -5,10 +5,13 @@ import { apiClient } from "./client";
 export const receptionApi = {
   // body: { ma_dat_lich } hoặc { qr_code }
   checkinOnline: (body) => apiClient.post("/api/checkin/online", body),
-  // body: { patient: {...}, trieu_chung, chuyen_khoa_id, phong_kham_id }
+  // body: { patient: { ho_ten, so_cccd_ho_chieu, ngay_sinh?, gioi_tinh?, ma_bhyt?, dia_chi? },
+  //         trieu_chung, chuyen_khoa_id, phong_kham_id }
+  // 201 -> { success, data: { queue: { stt_hien_thi, so_nguoi_cho_truoc, ... }, patient, room, specialty } }
   offlineCheckin: (body) => apiClient.post("/api/reception/offline-checkin", body),
-  // GET -> { success, data: [{ id, ten_chuyen_khoa, mo_ta }] }
-  specialtiesPath: () => "/api/master/chuyen-khoa",
-  // GET -> { success, data: [{ id, ten_phong, chuyen_khoa_id }] } (API master phòng khám, chờ BE)
-  roomsPath: (chuyenKhoaId) => `/api/master/phong-kham?chuyen_khoa_id=${chuyenKhoaId}`,
+  // -> { success, data: [{ id, ten_chuyen_khoa, mo_ta }] }
+  getSpecialties: () => apiClient.get("/api/master/chuyen-khoa"),
+  // -> { success, data: [{ id, ten_phong, loai_phong, chuyen_khoa_id, ten_chuyen_khoa }] }
+  getRooms: (chuyenKhoaId) =>
+    apiClient.get(`/api/master/phong-kham?chuyen_khoa_id=${encodeURIComponent(chuyenKhoaId)}`),
 };
