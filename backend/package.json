@@ -13,7 +13,8 @@
     "db:verify-seed": "node scripts/verify-seed.js",
     "api:verify-master": "node scripts/verify-master-api.js",
     "api:test-offline": "node scripts/test-offline-checkin.js",
-    "db:seed-offline-demo": "node scripts/seed-offline-demo.js"
+    "db:seed-offline-demo": "node scripts/seed-offline-demo.js",
+    "api:test-reception-queue": "node scripts/test-reception-queue.js"
   },
   "keywords": [],
   "author": "",
