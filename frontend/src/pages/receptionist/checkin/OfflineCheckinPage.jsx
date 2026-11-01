@@ -290,7 +290,7 @@ function OfflineCheckinPage() {
           <h3 className="ci-card__title">Quét QR trên CCCD</h3>
           <QrScanner
             large
-            title="Đưa mặt sau CCCD có mã QR vào khung quét"
+            title="Đưa mặt trước CCCD có mã QR vào khung quét"
             hint="Thông tin họ tên, ngày sinh, giới tính, số CCCD, địa chỉ sẽ được tự điền"
             onResult={handleScan}
           />
