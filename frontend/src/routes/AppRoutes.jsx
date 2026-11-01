@@ -18,6 +18,8 @@ import ConfirmBookingPage from "../pages/patient/booking/ConfirmBookingPage";
 import BookingSuccessPage from "../pages/patient/booking/BookingSuccessPage";
 import AppointmentListPage from "../pages/patient/appointments/AppointmentListPage";
 import AppointmentDetailPage from "../pages/patient/appointments/AppointmentDetailPage";
+import OnlineCheckinPage from "../pages/receptionist/checkin/OnlineCheckinPage";
+import OfflineCheckinPage from "../pages/receptionist/checkin/OfflineCheckinPage";
 function AppRoutes() {
     return (
         <Routes>
@@ -27,40 +29,73 @@ function AppRoutes() {
             <Route path="/register" element={<RegisterPage />} />
 
             {/* Bệnh nhân: phải đăng nhập với vai trò Bệnh nhân */}
-<Route
-    element={
-        <ProtectedRoute role="Bệnh nhân">
-            <MainLayout role="patient" />
-        </ProtectedRoute>
-    }
->
-    <Route path="/patient" element={<PatientHomePage />} />
-    <Route path="/patient/booking/specialty" element={<SelectSpecialtyPage />} />
-    <Route path="/patient/booking/doctor" element={<SelectDoctorPage />} />
-    <Route path="/patient/booking/slot" element={<SelectSlotPage />} />
-    <Route path="/patient/booking/patient-info" element={<PatientInfoPage />} />
-    <Route path="/patient/booking/confirm" element={<ConfirmBookingPage />} />
-    <Route path="/patient/booking/success" element={<BookingSuccessPage />} />
-    <Route path="/patient/appointments" element={<AppointmentListPage />} />
-    <Route path="/patient/appointments/:id" element={<AppointmentDetailPage />} />
-</Route>
+            <Route
+                element={
+                    <ProtectedRoute role="Bệnh nhân">
+                        <MainLayout role="patient" />
+                    </ProtectedRoute>
+                }
+            >
+                <Route path="/patient" element={<PatientHomePage />} />
+                <Route
+                    path="/patient/booking/specialty"
+                    element={<SelectSpecialtyPage />}
+                />
+                <Route
+                    path="/patient/booking/doctor"
+                    element={<SelectDoctorPage />}
+                />
+                <Route
+                    path="/patient/booking/slot"
+                    element={<SelectSlotPage />}
+                />
+                <Route
+                    path="/patient/booking/patient-info"
+                    element={<PatientInfoPage />}
+                />
+                <Route
+                    path="/patient/booking/confirm"
+                    element={<ConfirmBookingPage />}
+                />
+                <Route
+                    path="/patient/booking/success"
+                    element={<BookingSuccessPage />}
+                />
+                <Route
+                    path="/patient/appointments"
+                    element={<AppointmentListPage />}
+                />
+                <Route
+                    path="/patient/appointments/:id"
+                    element={<AppointmentDetailPage />}
+                />
+            </Route>
 
             {/* Bác sĩ */}
             <Route path="/doctor" element={<DoctorHomePage />} />
 
-            {/* Lễ tân */}
+            {/* Lễ tân: phải đăng nhập với vai trò Lễ tân */}
             <Route
                 element={
-                    <MainLayout
-                        role="receptionist"
-                        userName="Nguyễn Minh"
-                        userTitle="Nhân viên lễ tân"
-                    />
+                    <ProtectedRoute role="Lễ tân">
+                        <MainLayout
+                            role="receptionist"
+                            userTitle="Nhân viên lễ tân"
+                        />
+                    </ProtectedRoute>
                 }
             >
                 <Route
                     path="/receptionist"
                     element={<ReceptionistHomePage />}
+                />
+                <Route
+                    path="/receptionist/check-in-online"
+                    element={<OnlineCheckinPage />}
+                />
+                <Route
+                    path="/receptionist/walk-in"
+                    element={<OfflineCheckinPage />}
                 />
             </Route>
 
