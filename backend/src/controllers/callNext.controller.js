@@ -5,8 +5,11 @@ const LANE_ONLINE = "ONLINE";
 const LANE_OFFLINE = "OFFLINE";
 const ST_CHO_KHAM = "CHO_KHAM";
 const ST_DANG_GOI = "DANG_GOI";
+const ST_DANG_KHAM = "DANG_KHAM";
+const ST_BO_LUOT = "BO_LUOT";
+const ST_VANG_MAT = "VANG_MAT";
+
 // Chỉ lượt đã gọi THÀNH CÔNG (bệnh nhân vào khám) mới tiêu thụ lượt A/B.
-// DANG_GOI chưa tính (kết quả chưa biết); BO_LUOT / VANG_MAT (gọi thất bại) không tính.
 const CONSUMED_STATES = ["DANG_KHAM", "DA_XONG"];
 const LOCK_NS = 3008; // namespace cho advisory lock của C3-08
 
@@ -42,14 +45,14 @@ const callNextPatient = async (req, res) => {
       return res.status(status).json({ success: false, message });
     };
 
-    // 1. Xác định bác sĩ từ token (client không được truyền benh_nhan_id)
+    // 1. Xác định bác sĩ từ token
     const bs = await client.query(`SELECT id FROM "BacSi" WHERE tai_khoan_id = $1`, [req.user.id]);
     if (bs.rowCount === 0) {
       return fail(403, "Tài khoản chưa gắn với hồ sơ bác sĩ");
     }
     const bacSiId = bs.rows[0].id;
 
-    // 2. Xác định phòng của bác sĩ hôm nay (khung giờ đang diễn ra, không có thì khung gần nhất)
+    // 2. Xác định phòng của bác sĩ hôm nay
     const roomRes = await client.query(
       `SELECT l.phong_kham_id
        FROM "LichKhamBacSi" l
@@ -67,8 +70,7 @@ const callNextPatient = async (req, res) => {
     }
     const roomId = roomRes.rows[0].phong_kham_id;
 
-    // 3. Khóa theo phòng: các request "tiếp theo" của cùng phòng chạy lần lượt
-    //    (cũng chặn 2 bác sĩ cùng giành 1 lượt chưa gán bác sĩ)
+    // 3. Khóa theo phòng
     await client.query(`SELECT pg_advisory_xact_lock($1::int, $2::int)`, [LOCK_NS, roomId]);
 
     // 4. Bác sĩ đang có bệnh nhân DANG_GOI thì chưa được gọi người tiếp theo
@@ -101,14 +103,14 @@ const callNextPatient = async (req, res) => {
       });
     }
 
-    // 5. Tỷ lệ A:B từ CauHinhHeThong (không có thì mặc định 1:1)
+    // 5. Tỷ lệ A:B từ CauHinhHeThong
     const cfg = await client.query(
       `SELECT ti_le_online, ti_le_offline FROM "CauHinhHeThong" ORDER BY id LIMIT 1`
     );
     const a = positiveOr1(cfg.rows[0]?.ti_le_online);
     const b = positiveOr1(cfg.rows[0]?.ti_le_offline);
 
-    // 6. Số lượt đã gọi thành công hôm nay của CHÍNH bác sĩ này trong phòng
+    // 6. Số lượt đã gọi thành công hôm nay
     const counts = await client.query(
       `SELECT h.loai, COUNT(*)::int AS n
        FROM "HangDoi" h
@@ -123,8 +125,7 @@ const callNextPatient = async (req, res) => {
       if (called[r.loai] !== undefined) called[r.loai] = r.n;
     });
 
-    // 7. Chọn hàng theo tỷ lệ; hàng đó rỗng thì lấy hàng còn lại.
-    //    Chỉ lấy lượt gán cho mình hoặc chưa gán bác sĩ (bac_si_id IS NULL).
+    // 7. Chọn hàng theo tỷ lệ
     const preferred = chooseLane(called[LANE_ONLINE], called[LANE_OFFLINE], a, b);
     const lanes = [preferred, preferred === LANE_ONLINE ? LANE_OFFLINE : LANE_ONLINE];
 
@@ -147,7 +148,7 @@ const callNextPatient = async (req, res) => {
       }
     }
 
-    // 8. Không có ai chờ: trả kết quả hợp lệ
+    // 8. Không có ai chờ
     if (picked === null) {
       await client.query("COMMIT");
       return res.json({
@@ -164,7 +165,7 @@ const callNextPatient = async (req, res) => {
       });
     }
 
-    // 9. CHO_KHAM -> DANG_GOI, tăng so_lan_goi, gán bác sĩ nếu lượt chưa gán
+    // 9. CHO_KHAM -> DANG_GOI
     const upd = await client.query(
       `UPDATE "HangDoi"
        SET trang_thai = $2,
@@ -244,4 +245,253 @@ const callNextPatient = async (req, res) => {
   }
 };
 
-module.exports = { callNextPatient };
+// ==========================================
+// BỔ SUNG CHO ISSUE #51: RECALL, SKIP, START
+// ==========================================
+
+const recallPatient = async (req, res) => {
+  if (!req.user || req.user.role !== ROLE_BAC_SI) {
+    return res.status(403).json({ success: false, message: "Chỉ bác sĩ mới được gọi lại bệnh nhân" });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const bs = await client.query(`SELECT id FROM "BacSi" WHERE tai_khoan_id = $1`, [req.user.id]);
+    if (bs.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return res.status(403).json({ success: false, message: "Tài khoản chưa gắn với hồ sơ bác sĩ" });
+    }
+    const bacSiId = bs.rows[0].id;
+
+    // Lấy cấu hình số lần gọi tối đa từ CauHinhHeThong (mặc định 3 nếu chưa có)
+    let maxCalls = 3;
+    try {
+      const cfg = await client.query(`SELECT so_lan_goi_toi_da FROM "CauHinhHeThong" ORDER BY id LIMIT 1`);
+      if (cfg.rowCount > 0 && cfg.rows[0].so_lan_goi_toi_da) {
+        maxCalls = cfg.rows[0].so_lan_goi_toi_da;
+      }
+    } catch (e) {
+      // Bỏ qua nếu chưa có bảng cấu hình, giữ mặc định 3
+    }
+
+    // Tìm bệnh nhân đang DANG_GOI của bác sĩ này
+    const calling = await client.query(
+      `SELECT h.id, h.so_thu_tu, h.loai, h.so_lan_goi, h.phong_kham_id, h.dat_lich_id, h.benh_nhan_id
+       FROM "HangDoi" h
+       WHERE h.bac_si_id = $1 AND h.trang_thai = $2
+       ORDER BY h.id DESC
+       LIMIT 1
+       FOR UPDATE`,
+      [bacSiId, ST_DANG_GOI]
+    );
+
+    if (calling.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ success: false, message: "Không có bệnh nhân nào đang ở trạng thái gọi để gọi lại" });
+    }
+
+    const current = calling.rows[0];
+
+    if (current.so_lan_goi >= maxCalls) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({
+        success: false,
+        code: "MAX_CALLS_REACHED",
+        message: `Đã đạt số lần gọi tối đa (${maxCalls} lần). Vui lòng chọn Bỏ lượt / Vắng mặt.`,
+      });
+    }
+
+    // Tăng số lần gọi lên 1
+    await client.query(
+      `UPDATE "HangDoi" SET so_lan_goi = so_lan_goi + 1 WHERE id = $1`,
+      [current.id]
+    );
+
+    await client.query("COMMIT");
+
+    return res.json({
+      success: true,
+      message: `Đã phát tín hiệu gọi lại lần thứ ${current.so_lan_goi + 1}`,
+      data: {
+        queue: {
+          id: current.id,
+          loai: current.loai,
+          so_thu_tu: current.so_thu_tu,
+          nhan_stt: `${LANE_LABEL[current.loai] || ""}${current.so_thu_tu}`,
+          trang_thai: ST_DANG_GOI,
+          so_lan_goi: current.so_lan_goi + 1,
+        },
+      },
+    });
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    console.error("Lỗi recallPatient:", err);
+    return res.status(500).json({ success: false, message: "Lỗi server" });
+  } finally {
+    client.release();
+  }
+};
+
+
+const skipPatient = async (req, res) => {
+  if (!req.user || req.user.role !== ROLE_BAC_SI) {
+    return res.status(403).json({ success: false, message: "Chỉ bác sĩ mới được thao tác bỏ lượt" });
+  }
+
+  const queueId = Number(req.params.id);
+  if (!Number.isInteger(queueId) || queueId <= 0) {
+    return res.status(400).json({ success: false, message: "ID hàng đợi không hợp lệ" });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const fail = async (status, message) => {
+      await client.query("ROLLBACK");
+      return res.status(status).json({ success: false, message });
+    };
+
+    const bs = await client.query(`SELECT id FROM "BacSi" WHERE tai_khoan_id = $1`, [req.user.id]);
+    if (bs.rowCount === 0) return fail(403, "Tài khoản chưa gắn với hồ sơ bác sĩ");
+    const bacSiId = bs.rows[0].id;
+
+    const hd = await client.query(
+      `SELECT h.id, h.trang_thai, h.so_lan_bo_luot, h.bac_si_id
+       FROM "HangDoi" h
+       WHERE h.id = $1 FOR UPDATE`,
+      [queueId]
+    );
+
+    if (hd.rowCount === 0) {
+      return fail(404, "Không tìm thấy lượt khám trong hàng đợi");
+    }
+
+    const row = hd.rows[0];
+    if (row.bac_si_id && row.bac_si_id !== bacSiId) {
+      return fail(403, "Bạn không có quyền xử lý lượt khám của bác sĩ khác");
+    }
+
+    const newSkipCount = row.so_lan_bo_luot + 1;
+    const nextStatus = newSkipCount >= 2 ? ST_VANG_MAT : ST_BO_LUOT;
+
+    await client.query(
+      `UPDATE "HangDoi"
+       SET trang_thai = $1, so_lan_bo_luot = $2
+       WHERE id = $3`,
+      [nextStatus, newSkipCount, queueId]
+    );
+
+    await client.query("COMMIT");
+
+    return res.json({
+      success: true,
+      message: newSkipCount >= 2 
+        ? "Bệnh nhân vắng mặt lần 2, đã chuyển trạng thái thành VANG_MAT (đóng lượt)" 
+        : "Đã ghi nhận bỏ lượt lần 1 (BO_LUOT), chờ lễ tân xử lý xếp lại hoặc chuyển vắng mặt",
+      data: {
+        id: queueId,
+        trang_thai: nextStatus,
+        so_lan_bo_luot: newSkipCount,
+      },
+    });
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    console.error("Lỗi skipPatient:", err);
+    return res.status(500).json({ success: false, message: "Lỗi server" });
+  } finally {
+    client.release();
+  }
+};
+
+const startExamination = async (req, res) => {
+  if (!req.user || req.user.role !== ROLE_BAC_SI) {
+    return res.status(403).json({ success: false, message: "Chỉ bác sĩ mới được bắt đầu khám" });
+  }
+
+  const queueId = Number(req.params.id);
+  if (!Number.isInteger(queueId) || queueId <= 0) {
+    return res.status(400).json({ success: false, message: "ID hàng đợi không hợp lệ" });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const fail = async (status, message) => {
+      await client.query("ROLLBACK");
+      return res.status(status).json({ success: false, message });
+    };
+
+    const bs = await client.query(`SELECT id FROM "BacSi" WHERE tai_khoan_id = $1`, [req.user.id]);
+    if (bs.rowCount === 0) return fail(403, "Tài khoản chưa gắn với hồ sơ bác sĩ");
+    const bacSiId = bs.rows[0].id;
+
+    const hd = await client.query(
+      `SELECT h.id, h.benh_nhan_id, h.bac_si_id, h.trang_thai, h.phong_kham_id
+       FROM "HangDoi" h
+       WHERE h.id = $1 FOR UPDATE`,
+      [queueId]
+    );
+
+    if (hd.rowCount === 0) return fail(404, "Không tìm thấy lượt khám trong hàng đợi");
+    const row = hd.rows[0];
+
+    if (row.bac_si_id && row.bac_si_id !== bacSiId) {
+      return fail(403, "Bạn không có quyền khám bệnh nhân này");
+    }
+
+    if (row.trang_thai !== ST_DANG_GOI && row.trang_thai !== ST_CHO_KHAM) {
+      return fail(400, `Không thể bắt đầu khám từ trạng thái hiện tại (${row.trang_thai})`);
+    }
+
+    await client.query(
+      `UPDATE "HangDoi"
+       SET trang_thai = $1, bac_si_id = COALESCE(bac_si_id, $3)
+       WHERE id = $2`,
+      [ST_DANG_KHAM, queueId, bacSiId]
+    );
+
+    let hs = await client.query(`SELECT id FROM "HoSoBenhAn" WHERE hang_doi_id = $1`, [queueId]);
+    let hoSoId;
+    if (hs.rowCount === 0) {
+      const newHs = await client.query(
+        `INSERT INTO "HoSoBenhAn" (hang_doi_id, benh_nhan_id, bac_si_id, ngay_kham, trang_thai)
+         VALUES ($1, $2, $3, ${TODAY_VN}, $4)
+         RETURNING id`,
+        [queueId, row.benh_nhan_id, bacSiId, ST_DANG_KHAM]
+      );
+      hoSoId = newHs.rows[0].id;
+    } else {
+      hoSoId = hs.rows[0].id;
+      await client.query(`UPDATE "HoSoBenhAn" SET trang_thai = $1 WHERE id = $2`, [ST_DANG_KHAM, hoSoId]);
+    }
+
+    await client.query("COMMIT");
+
+    return res.json({
+      success: true,
+      message: "Đã bắt đầu khám bệnh nhân",
+      data: {
+        queue_id: queueId,
+        trang_thai: ST_DANG_KHAM,
+        ho_so_id: hoSoId,
+      },
+    });
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    console.error("Lỗi startExamination:", err);
+    return res.status(500).json({ success: false, message: "Lỗi server" });
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = { 
+  callNextPatient, 
+  recallPatient, 
+  skipPatient, 
+  startExamination 
+};
