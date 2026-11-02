@@ -20,6 +20,7 @@ import AppointmentListPage from "../pages/patient/appointments/AppointmentListPa
 import AppointmentDetailPage from "../pages/patient/appointments/AppointmentDetailPage";
 import OnlineCheckinPage from "../pages/receptionist/checkin/OnlineCheckinPage";
 import OfflineCheckinPage from "../pages/receptionist/checkin/OfflineCheckinPage";
+import ReceptionQueuePage from "../pages/receptionist/ReceptionQueuePage";
 function AppRoutes() {
     return (
         <Routes>
@@ -96,6 +97,10 @@ function AppRoutes() {
                 <Route
                     path="/receptionist/walk-in"
                     element={<OfflineCheckinPage />}
+                />
+                <Route
+                    path="/receptionist/queue"
+                    element={<ReceptionQueuePage />}
                 />
             </Route>
 

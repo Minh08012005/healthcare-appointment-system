@@ -13,5 +13,12 @@ export const receptionApi = {
   getSpecialties: () => apiClient.get("/api/master/chuyen-khoa"),
   // -> { success, data: [{ id, ten_phong, loai_phong, chuyen_khoa_id, ten_chuyen_khoa }] }
   getRooms: (chuyenKhoaId) =>
-    apiClient.get(`/api/master/phong-kham?chuyen_khoa_id=${encodeURIComponent(chuyenKhoaId)}`),
+    apiClient.get(
+      chuyenKhoaId == null || chuyenKhoaId === ""
+        ? "/api/master/phong-kham"
+        : `/api/master/phong-kham?chuyen_khoa_id=${encodeURIComponent(chuyenKhoaId)}`,
+    ),
+  // GET /api/reception/queue?phong_kham_id=<id> -> { success, data: { room, ngay, summary, queue } }
+  getQueue: (phongKhamId) =>
+    apiClient.get(`/api/reception/queue?phong_kham_id=${encodeURIComponent(phongKhamId)}`),
 };
