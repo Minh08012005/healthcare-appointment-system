@@ -489,9 +489,93 @@ const startExamination = async (req, res) => {
   }
 };
 
+const getCurrentCalling = async (req, res) => {
+  if (!req.user || req.user.role !== ROLE_BAC_SI) {
+    return res.status(403).json({ success: false, message: "Chỉ bác sĩ mới được xem thông tin gọi khám" });
+  }
+
+  const client = await pool.connect();
+  try {
+    const bs = await client.query(`SELECT id FROM "BacSi" WHERE tai_khoan_id = $1`, [req.user.id]);
+    if (bs.rowCount === 0) {
+      return res.status(403).json({ success: false, message: "Tài khoản chưa gắn với hồ sơ bác sĩ" });
+    }
+    const bacSiId = bs.rows[0].id;
+
+    // Tìm bệnh nhân đang DANG_GOI của bác sĩ hôm nay
+    const info = await client.query(
+      `SELECT h.id, h.so_thu_tu, h.loai, h.trang_thai, h.so_lan_goi, h.so_lan_bo_luot,
+              h.thoi_gian_check_in, h.dat_lich_id, h.phong_kham_id, h.bac_si_id,
+              bn.id AS bn_id, bn.ho_ten, to_char(bn.ngay_sinh, 'YYYY-MM-DD') AS ngay_sinh,
+              bn.gioi_tinh, bn.ma_bhyt,
+              d.ma_dat_lich, to_char(d.gio_kham, 'HH24:MI:SS') AS gio_kham,
+              pk.ten_phong,
+              COALESCE(d.trieu_chung, kq.trieu_chung_ghi_nhan) AS trieu_chung_hien_thi
+       FROM "HangDoi" h
+       JOIN "BenhNhan" bn ON bn.id = h.benh_nhan_id
+       LEFT JOIN "DatLichKham" d ON d.id = h.dat_lich_id
+       LEFT JOIN "PhongKham" pk ON pk.id = h.phong_kham_id
+       LEFT JOIN LATERAL (
+         SELECT k.trieu_chung_ghi_nhan
+         FROM "HoSoBenhAn" hs
+         JOIN "KetQuaKham" k ON k.ho_so_id = hs.id
+         WHERE hs.hang_doi_id = h.id
+         ORDER BY k.id DESC LIMIT 1
+       ) kq ON true
+       WHERE h.bac_si_id = $1 AND h.trang_thai = $2 AND ${CHECKIN_DAY} = ${TODAY_VN}
+       ORDER BY h.id DESC
+       LIMIT 1`,
+      [bacSiId, ST_DANG_GOI]
+    );
+
+    if (info.rowCount === 0) {
+      return res.json({
+        success: true,
+        data: { has_calling: false, queue: null, patient: null, appointment: null, room: null, trieu_chung: null }
+      });
+    }
+
+    const i = info.rows[0];
+    return res.json({
+      success: true,
+      data: {
+        has_calling: true,
+        queue: {
+          id: i.id,
+          loai: i.loai,
+          so_thu_tu: i.so_thu_tu,
+          nhan_stt: `${LANE_LABEL[i.loai] || ""}${i.so_thu_tu}`,
+          trang_thai: i.trang_thai,
+          so_lan_goi: i.so_lan_goi,
+          so_lan_bo_luot: i.so_lan_bo_luot,
+          thoi_gian_check_in: i.thoi_gian_check_in,
+          dat_lich_id: i.dat_lich_id,
+          bac_si_id: i.bac_si_id,
+        },
+        patient: {
+          id: i.bn_id,
+          ho_ten: i.ho_ten,
+          ngay_sinh: i.ngay_sinh,
+          gioi_tinh: i.gioi_tinh,
+          ma_bhyt: i.ma_bhyt,
+        },
+        appointment: i.ma_dat_lich ? { ma_dat_lich: i.ma_dat_lich, gio_kham: i.gio_kham } : null,
+        room: { id: i.phong_kham_id, ten_phong: i.ten_phong },
+        trieu_chung: i.trieu_chung_hien_thi,
+      },
+    });
+  } catch (err) {
+    console.error("Lỗi getCurrentCalling:", err);
+    return res.status(500).json({ success: false, message: "Lỗi server" });
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = { 
   callNextPatient, 
   recallPatient, 
   skipPatient, 
-  startExamination 
+  startExamination,
+  getCurrentCalling
 };

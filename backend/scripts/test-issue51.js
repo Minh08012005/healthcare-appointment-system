@@ -136,6 +136,12 @@ const cleanup = async () => {
     r = await api("POST", `/queue/${hdId2}/skip`, {}, doc.token);
     check("Skip lần 2 chuyển trạng thái thành VANG_MAT (đóng lượt)", r.status === 200 && r.data?.data?.trang_thai === "VANG_MAT" && r.data?.data?.so_lan_bo_luot === 2);
 
+    // --- TEST 6: Kiểm thử API lấy lại thông tin bệnh nhân đang gọi khi F5 (/queue/current) ---
+    r = await api("GET", "/queue/current", null, doc.token);
+    check("Lấy thông tin bệnh nhân đang gọi qua GET /queue/current thành công", 
+      r.status === 200 && r.data?.success === true
+    );
+    
   } catch (e) {
     fail++;
     console.error("LỖI CHẠY SCRIPT TEST:", e);

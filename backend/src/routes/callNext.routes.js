@@ -3,7 +3,8 @@ const {
   callNextPatient, 
   recallPatient, 
   skipPatient, 
-  startExamination 
+  startExamination,
+  getCurrentCalling
 } = require("../controllers/callNext.controller");
 const { authenticate } = require("../middlewares/auth.middleware");
 
@@ -13,5 +14,6 @@ router.post("/next", authenticate, callNextPatient);
 router.post("/recall", authenticate, recallPatient);
 router.post("/:id/skip", authenticate, skipPatient);
 router.post("/:id/start", authenticate, startExamination);
+router.get("/current", authenticate, getCurrentCalling);
 
 module.exports = router;
