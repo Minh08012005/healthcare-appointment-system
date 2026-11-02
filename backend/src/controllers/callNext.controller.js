@@ -5,8 +5,9 @@ const LANE_ONLINE = "ONLINE";
 const LANE_OFFLINE = "OFFLINE";
 const ST_CHO_KHAM = "CHO_KHAM";
 const ST_DANG_GOI = "DANG_GOI";
-// Lượt đã "tiêu thụ" 1A:1B. BO_LUOT / VANG_MAT (gọi thất bại) KHÔNG tính.
-const CONSUMED_STATES = ["DANG_GOI", "DANG_KHAM", "DA_XONG"];
+// Chỉ lượt đã gọi THÀNH CÔNG (bệnh nhân vào khám) mới tiêu thụ lượt A/B.
+// DANG_GOI chưa tính (kết quả chưa biết); BO_LUOT / VANG_MAT (gọi thất bại) không tính.
+const CONSUMED_STATES = ["DANG_KHAM", "DA_XONG"];
 const LOCK_NS = 3008; // namespace cho advisory lock của C3-08
 
 const NOW_VN = `(NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh')`;
@@ -67,30 +68,63 @@ const callNextPatient = async (req, res) => {
     const roomId = roomRes.rows[0].phong_kham_id;
 
     // 3. Khóa theo phòng: các request "tiếp theo" của cùng phòng chạy lần lượt
+    //    (cũng chặn 2 bác sĩ cùng giành 1 lượt chưa gán bác sĩ)
     await client.query(`SELECT pg_advisory_xact_lock($1::int, $2::int)`, [LOCK_NS, roomId]);
 
-    // 4. Tỷ lệ A:B từ CauHinhHeThong (không có thì mặc định 1:1)
+    // 4. Bác sĩ đang có bệnh nhân DANG_GOI thì chưa được gọi người tiếp theo
+    const calling = await client.query(
+      `SELECT h.id, h.loai, h.so_thu_tu, h.so_lan_goi, bn.ho_ten
+       FROM "HangDoi" h
+       JOIN "BenhNhan" bn ON bn.id = h.benh_nhan_id
+       WHERE h.bac_si_id = $1 AND h.trang_thai = $2 AND ${CHECKIN_DAY} = ${TODAY_VN}
+       ORDER BY h.id
+       LIMIT 1`,
+      [bacSiId, ST_DANG_GOI]
+    );
+    if (calling.rowCount > 0) {
+      await client.query("ROLLBACK");
+      const c = calling.rows[0];
+      return res.status(409).json({
+        success: false,
+        code: "ALREADY_CALLING",
+        message: "Đang gọi một bệnh nhân. Hãy xử lý bệnh nhân này trước khi gọi người tiếp theo",
+        data: {
+          current: {
+            id: c.id,
+            loai: c.loai,
+            so_thu_tu: c.so_thu_tu,
+            nhan_stt: `${LANE_LABEL[c.loai] || ""}${c.so_thu_tu}`,
+            so_lan_goi: c.so_lan_goi,
+            ho_ten: c.ho_ten,
+          },
+        },
+      });
+    }
+
+    // 5. Tỷ lệ A:B từ CauHinhHeThong (không có thì mặc định 1:1)
     const cfg = await client.query(
       `SELECT ti_le_online, ti_le_offline FROM "CauHinhHeThong" ORDER BY id LIMIT 1`
     );
     const a = positiveOr1(cfg.rows[0]?.ti_le_online);
     const b = positiveOr1(cfg.rows[0]?.ti_le_offline);
 
-    // 5. Số lượt đã gọi hôm nay của từng hàng trong phòng
+    // 6. Số lượt đã gọi thành công hôm nay của CHÍNH bác sĩ này trong phòng
     const counts = await client.query(
       `SELECT h.loai, COUNT(*)::int AS n
        FROM "HangDoi" h
-       WHERE h.phong_kham_id = $1 AND ${CHECKIN_DAY} = ${TODAY_VN}
-         AND h.trang_thai = ANY($2)
+       WHERE h.phong_kham_id = $1 AND h.bac_si_id = $2
+         AND ${CHECKIN_DAY} = ${TODAY_VN}
+         AND h.trang_thai = ANY($3)
        GROUP BY h.loai`,
-      [roomId, CONSUMED_STATES]
+      [roomId, bacSiId, CONSUMED_STATES]
     );
     const called = { [LANE_ONLINE]: 0, [LANE_OFFLINE]: 0 };
     counts.rows.forEach((r) => {
       if (called[r.loai] !== undefined) called[r.loai] = r.n;
     });
 
-    // 6. Chọn hàng theo tỷ lệ; hàng đó rỗng thì lấy hàng còn lại
+    // 7. Chọn hàng theo tỷ lệ; hàng đó rỗng thì lấy hàng còn lại.
+    //    Chỉ lấy lượt gán cho mình hoặc chưa gán bác sĩ (bac_si_id IS NULL).
     const preferred = chooseLane(called[LANE_ONLINE], called[LANE_OFFLINE], a, b);
     const lanes = [preferred, preferred === LANE_ONLINE ? LANE_OFFLINE : LANE_ONLINE];
 
@@ -100,11 +134,12 @@ const callNextPatient = async (req, res) => {
         `SELECT h.id
          FROM "HangDoi" h
          WHERE h.phong_kham_id = $1 AND h.loai = $2 AND h.trang_thai = $3
+           AND (h.bac_si_id = $4 OR h.bac_si_id IS NULL)
            AND ${CHECKIN_DAY} = ${TODAY_VN}
          ORDER BY h.so_thu_tu ASC, h.thoi_gian_check_in ASC, h.id ASC
          LIMIT 1
          FOR UPDATE`,
-        [roomId, lane, ST_CHO_KHAM]
+        [roomId, lane, ST_CHO_KHAM, bacSiId]
       );
       if (cand.rowCount > 0) {
         picked = cand.rows[0].id;
@@ -112,7 +147,7 @@ const callNextPatient = async (req, res) => {
       }
     }
 
-    // 7. Không có ai chờ: trả kết quả hợp lệ
+    // 8. Không có ai chờ: trả kết quả hợp lệ
     if (picked === null) {
       await client.query("COMMIT");
       return res.json({
@@ -124,34 +159,45 @@ const callNextPatient = async (req, res) => {
           queue: null,
           patient: null,
           appointment: null,
+          trieu_chung: null,
         },
       });
     }
 
-    // 8. CHO_KHAM -> DANG_GOI, tăng so_lan_goi
+    // 9. CHO_KHAM -> DANG_GOI, tăng so_lan_goi, gán bác sĩ nếu lượt chưa gán
     const upd = await client.query(
       `UPDATE "HangDoi"
-       SET trang_thai = $2, so_lan_goi = COALESCE(so_lan_goi, 0) + 1
+       SET trang_thai = $2,
+           so_lan_goi = COALESCE(so_lan_goi, 0) + 1,
+           bac_si_id = COALESCE(bac_si_id, $4)
        WHERE id = $1 AND trang_thai = $3
        RETURNING id`,
-      [picked, ST_DANG_GOI, ST_CHO_KHAM]
+      [picked, ST_DANG_GOI, ST_CHO_KHAM, bacSiId]
     );
     if (upd.rowCount === 0) {
       return fail(409, "Lượt khám vừa được xử lý, vui lòng thử lại");
     }
 
-    // 9. Dữ liệu trả về
+    // 10. Dữ liệu trả về
     const info = await client.query(
       `SELECT h.id, h.so_thu_tu, h.loai, h.trang_thai, h.so_lan_goi, h.so_lan_bo_luot,
-              h.thoi_gian_check_in, h.dat_lich_id, h.phong_kham_id,
+              h.thoi_gian_check_in, h.dat_lich_id, h.phong_kham_id, h.bac_si_id,
               bn.id AS bn_id, bn.ho_ten, to_char(bn.ngay_sinh, 'YYYY-MM-DD') AS ngay_sinh,
               bn.gioi_tinh, bn.ma_bhyt,
-              d.ma_dat_lich, to_char(d.gio_kham, 'HH24:MI:SS') AS gio_kham, d.trieu_chung,
-              pk.ten_phong
+              d.ma_dat_lich, to_char(d.gio_kham, 'HH24:MI:SS') AS gio_kham,
+              pk.ten_phong,
+              COALESCE(d.trieu_chung, kq.trieu_chung_ghi_nhan) AS trieu_chung_hien_thi
        FROM "HangDoi" h
        JOIN "BenhNhan" bn ON bn.id = h.benh_nhan_id
        LEFT JOIN "DatLichKham" d ON d.id = h.dat_lich_id
        LEFT JOIN "PhongKham" pk ON pk.id = h.phong_kham_id
+       LEFT JOIN LATERAL (
+         SELECT k.trieu_chung_ghi_nhan
+         FROM "HoSoBenhAn" hs
+         JOIN "KetQuaKham" k ON k.ho_so_id = hs.id
+         WHERE hs.hang_doi_id = h.id
+         ORDER BY k.id DESC LIMIT 1
+       ) kq ON true
        WHERE h.id = $1`,
       [picked]
     );
@@ -173,6 +219,7 @@ const callNextPatient = async (req, res) => {
           so_lan_bo_luot: i.so_lan_bo_luot,
           thoi_gian_check_in: i.thoi_gian_check_in,
           dat_lich_id: i.dat_lich_id,
+          bac_si_id: i.bac_si_id,
         },
         patient: {
           id: i.bn_id,
@@ -182,9 +229,10 @@ const callNextPatient = async (req, res) => {
           ma_bhyt: i.ma_bhyt,
         },
         appointment: i.ma_dat_lich
-          ? { ma_dat_lich: i.ma_dat_lich, gio_kham: i.gio_kham, trieu_chung: i.trieu_chung }
+          ? { ma_dat_lich: i.ma_dat_lich, gio_kham: i.gio_kham }
           : null,
         room: { id: i.phong_kham_id, ten_phong: i.ten_phong },
+        trieu_chung: i.trieu_chung_hien_thi,
       },
     });
   } catch (err) {
