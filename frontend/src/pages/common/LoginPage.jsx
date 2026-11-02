@@ -4,6 +4,16 @@ import { useAuth } from "../../auth/useAuth";
 import PasswordInput from "../../components/auth/PasswordInput";
 import "./auth.css";
 
+const POST_LOGIN_PATHS = new Map([
+  ["Bệnh nhân", "/patient"],
+  ["Bác sĩ", "/doctor"],
+  ["Lễ tân", "/receptionist"],
+  ["Xét nghiệm", "/lab"],
+  ["Quản trị viên", "/admin"],
+]);
+
+const getPostLoginPath = (role) => POST_LOGIN_PATHS.get(role) || "/not-found";
+
 function LoginPage() {
   const { user, loading, login } = useAuth();
   const navigate = useNavigate();
@@ -14,7 +24,7 @@ function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   if (loading) return null;
-  if (user) return <Navigate to="/patient" replace />;
+  if (user) return <Navigate to={getPostLoginPath(user.role)} replace />;
 
   const update = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -31,8 +41,8 @@ function LoginPage() {
     setError("");
     setSubmitting(true);
     try {
-      await login(form.username.trim(), form.password);
-      navigate("/patient", { replace: true });
+      const loggedInUser = await login(form.username.trim(), form.password);
+      navigate(getPostLoginPath(loggedInUser.role), { replace: true });
     } catch (err) {
       if (err.status === 401) {
         setError("Tên đăng nhập hoặc mật khẩu không đúng.");

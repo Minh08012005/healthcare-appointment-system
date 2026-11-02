@@ -31,6 +31,7 @@ function AuthProvider({ children }) {
     try {
       const me = await authApi.me(); // lấy đủ thông tin (ho_ten...)
       setUser(me.data.user);
+      return me.data.user;
     } catch (err) {
       clearToken();
       throw err;
