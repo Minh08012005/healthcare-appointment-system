@@ -1,30 +1,181 @@
-.rq-page { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; }
-.rq-header h1 { margin: 0; }
-.rq-description { margin: 6px 0 0; color: var(--text-secondary); }
-.rq-card { min-width: 0; padding: 20px 22px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); }
-.rq-room-picker { display: flex; flex-direction: column; gap: 8px; }
-.rq-label { font-weight: 600; }
-.rq-select { box-sizing: border-box; width: min(100%, 480px); min-height: 42px; padding: 9px 12px; color: var(--text); background: #fff; border: 1px solid var(--border); border-radius: var(--radius); font: inherit; }
-.rq-select:focus-visible, .rq-button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.rq-state { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 100px; padding: 18px; color: var(--text-secondary); text-align: center; }
-.rq-state p { margin: 0; }
-.rq-state--error { color: var(--danger); }
-.rq-button { padding: 8px 14px; color: #fff; background: var(--primary); border: 0; border-radius: var(--radius); font: inherit; cursor: pointer; }
-.rq-spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: rq-spin .7s linear infinite; }
-@keyframes rq-spin { to { transform: rotate(360deg); } }
-.rq-list-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
-.rq-list-header h2 { margin: 0; font-size: 18px; }
-.rq-list-header p { margin: 4px 0 0; color: var(--text-secondary); }
-.rq-count { padding: 6px 10px; color: var(--primary-dark); background: var(--primary-light); border-radius: var(--radius-pill); white-space: nowrap; }
-.rq-table-wrap { overflow-x: auto; }
-.rq-table { width: 100%; border-collapse: collapse; text-align: left; }
-.rq-table th, .rq-table td { padding: 12px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-.rq-table th { color: var(--text-secondary); font-size: 12px; font-weight: 600; }
-.rq-table tbody tr:last-child td { border-bottom: 0; }
-.rq-number { color: var(--primary-dark); font-weight: 700; }
-.rq-patient { font-weight: 600; }
-.rq-badge, .rq-status { display: inline-block; padding: 4px 9px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; }
-.rq-badge--online { color: #1765a5; background: #e8f3fc; }
-.rq-badge--offline { color: #087e78; background: #e5f6f3; }
-.rq-status { color: #72520b; background: #fff4d9; }
-@media (max-width: 700px) { .rq-card { padding: 16px; } .rq-list-header { align-items: flex-start; flex-direction: column; } }
+.rq-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1200px;
+}
+.rq-header h1 {
+    margin: 0;
+}
+.rq-description {
+    margin: 6px 0 0;
+    color: var(--text-secondary);
+}
+.rq-card {
+    min-width: 0;
+    padding: 20px 22px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+}
+.rq-room-picker {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.rq-label {
+    font-weight: 600;
+}
+.rq-select {
+    box-sizing: border-box;
+    width: min(100%, 480px);
+    min-height: 42px;
+    padding: 9px 12px;
+    color: var(--text);
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font: inherit;
+}
+.rq-select:focus-visible,
+.rq-button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+.rq-button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+.rq-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    min-height: 100px;
+    padding: 18px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+.rq-state p {
+    margin: 0;
+}
+.rq-state--error {
+    color: var(--danger);
+}
+.rq-button {
+    padding: 8px 14px;
+    color: #fff;
+    background: var(--primary);
+    border: 0;
+    border-radius: var(--radius);
+    font: inherit;
+    cursor: pointer;
+}
+.rq-button--small {
+    padding: 6px 10px;
+    font-size: 13px;
+}
+.rq-action-error {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    color: var(--danger);
+    background: #fff2f2;
+    border-radius: var(--radius);
+}
+.rq-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: rq-spin 0.7s linear infinite;
+}
+@keyframes rq-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.rq-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.rq-list-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+.rq-list-header p {
+    margin: 4px 0 0;
+    color: var(--text-secondary);
+}
+.rq-count {
+    padding: 6px 10px;
+    color: var(--primary-dark);
+    background: var(--primary-light);
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+.rq-table-wrap {
+    overflow-x: auto;
+}
+.rq-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+.rq-table th,
+.rq-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+}
+.rq-table th {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+}
+.rq-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+.rq-number {
+    color: var(--primary-dark);
+    font-weight: 700;
+}
+.rq-patient {
+    font-weight: 600;
+}
+.rq-badge,
+.rq-status {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    font-weight: 600;
+}
+.rq-badge--online {
+    color: #1765a5;
+    background: #e8f3fc;
+}
+.rq-badge--offline {
+    color: #087e78;
+    background: #e5f6f3;
+}
+.rq-status {
+    color: #72520b;
+    background: #fff4d9;
+}
+.rq-table tr:has(.rq-button) .rq-status {
+    color: var(--danger);
+    background: #fff2f2;
+}
+@media (max-width: 700px) {
+    .rq-card {
+        padding: 16px;
+    }
+    .rq-list-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

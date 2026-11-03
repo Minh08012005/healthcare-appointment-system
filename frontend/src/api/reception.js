@@ -8,7 +8,8 @@ export const receptionApi = {
   // body: { patient: { ho_ten, so_cccd_ho_chieu, ngay_sinh?, gioi_tinh?, ma_bhyt?, dia_chi? },
   //         trieu_chung, chuyen_khoa_id, phong_kham_id }
   // 201 -> { success, data: { queue: { stt_hien_thi, so_nguoi_cho_truoc, ... }, patient, room, specialty } }
-  offlineCheckin: (body) => apiClient.post("/api/reception/offline-checkin", body),
+  offlineCheckin: (body) =>
+    apiClient.post("/api/reception/offline-checkin", body),
   // -> { success, data: [{ id, ten_chuyen_khoa, mo_ta }] }
   getSpecialties: () => apiClient.get("/api/master/chuyen-khoa"),
   // -> { success, data: [{ id, ten_phong, loai_phong, chuyen_khoa_id, ten_chuyen_khoa }] }
@@ -20,5 +21,11 @@ export const receptionApi = {
     ),
   // GET /api/reception/queue?phong_kham_id=<id> -> { success, data: { room, ngay, summary, queue } }
   getQueue: (phongKhamId) =>
-    apiClient.get(`/api/reception/queue?phong_kham_id=${encodeURIComponent(phongKhamId)}`),
+    apiClient.get(
+      `/api/reception/queue?phong_kham_id=${encodeURIComponent(phongKhamId)}&trang_thai=CHO_KHAM,DANG_GOI,DANG_KHAM,BO_LUOT`,
+    ),
+  requeue: (queueId) =>
+    apiClient.post(
+      `/api/reception/queue/${encodeURIComponent(queueId)}/requeue`,
+    ),
 };
