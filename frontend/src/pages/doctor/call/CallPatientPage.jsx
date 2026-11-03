@@ -180,7 +180,7 @@ function CallPatientPage() {
           type="button"
           className="cp-btn cp-btn--primary"
           onClick={handleNext}
-          disabled={busy || loading}
+          disabled={busy || loading || Boolean(loadError)}
         >
           {pending === "next" ? "Đang gọi..." : "Bệnh nhân tiếp theo"}
         </button>
