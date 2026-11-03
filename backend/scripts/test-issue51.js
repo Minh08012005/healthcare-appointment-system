@@ -28,10 +28,27 @@ const api = async (method, path, body, token) => {
 
 const readQueueState = async (id) => (
   await pool.query(
-    `SELECT so_lan_goi, thoi_gian_goi_gan_nhat, trang_thai FROM "HangDoi" WHERE id = $1`,
+    `SELECT so_lan_goi, so_lan_bo_luot, thoi_gian_goi_gan_nhat, trang_thai, loai, so_thu_tu
+     FROM "HangDoi" WHERE id = $1`,
     [id]
   )
 ).rows[0];
+
+const makeQueueFixture = async ({ tag, roomId, doctorId, status, calls, skipped = 0, minutesAgo = 0 }) => {
+  const patientId = (await pool.query(
+    `INSERT INTO "BenhNhan" (ho_ten) VALUES ($1) RETURNING id`,
+    [`${P} BN ${tag}`]
+  )).rows[0].id;
+  return (await pool.query(
+    `INSERT INTO "HangDoi"
+       (benh_nhan_id, so_thu_tu, phong_kham_id, bac_si_id, loai, trang_thai,
+        so_lan_goi, so_lan_bo_luot, thoi_gian_goi_gan_nhat)
+     VALUES ($1, $2, $3, $4, 'ONLINE', $5, $6, $7,
+             NOW() - ($8::int * interval '1 minute'))
+     RETURNING id`,
+    [patientId, 40, roomId, doctorId, status, calls, skipped, minutesAgo]
+  )).rows[0].id;
+};
 
 const cleanup = async () => {
   try {
@@ -227,14 +244,31 @@ const cleanup = async () => {
         Boolean(r.data?.data?.queue?.thoi_gian_goi_gan_nhat)
     );
 
+    const currentBefore = await readQueueState(hdOnline1);
+    const schemaColumnBefore = (await pool.query(
+      `SELECT COUNT(*)::int AS n FROM information_schema.columns
+       WHERE table_schema = 'public' AND table_name = 'HangDoi'
+         AND column_name = 'thoi_gian_goi_gan_nhat'`
+    )).rows[0].n;
     const cur1 = await api("GET", "/queue/current", null, doc1.token);
     const cur2 = await api("GET", "/queue/current", null, doc1.token);
+    const currentAfter = await readQueueState(hdOnline1);
+    const schemaColumnAfter = (await pool.query(
+      `SELECT COUNT(*)::int AS n FROM information_schema.columns
+       WHERE table_schema = 'public' AND table_name = 'HangDoi'
+         AND column_name = 'thoi_gian_goi_gan_nhat'`
+    )).rows[0].n;
     check(
-      "GET /queue/current trả đúng A1 đang gọi và giữ nguyên so_lan_goi = 1 khi F5 nhiều lần",
+      "GET /queue/current read-only: không đổi queue hoặc schema qua nhiều lần đọc",
       cur1.status === 200 &&
         cur1.data?.data?.has_calling === true &&
         cur1.data?.data?.queue?.id === hdOnline1 &&
-        cur2.data?.data?.queue?.so_lan_goi === 1
+        cur2.data?.data?.queue?.so_lan_goi === 1 &&
+        currentAfter.so_lan_goi === currentBefore.so_lan_goi &&
+        currentAfter.so_lan_bo_luot === currentBefore.so_lan_bo_luot &&
+        currentAfter.thoi_gian_goi_gan_nhat.getTime() === currentBefore.thoi_gian_goi_gan_nhat.getTime() &&
+        currentAfter.trang_thai === currentBefore.trang_thai &&
+        schemaColumnAfter === schemaColumnBefore
     );
 
     const curOtherDoc = await api("GET", "/queue/current", null, doc2.token);
@@ -462,6 +496,94 @@ const cleanup = async () => {
     check(
       "Chặn Lễ tân xếp lại lượt đã chuyển sang VANG_MAT (lần 2)",
       r.status === 400 && r.data?.code === "INVALID_REQUEUE_STATE"
+    );
+
+    // =========================================================================
+    // NHÓM 8: Race/concurrency C3-09
+    // =========================================================================
+    const startRaceId = await makeQueueFixture({
+      tag: "race-start", roomId: room1, doctorId: bs1, status: "DANG_GOI", calls: 1,
+      minutesAgo: intervalMin + 2,
+    });
+    const [startRaceRecall, startRaceResponse] = await Promise.all([
+      xuLyTuDongGoiLai([startRaceId]),
+      api("POST", `/queue/${startRaceId}/start`, {}, doc1.token),
+    ]);
+    const startRaceState = await readQueueState(startRaceId);
+    check(
+      "Race auto-recall/start giữ kết quả DANG_KHAM hợp lệ, count không vượt N",
+      startRaceResponse.status === 200 && startRaceState.trang_thai === "DANG_KHAM" &&
+        startRaceState.so_lan_goi >= 1 && startRaceState.so_lan_goi <= maxCalls &&
+        startRaceRecall <= 1
+    );
+
+    const skipRaceId = await makeQueueFixture({
+      tag: "race-skip", roomId: room1, doctorId: bs1, status: "DANG_GOI", calls: maxCalls - 1,
+      minutesAgo: intervalMin + 2,
+    });
+    const [skipRaceRecall, skipRaceResponse] = await Promise.all([
+      xuLyTuDongGoiLai([skipRaceId]),
+      api("POST", `/queue/${skipRaceId}/skip`, {}, doc1.token),
+    ]);
+    const skipRaceState = await readQueueState(skipRaceId);
+    check(
+      "Race auto-recall/skip kết thúc ở DANG_GOI đủ N hoặc BO_LUOT đủ N",
+      skipRaceRecall <= 1 && skipRaceState.so_lan_goi === maxCalls &&
+        ((skipRaceState.trang_thai === "DANG_GOI" && skipRaceState.so_lan_bo_luot === 0 && skipRaceResponse.status === 400) ||
+         (skipRaceState.trang_thai === "BO_LUOT" && skipRaceState.so_lan_bo_luot === 1 && skipRaceResponse.status === 200))
+    );
+
+    const doubleSkipId = await makeQueueFixture({
+      tag: "double-skip", roomId: room1, doctorId: bs1, status: "DANG_GOI", calls: maxCalls,
+    });
+    const doubleSkipResponses = await Promise.all([
+      api("POST", `/queue/${doubleSkipId}/skip`, {}, doc1.token),
+      api("POST", `/queue/${doubleSkipId}/skip`, {}, doc1.token),
+    ]);
+    const doubleSkipState = await readQueueState(doubleSkipId);
+    check(
+      "Double skip chỉ có một transition thành công",
+      doubleSkipResponses.filter((x) => x.status === 200).length === 1 &&
+        doubleSkipResponses.filter((x) => x.status === 400).length === 1 &&
+        doubleSkipState.trang_thai === "BO_LUOT" && doubleSkipState.so_lan_bo_luot === 1
+    );
+
+    const doubleRequeueId = await makeQueueFixture({
+      tag: "double-requeue", roomId: room1, doctorId: bs1, status: "BO_LUOT", calls: maxCalls, skipped: 1,
+    });
+    const doubleRequeueResponses = await Promise.all([
+      api("POST", `/queue/${doubleRequeueId}/requeue`, {}, leTan.token),
+      api("POST", `/queue/${doubleRequeueId}/requeue`, {}, leTan.token),
+    ]);
+    const doubleRequeueState = await readQueueState(doubleRequeueId);
+    check(
+      "Double requeue chỉ requeue một lần và cấp đúng một STT",
+      doubleRequeueResponses.filter((x) => x.status === 200).length === 1 &&
+        doubleRequeueResponses.filter((x) => x.status === 400).length === 1 &&
+        doubleRequeueState.trang_thai === "CHO_KHAM" && doubleRequeueState.loai === "OFFLINE" &&
+        doubleRequeueState.so_lan_bo_luot === 1 &&
+        doubleRequeueResponses.filter((x) => x.status === 200)[0].data?.data?.queue?.so_thu_tu === doubleRequeueState.so_thu_tu
+    );
+
+    const [requeueAId, requeueBId] = await Promise.all([
+      makeQueueFixture({ tag: "parallel-requeue-a", roomId: room1, doctorId: bs1, status: "BO_LUOT", calls: maxCalls, skipped: 1 }),
+      makeQueueFixture({ tag: "parallel-requeue-b", roomId: room1, doctorId: bs1, status: "BO_LUOT", calls: maxCalls, skipped: 1 }),
+    ]);
+    const parallelRequeueResponses = await Promise.all([
+      api("POST", `/queue/${requeueAId}/requeue`, {}, leTan.token),
+      api("POST", `/queue/${requeueBId}/requeue`, {}, leTan.token),
+    ]);
+    const [parallelRequeueA, parallelRequeueB] = await Promise.all([
+      readQueueState(requeueAId), readQueueState(requeueBId),
+    ]);
+    const parallelStts = parallelRequeueResponses.map((x) => x.data?.data?.queue?.so_thu_tu);
+    check(
+      "Hai requeue cùng phòng được STT OFFLINE khác nhau",
+      parallelRequeueResponses.every((x) => x.status === 200) &&
+        parallelStts[0] !== parallelStts[1] &&
+        parallelRequeueA.trang_thai === "CHO_KHAM" && parallelRequeueA.loai === "OFFLINE" &&
+        parallelRequeueB.trang_thai === "CHO_KHAM" && parallelRequeueB.loai === "OFFLINE" &&
+        parallelRequeueA.so_thu_tu !== parallelRequeueB.so_thu_tu
     );
   } catch (e) {
     fail++;
