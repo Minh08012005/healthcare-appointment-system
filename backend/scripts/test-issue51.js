@@ -26,6 +26,13 @@ const api = async (method, path, body, token) => {
   return { status: res.status, data: await res.json().catch(() => ({})) };
 };
 
+const readQueueState = async (id) => (
+  await pool.query(
+    `SELECT so_lan_goi, thoi_gian_goi_gan_nhat, trang_thai FROM "HangDoi" WHERE id = $1`,
+    [id]
+  )
+).rows[0];
+
 const cleanup = async () => {
   try {
     await pool.query(
@@ -295,19 +302,25 @@ const cleanup = async () => {
     );
     await pool.query(`UPDATE "HangDoi" SET thoi_gian_goi_gan_nhat = NOW() WHERE id = $1`, [hdOnline1]);
 
+    const beforeEarlySkip = await readQueueState(hdOnline1);
     r = await api("POST", `/queue/${hdOnline1}/skip`, {}, doc1.token);
+    const afterEarlySkip = await readQueueState(hdOnline1);
     check(
       "Chặn Skip khi chưa gọi đủ số lần tối đa (so_lan_goi = 1 < N)",
-      r.status === 400 && r.data?.code === "CALLS_NOT_EXHAUSTED"
+      r.status === 400 && r.data?.code === "CALLS_NOT_EXHAUSTED" &&
+        afterEarlySkip.so_lan_goi === beforeEarlySkip.so_lan_goi &&
+        afterEarlySkip.thoi_gian_goi_gan_nhat.getTime() === beforeEarlySkip.thoi_gian_goi_gan_nhat.getTime() &&
+        afterEarlySkip.trang_thai === beforeEarlySkip.trang_thai
     );
 
     // Chạy auto-recall ngay lập tức (chưa đủ M phút) -> không được tăng so_lan_goi
     const countEarly = await xuLyTuDongGoiLai([hdOnline1]);
-    r = await api("POST", "/queue/recall", {}, doc1.token);
     check(
-      "Kiểm soát khoảng cách gọi: Chặn tăng so_lan_goi khi chưa đủ M phút",
-      countEarly === 0 && r.status === 400 && r.data?.code === "CALL_INTERVAL_NOT_REACHED"
+      "Auto-recall nền không tăng số lần gọi khi chưa đủ M phút",
+      countEarly === 0
     );
+    r = await api("POST", "/queue/recall", {}, doc1.token);
+    check("Route gọi lại thủ công đã bị gỡ", r.status === 404);
 
     // Tua lùi thoi_gian_goi_gan_nhat về trước M phút để kích hoạt Auto-Recall từng nấc tới maxCalls
     for (let targetCall = 2; targetCall <= maxCalls; targetCall++) {
@@ -344,10 +357,15 @@ const cleanup = async () => {
     // =========================================================================
     // NHÓM 4: Kiểm tra Ownership (Sai bác sĩ/phòng) & Skip lần 1 -> BO_LUOT
     // =========================================================================
+    const beforeWrongOwnerSkip = await readQueueState(hdOnline1);
     r = await api("POST", `/queue/${hdOnline1}/skip`, {}, doc2.token);
+    const afterWrongOwnerSkip = await readQueueState(hdOnline1);
     check(
       "Chặn Bác sĩ khác / Phòng khác bấm Skip lượt của Bác sĩ 1",
-      r.status === 403 && r.data?.code === "FORBIDDEN_OWNERSHIP"
+      r.status === 403 && r.data?.code === "FORBIDDEN_OWNERSHIP" &&
+        afterWrongOwnerSkip.so_lan_goi === beforeWrongOwnerSkip.so_lan_goi &&
+        afterWrongOwnerSkip.thoi_gian_goi_gan_nhat.getTime() === beforeWrongOwnerSkip.thoi_gian_goi_gan_nhat.getTime() &&
+        afterWrongOwnerSkip.trang_thai === beforeWrongOwnerSkip.trang_thai
     );
 
     r = await api("POST", `/queue/${hdOnline1}/start`, {}, doc2.token);

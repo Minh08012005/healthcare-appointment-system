@@ -408,99 +408,6 @@ const getCurrentCalling = async (req, res) => {
   }
 };
 
-// POST /api/queue/recall — Kích hoạt kiểm tra auto-recall theo đúng quy tắc N/M & khoảng cách gọi
-const recallPatient = async (req, res) => {
-  if (!req.user || req.user.role !== ROLE_BAC_SI) {
-    return res.status(403).json({ success: false, message: "Chỉ bác sĩ mới được gọi lại bệnh nhân" });
-  }
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-
-    const { bacSiId, roomId, errorStatus, errorMessage } = await getDoctorAndRoom(client, req.user.id);
-    if (errorStatus) {
-      await client.query("ROLLBACK");
-      return res.status(errorStatus).json({ success: false, message: errorMessage });
-    }
-
-    const { maxCalls, callIntervalMinutes } = await getQueueConfig(client, { requireRecallConfig: true });
-
-    const calling = await client.query(
-      `SELECT h.id, h.so_thu_tu, h.loai, h.so_lan_goi, h.thoi_gian_goi_gan_nhat,
-              (COALESCE(h.thoi_gian_goi_gan_nhat, h.thoi_gian_check_in)
-               <= NOW() - ($4::int * interval '1 minute')) AS du_khoang_cach
-       FROM "HangDoi" h
-       WHERE h.bac_si_id = $1 AND h.phong_kham_id = $2
-         AND h.trang_thai = $3 AND ${CHECKIN_DAY} = ${TODAY_VN}
-       ORDER BY h.id DESC
-       LIMIT 1
-       FOR UPDATE`,
-      [bacSiId, roomId, ST_DANG_GOI, callIntervalMinutes]
-    );
-
-    if (calling.rowCount === 0) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({
-        success: false,
-        message: "Không có bệnh nhân nào đang ở trạng thái gọi tại phòng của bác sĩ",
-      });
-    }
-
-    const current = calling.rows[0];
-
-    if (current.so_lan_goi >= maxCalls) {
-      await client.query("ROLLBACK");
-      return res.status(400).json({
-        success: false,
-        code: "MAX_CALLS_REACHED",
-        message: `Đã đạt số lần gọi tối đa (${maxCalls} lần). Vui lòng chọn Bỏ lượt / Vắng mặt.`,
-      });
-    }
-
-    if (!current.du_khoang_cach) {
-      await client.query("ROLLBACK");
-      return res.status(400).json({
-        success: false,
-        code: "CALL_INTERVAL_NOT_REACHED",
-        message: `Chưa đủ khoảng cách tối thiểu giữa các lần gọi (${callIntervalMinutes} phút).`,
-      });
-    }
-
-    const upd = await client.query(
-      `UPDATE "HangDoi"
-       SET so_lan_goi = so_lan_goi + 1,
-           thoi_gian_goi_gan_nhat = NOW()
-       WHERE id = $1
-       RETURNING so_lan_goi, thoi_gian_goi_gan_nhat`,
-      [current.id]
-    );
-
-    await client.query("COMMIT");
-
-    return res.json({
-      success: true,
-      message: `Đã tự động phát tín hiệu gọi lại lần thứ ${upd.rows[0].so_lan_goi}`,
-      data: {
-        queue: {
-          id: current.id,
-          loai: current.loai,
-          so_thu_tu: current.so_thu_tu,
-          nhan_stt: `${LANE_LABEL[current.loai] || ""}${current.so_thu_tu}`,
-          trang_thai: ST_DANG_GOI,
-          so_lan_goi: upd.rows[0].so_lan_goi,
-          thoi_gian_goi_gan_nhat: upd.rows[0].thoi_gian_goi_gan_nhat,
-        },
-      },
-    });
-  } catch (err) {
-    await client.query("ROLLBACK").catch(() => {});
-    console.error("Lỗi recallPatient:", err);
-    return res.status(500).json({ success: false, message: "Lỗi server" });
-  } finally {
-    client.release();
-  }
-};
-
 // ============================================================================
 // 2. BỎ LƯỢT / VẮNG MẶT (POST /api/queue/:id/skip)
 // ============================================================================
@@ -513,8 +420,6 @@ const skipPatient = async (req, res) => {
   if (!Number.isInteger(queueId) || queueId <= 0) {
     return res.status(400).json({ success: false, message: "ID hàng đợi không hợp lệ" });
   }
-  // Đồng bộ auto-recall nếu đã đủ thời gian trước khi kiểm tra skip
-  await xuLyTuDongGoiLai([queueId]);
 
   const client = await pool.connect();
   try {
@@ -807,7 +712,6 @@ const startExamination = async (req, res) => {
 module.exports = {
   callNextPatient,
   getCurrentCalling,
-  recallPatient,
   skipPatient,
   requeuePatient,
   startExamination,
