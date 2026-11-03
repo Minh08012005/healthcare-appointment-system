@@ -29,20 +29,34 @@ const positiveOr1 = (v) => {
   return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1;
 };
 
-// �?c c?u h�nh t? CauHinhHeThong
-const getQueueConfig = async (db = pool) => {
+const getQueueConfig = async (db = pool, { requireRecallConfig = false } = {}) => {
   const cfg = await db.query(
     `SELECT ti_le_online, ti_le_offline, so_lan_goi_toi_da, khoang_cach_goi_phut, chu_ky_quet_phut
      FROM "CauHinhHeThong"
      ORDER BY id LIMIT 1`
   );
-  const row = cfg.rows[0] || {};
+  const row = cfg.rows[0];
+  if (!row && requireRecallConfig) {
+    throw new Error("C3-09 config error: no row found in CauHinhHeThong");
+  }
+
+  if (requireRecallConfig) {
+    for (const [key, value] of [
+      ["so_lan_goi_toi_da", row.so_lan_goi_toi_da],
+      ["khoang_cach_goi_phut", row.khoang_cach_goi_phut],
+    ]) {
+      if (!Number.isInteger(value) || value <= 0) {
+        throw new Error(`C3-09 config error: ${key} must be a positive integer`);
+      }
+    }
+  }
+
   return {
-    a: positiveOr1(row.ti_le_online),
-    b: positiveOr1(row.ti_le_offline),
-    maxCalls: positiveOr1(row.so_lan_goi_toi_da ?? 3),
-    callIntervalMinutes: positiveOr1(row.khoang_cach_goi_phut ?? 1),
-    scanCycleMinutes: positiveOr1(row.chu_ky_quet_phut ?? 1),
+    a: positiveOr1(row?.ti_le_online),
+    b: positiveOr1(row?.ti_le_offline),
+    maxCalls: row?.so_lan_goi_toi_da,
+    callIntervalMinutes: row?.khoang_cach_goi_phut,
+    scanCycleMinutes: positiveOr1(row?.chu_ky_quet_phut ?? 1),
   };
 };
 
@@ -140,7 +154,7 @@ const fetchQueueDetail = async (db, queueId) => {
 // - so_lan_goi < so_lan_goi_toi_da (N)
 // - Thời gian từ thoi_gian_goi_gan_nhat đến hiện tại >= khoang_cach_goi_phut (M)
 const xuLyTuDongGoiLai = async (onlyIds = null) => {
-  const { maxCalls, callIntervalMinutes } = await getQueueConfig(pool);
+  const { maxCalls, callIntervalMinutes } = await getQueueConfig(pool, { requireRecallConfig: true });
 
   const ung = await pool.query(
     `SELECT h.id
@@ -148,7 +162,7 @@ const xuLyTuDongGoiLai = async (onlyIds = null) => {
      WHERE h.trang_thai = $1
        AND ${CHECKIN_DAY} = ${TODAY_VN}
        AND h.so_lan_goi < $2
-       AND COALESCE(h.thoi_gian_goi_gan_nhat, h.thoi_gian_check_in)
+       AND h.thoi_gian_goi_gan_nhat
            <= NOW() - ($3::int * interval '1 minute')
        AND ($4::int[] IS NULL OR h.id = ANY($4::int[]))
      ORDER BY h.id ASC`,
@@ -168,7 +182,7 @@ const xuLyTuDongGoiLai = async (onlyIds = null) => {
            AND h.trang_thai = $2
            AND ${CHECKIN_DAY} = ${TODAY_VN}
            AND h.so_lan_goi < $3
-           AND COALESCE(h.thoi_gian_goi_gan_nhat, h.thoi_gian_check_in)
+           AND h.thoi_gian_goi_gan_nhat
                <= NOW() - ($4::int * interval '1 minute')
          RETURNING h.id, h.so_lan_goi`,
         [id, ST_DANG_GOI, maxCalls, callIntervalMinutes]
@@ -402,7 +416,7 @@ const recallPatient = async (req, res) => {
       return res.status(errorStatus).json({ success: false, message: errorMessage });
     }
 
-    const { maxCalls, callIntervalMinutes } = await getQueueConfig(client);
+    const { maxCalls, callIntervalMinutes } = await getQueueConfig(client, { requireRecallConfig: true });
 
     const calling = await client.query(
       `SELECT h.id, h.so_thu_tu, h.loai, h.so_lan_goi, h.thoi_gian_goi_gan_nhat,
@@ -539,7 +553,7 @@ const skipPatient = async (req, res) => {
     }
 
     // Chỉ được xử lý sau khi đã gọi đủ số lần tối đa (N)
-    const { maxCalls } = await getQueueConfig(client);
+    const { maxCalls } = await getQueueConfig(client, { requireRecallConfig: true });
     if (row.so_lan_goi < maxCalls) {
       return fail(
         400,
@@ -790,5 +804,6 @@ module.exports = {
   skipPatient,
   requeuePatient,
   startExamination,
+  getQueueConfig,
   xuLyTuDongGoiLai,
 };

@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const pool = require("../src/config/db");
-const { xuLyTuDongGoiLai } = require("../src/controllers/callNext.controller");
+const { getQueueConfig, xuLyTuDongGoiLai } = require("../src/controllers/callNext.controller");
 
 const BASE = "http://localhost:3000/api";
 const STATUS_ACTIVE = "HoatDong";
@@ -61,6 +61,43 @@ const cleanup = async () => {
 
 (async () => {
   try {
+    const validConfig = {
+      ti_le_online: 1,
+      ti_le_offline: 1,
+      so_lan_goi_toi_da: 3,
+      khoang_cach_goi_phut: 1,
+      chu_ky_quet_phut: 1,
+    };
+    const configDb = (row) => ({
+      query: async () => ({ rows: row ? [row] : [] }),
+    });
+    const expectInvalidConfig = async (label, row, expectedField) => {
+      let error;
+      try {
+        await getQueueConfig(configDb(row), { requireRecallConfig: true });
+      } catch (err) {
+        error = err;
+      }
+      check(label, Boolean(error) && (!expectedField || error.message.includes(expectedField)), error?.message);
+    };
+
+    await expectInvalidConfig("Cấu hình C3-09 thiếu dòng bị từ chối", null, "no row");
+    for (const [field, invalidValue] of [
+      ["so_lan_goi_toi_da", null],
+      ["so_lan_goi_toi_da", 0],
+      ["so_lan_goi_toi_da", -1],
+      ["so_lan_goi_toi_da", "3"],
+      ["khoang_cach_goi_phut", null],
+      ["khoang_cach_goi_phut", 0],
+      ["khoang_cach_goi_phut", -1],
+      ["khoang_cach_goi_phut", "1"],
+    ]) {
+      await expectInvalidConfig(`Từ chối ${field}=${String(invalidValue)}`, {
+        ...validConfig,
+        [field]: invalidValue,
+      }, field);
+    }
+
     const pwHash = await bcrypt.hash("123456", 10);
     const rolesRes = await pool.query(`SELECT id, ten_vai_tro FROM "VaiTro"`);
     const roleMap = Object.fromEntries(rolesRes.rows.map((r) => [r.ten_vai_tro, r.id]));
@@ -69,8 +106,15 @@ const cleanup = async () => {
     const ck = (await pool.query(`SELECT id FROM "ChuyenKhoa" ORDER BY id LIMIT 1`)).rows[0].id;
 
     const cfgRow = (await pool.query(`SELECT * FROM "CauHinhHeThong" ORDER BY id LIMIT 1`)).rows[0];
-    const maxCalls = Number(cfgRow?.so_lan_goi_toi_da || 3);
-    const intervalMin = Number(cfgRow?.khoang_cach_goi_phut || 1);
+    if (
+      !cfgRow ||
+      !Number.isInteger(cfgRow.so_lan_goi_toi_da) || cfgRow.so_lan_goi_toi_da <= 0 ||
+      !Number.isInteger(cfgRow.khoang_cach_goi_phut) || cfgRow.khoang_cach_goi_phut <= 0
+    ) {
+      throw new Error("Test C3-09 requires valid so_lan_goi_toi_da and khoang_cach_goi_phut config");
+    }
+    const maxCalls = cfgRow.so_lan_goi_toi_da;
+    const intervalMin = cfgRow.khoang_cach_goi_phut;
 
     const mkUser = async (roleId, tag) => {
       const username = `is51_${sfx}_${tag}`;
@@ -194,6 +238,18 @@ const cleanup = async () => {
     // =========================================================================
     // NHÓM 3: Kiểm soát khoảng cách gọi (M) & Auto-Recall tới N lần & Chặn Skip sớm
     // =========================================================================
+    await pool.query(`UPDATE "HangDoi" SET thoi_gian_goi_gan_nhat = NULL WHERE id = $1`, [hdOnline1]);
+    const nullTimestampRecall = await xuLyTuDongGoiLai([hdOnline1]);
+    const nullTimestampRow = (await pool.query(
+      `SELECT so_lan_goi, thoi_gian_goi_gan_nhat FROM "HangDoi" WHERE id = $1`,
+      [hdOnline1]
+    )).rows[0];
+    check(
+      "Timestamp NULL bị bỏ qua, không dùng check-in hoặc tăng số lần gọi",
+      nullTimestampRecall === 0 && nullTimestampRow.so_lan_goi === 1 && nullTimestampRow.thoi_gian_goi_gan_nhat === null
+    );
+    await pool.query(`UPDATE "HangDoi" SET thoi_gian_goi_gan_nhat = NOW() WHERE id = $1`, [hdOnline1]);
+
     r = await api("POST", `/queue/${hdOnline1}/skip`, {}, doc1.token);
     check(
       "Chặn Skip khi chưa gọi đủ số lần tối đa (so_lan_goi = 1 < N)",
