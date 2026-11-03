@@ -21,6 +21,7 @@ import AppointmentDetailPage from "../pages/patient/appointments/AppointmentDeta
 import OnlineCheckinPage from "../pages/receptionist/checkin/OnlineCheckinPage";
 import OfflineCheckinPage from "../pages/receptionist/checkin/OfflineCheckinPage";
 import ReceptionQueuePage from "../pages/receptionist/ReceptionQueuePage";
+import CallPatientPage from "../pages/doctor/call/CallPatientPage";
 function AppRoutes() {
     return (
         <Routes>
@@ -72,8 +73,17 @@ function AppRoutes() {
                 />
             </Route>
 
-            {/* Bác sĩ */}
-            <Route path="/doctor" element={<DoctorHomePage />} />
+            {/* Bác sĩ: phải đăng nhập với vai trò Bác sĩ */}
+            <Route
+                element={
+                    <ProtectedRoute role="Bác sĩ">
+                        <MainLayout role="doctor" />
+                    </ProtectedRoute>
+                }
+            >
+                <Route path="/doctor" element={<DoctorHomePage />} />
+                <Route path="/doctor/call" element={<CallPatientPage />} />
+            </Route>
 
             {/* Lễ tân: phải đăng nhập với vai trò Lễ tân */}
             <Route
