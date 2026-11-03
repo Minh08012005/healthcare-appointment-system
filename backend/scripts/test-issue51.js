@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const pool = require("../src/config/db");
 const { getQueueConfig, xuLyTuDongGoiLai } = require("../src/controllers/callNext.controller");
+const ORIGINAL_C3_JOB_DRY_RUN = process.env.C3_JOB_DRY_RUN;
 
 const BASE = "http://localhost:3000/api";
 const STATUS_ACTIVE = "HoatDong";
@@ -236,7 +237,51 @@ const cleanup = async () => {
     );
 
     // =========================================================================
-    // NHÓM 3: Kiểm soát khoảng cách gọi (M) & Auto-Recall tới N lần & Chặn Skip sớm
+    // NHÓM 3: DRY-RUN không ghi DB; chế độ thường vẫn auto-recall
+    // =========================================================================
+    await pool.query(
+      `UPDATE "HangDoi"
+       SET thoi_gian_goi_gan_nhat = NOW() - (($2::int + 1) * interval '1 minute')
+       WHERE id = $1`,
+      [hdOnline1, intervalMin]
+    );
+    const beforeDryRun = (await pool.query(
+      `SELECT so_lan_goi, thoi_gian_goi_gan_nhat, trang_thai FROM "HangDoi" WHERE id = $1`,
+      [hdOnline1]
+    )).rows[0];
+    process.env.C3_JOB_DRY_RUN = "true";
+    const dryRunRecall = await xuLyTuDongGoiLai([hdOnline1]);
+    const afterDryRun = (await pool.query(
+      `SELECT so_lan_goi, thoi_gian_goi_gan_nhat, trang_thai FROM "HangDoi" WHERE id = $1`,
+      [hdOnline1]
+    )).rows[0];
+    check(
+      "DRY-RUN không đổi số lần gọi, timestamp hoặc trạng thái",
+      dryRunRecall === 0 &&
+        afterDryRun.so_lan_goi === beforeDryRun.so_lan_goi &&
+        afterDryRun.thoi_gian_goi_gan_nhat.getTime() === beforeDryRun.thoi_gian_goi_gan_nhat.getTime() &&
+        afterDryRun.trang_thai === beforeDryRun.trang_thai
+    );
+
+    process.env.C3_JOB_DRY_RUN = "false";
+    const normalRecall = await xuLyTuDongGoiLai([hdOnline1]);
+    const afterNormalRecall = (await pool.query(
+      `SELECT so_lan_goi, thoi_gian_goi_gan_nhat FROM "HangDoi" WHERE id = $1`,
+      [hdOnline1]
+    )).rows[0];
+    check(
+      "Non-dry-run vẫn auto-recall và cập nhật số lần gọi/timestamp",
+      normalRecall === 1 &&
+        afterNormalRecall.so_lan_goi === beforeDryRun.so_lan_goi + 1 &&
+        afterNormalRecall.thoi_gian_goi_gan_nhat.getTime() > beforeDryRun.thoi_gian_goi_gan_nhat.getTime()
+    );
+    await pool.query(
+      `UPDATE "HangDoi" SET so_lan_goi = 1, thoi_gian_goi_gan_nhat = NOW() WHERE id = $1`,
+      [hdOnline1]
+    );
+
+    // =========================================================================
+    // NHÓM 4: Kiểm soát khoảng cách gọi (M) & Auto-Recall tới N lần & Chặn Skip sớm
     // =========================================================================
     await pool.query(`UPDATE "HangDoi" SET thoi_gian_goi_gan_nhat = NULL WHERE id = $1`, [hdOnline1]);
     const nullTimestampRecall = await xuLyTuDongGoiLai([hdOnline1]);
@@ -404,6 +449,8 @@ const cleanup = async () => {
     fail++;
     console.error("LỖI CHẠY SCRIPT TEST:", e);
   } finally {
+    if (ORIGINAL_C3_JOB_DRY_RUN === undefined) delete process.env.C3_JOB_DRY_RUN;
+    else process.env.C3_JOB_DRY_RUN = ORIGINAL_C3_JOB_DRY_RUN;
     await cleanup();
     console.log(`\nKẾT QUẢ KIỂM THỬ: ${pass} PASS, ${fail} FAIL`);
     await pool.end();

@@ -169,6 +169,13 @@ const xuLyTuDongGoiLai = async (onlyIds = null) => {
     [ST_DANG_GOI, maxCalls, callIntervalMinutes, onlyIds]
   );
 
+  if (process.env.C3_JOB_DRY_RUN === "true") {
+    if (ung.rowCount > 0) {
+      console.log(`[C3-09][DRY-RUN] Sẽ tự động gọi lại ${ung.rowCount} lượt:`, ung.rows);
+    }
+    return 0;
+  }
+
   let daGoiLai = 0;
   for (const { id } of ung.rows) {
     const client = await pool.connect();
