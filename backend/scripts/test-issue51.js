@@ -585,6 +585,59 @@ const cleanup = async () => {
         parallelRequeueB.trang_thai === "CHO_KHAM" && parallelRequeueB.loai === "OFFLINE" &&
         parallelRequeueA.so_thu_tu !== parallelRequeueB.so_thu_tu
     );
+
+    // Two active schedules for this doctor: room A is earlier and has a
+    // DANG_GOI row, while /next resolves the currently active room B.
+    await pool.query(
+      `UPDATE "HangDoi" h SET trang_thai = 'DANG_KHAM'
+       FROM "BenhNhan" bn
+       WHERE h.benh_nhan_id = bn.id AND h.bac_si_id = $1
+         AND h.trang_thai = 'DANG_GOI' AND bn.ho_ten LIKE $2`,
+      [bs1, `${P} BN%`]
+    );
+    await pool.query(
+      `UPDATE "LichKhamBacSi"
+       SET gio_ket_thuc = '00:01'
+       WHERE bac_si_id = $1 AND phong_kham_id = $2
+         AND ngay = (NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date`,
+      [bs1, room1]
+    );
+    await pool.query(
+      `INSERT INTO "LichKhamBacSi"
+         (bac_si_id, phong_kham_id, ngay, gio_bat_dau, gio_ket_thuc,
+          so_slot_toi_da, so_slot_online, so_slot_da_dat, trang_thai)
+       VALUES ($1, $2, (NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date,
+               '00:02', '23:59:59', 10, 5, 0, 'HoatDong')`,
+      [bs1, room2]
+    );
+
+    const activeInRoomAId = await makeQueueFixture({
+      tag: "cross-room-active", roomId: room1, doctorId: bs1, status: "DANG_GOI", calls: 1,
+    });
+    const waitingInRoomBId = await makeQueueFixture({
+      tag: "cross-room-waiting", roomId: room2, doctorId: bs1, status: "CHO_KHAM", calls: 0,
+    });
+    const crossRoomNext = await api("POST", "/queue/next", {}, doc1.token);
+    const [activeInRoomA, waitingInRoomB] = await Promise.all([
+      readQueueState(activeInRoomAId), readQueueState(waitingInRoomBId),
+    ]);
+    const testCallingCount = await pool.query(
+      `SELECT COUNT(*)::int AS n FROM "HangDoi" h
+       JOIN "BenhNhan" bn ON bn.id = h.benh_nhan_id
+       WHERE h.bac_si_id = $1 AND h.trang_thai = 'DANG_GOI'
+         AND bn.ho_ten LIKE $2`,
+      [bs1, `${P} BN%`]
+    );
+    check(
+      "/queue/next phòng B bị chặn bởi DANG_GOI cùng bác sĩ ở phòng A",
+      crossRoomNext.status === 409 && crossRoomNext.data?.code === "ALREADY_CALLING" &&
+        crossRoomNext.data?.data?.current?.id === activeInRoomAId &&
+        activeInRoomA.trang_thai === "DANG_GOI" && waitingInRoomB.trang_thai === "CHO_KHAM" &&
+        testCallingCount.rows[0].n === 1,
+      JSON.stringify({ status: crossRoomNext.status, data: crossRoomNext.data,
+        activeInRoomAId, waitingInRoomB: waitingInRoomB.trang_thai,
+        testCallingCount: testCallingCount.rows[0].n })
+    );
   } catch (e) {
     fail++;
     console.error("LỖI CHẠY SCRIPT TEST:", e);

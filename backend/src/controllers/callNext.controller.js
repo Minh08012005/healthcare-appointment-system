@@ -229,16 +229,16 @@ const callNextPatient = async (req, res) => {
     // 3. Khóa theo phòng
     await client.query(`SELECT pg_advisory_xact_lock($1::int, $2::int)`, [LOCK_NS, roomId]);
 
-    // 4. Bác sĩ đang có bệnh nhân DANG_GOI tại phòng thì chưa được gọi người tiếp theo
+    // 4. Bác sĩ có bất kỳ lượt DANG_GOI nào hôm nay thì chưa được gọi người tiếp theo
     const calling = await client.query(
       `SELECT h.id, h.loai, h.so_thu_tu, h.so_lan_goi, h.thoi_gian_goi_gan_nhat, bn.ho_ten
        FROM "HangDoi" h
        JOIN "BenhNhan" bn ON bn.id = h.benh_nhan_id
-       WHERE h.bac_si_id = $1 AND h.phong_kham_id = $2
-         AND h.trang_thai = $3 AND ${CHECKIN_DAY} = ${TODAY_VN}
+       WHERE h.bac_si_id = $1
+         AND h.trang_thai = $2 AND ${CHECKIN_DAY} = ${TODAY_VN}
        ORDER BY h.id
        LIMIT 1`,
-      [bacSiId, roomId, ST_DANG_GOI]
+      [bacSiId, ST_DANG_GOI]
     );
     if (calling.rowCount > 0) {
       await client.query("ROLLBACK");
