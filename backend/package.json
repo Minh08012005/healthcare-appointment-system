@@ -11,6 +11,7 @@
     "db:migrate:c3-09": "node scripts/migrate-c3-09.js",
     "db:verify": "node scripts/verify-schema.js",
     "db:seed": "node scripts/run-seed.js",
+    "db:seed-c3-demo": "node scripts/seed-c3-demo.js",
     "db:verify-seed": "node scripts/verify-seed.js",
     "api:verify-master": "node scripts/verify-master-api.js",
     "api:test-offline": "node scripts/test-offline-checkin.js",
