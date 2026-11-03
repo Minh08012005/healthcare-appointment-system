@@ -29,21 +29,7 @@ const positiveOr1 = (v) => {
   return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1;
 };
 
-// Đảm bảo bảng HangDoi có cột thoi_gian_goi_gan_nhat để kiểm soát khoảng cách giữa các lần gọi
-let schemaReadyPromise = null;
-const ensureCallSchema = () => {
-  if (!schemaReadyPromise) {
-    schemaReadyPromise = pool
-      .query(`ALTER TABLE "HangDoi" ADD COLUMN IF NOT EXISTS thoi_gian_goi_gan_nhat TIMESTAMPTZ`)
-      .catch((err) => {
-        schemaReadyPromise = null;
-        throw err;
-      });
-  }
-  return schemaReadyPromise;
-};
-
-// Đọc cấu hình từ CauHinhHeThong
+// �?c c?u h�nh t? CauHinhHeThong
 const getQueueConfig = async (db = pool) => {
   const cfg = await db.query(
     `SELECT ti_le_online, ti_le_offline, so_lan_goi_toi_da, khoang_cach_goi_phut, chu_ky_quet_phut
@@ -154,7 +140,6 @@ const fetchQueueDetail = async (db, queueId) => {
 // - so_lan_goi < so_lan_goi_toi_da (N)
 // - Thời gian từ thoi_gian_goi_gan_nhat đến hiện tại >= khoang_cach_goi_phut (M)
 const xuLyTuDongGoiLai = async (onlyIds = null) => {
-  await ensureCallSchema();
   const { maxCalls, callIntervalMinutes } = await getQueueConfig(pool);
 
   const ung = await pool.query(
@@ -207,8 +192,6 @@ const callNextPatient = async (req, res) => {
       .status(403)
       .json({ success: false, message: "Chỉ bác sĩ mới được gọi bệnh nhân tiếp theo" });
   }
-
-  await ensureCallSchema();
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -356,8 +339,6 @@ const getCurrentCalling = async (req, res) => {
   if (!req.user || req.user.role !== ROLE_BAC_SI) {
     return res.status(403).json({ success: false, message: "Chỉ bác sĩ mới được xem thông tin gọi khám" });
   }
-
-  await ensureCallSchema();
   const client = await pool.connect();
   try {
     const { bacSiId, roomId, errorStatus, errorMessage } = await getDoctorAndRoom(client, req.user.id);
@@ -411,8 +392,6 @@ const recallPatient = async (req, res) => {
   if (!req.user || req.user.role !== ROLE_BAC_SI) {
     return res.status(403).json({ success: false, message: "Chỉ bác sĩ mới được gọi lại bệnh nhân" });
   }
-
-  await ensureCallSchema();
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -513,8 +492,6 @@ const skipPatient = async (req, res) => {
   if (!Number.isInteger(queueId) || queueId <= 0) {
     return res.status(400).json({ success: false, message: "ID hàng đợi không hợp lệ" });
   }
-
-  await ensureCallSchema();
   // Đồng bộ auto-recall nếu đã đủ thời gian trước khi kiểm tra skip
   await xuLyTuDongGoiLai([queueId]);
 
@@ -620,8 +597,6 @@ const requeuePatient = async (req, res) => {
   if (!Number.isInteger(queueId) || queueId <= 0) {
     return res.status(400).json({ success: false, message: "ID hàng đợi không hợp lệ" });
   }
-
-  await ensureCallSchema();
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -723,8 +698,6 @@ const startExamination = async (req, res) => {
   if (!Number.isInteger(queueId) || queueId <= 0) {
     return res.status(400).json({ success: false, message: "ID hàng đợi không hợp lệ" });
   }
-
-  await ensureCallSchema();
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
