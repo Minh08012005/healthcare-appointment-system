@@ -34,7 +34,7 @@ function CallPatientPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [pending, setPending] = useState(null); // "next" | "recall" | "skip" | "start"
+  const [pending, setPending] = useState(null); // "next" | "skip" | "start"
   const [notice, setNotice] = useState(null); // { type, title, text } — mỗi lúc 1 thông báo
   const busyRef = useRef(false); // chặn double-click trước khi state kịp render
 
@@ -116,25 +116,6 @@ function CallPatientPage() {
           title: "Đang có bệnh nhân được gọi",
           text: err.message,
         });
-      }
-    });
-
-  const handleRecall = () =>
-    runAction("recall", async () => {
-      try {
-        const res = await doctorQueueApi.recall();
-        const q = res?.data?.queue;
-        if (q) {
-          setCurrent((prev) =>
-            prev?.queue?.id === q.id
-              ? { ...prev, queue: { ...prev.queue, so_lan_goi: q.so_lan_goi } }
-              : prev,
-          );
-        }
-        setNotice({ type: "success", title: "Đã gọi lại", text: res?.message || "" });
-      } catch (err) {
-        if (err?.code !== "MAX_CALLS_REACHED") throw err;
-        setNotice({ type: "warning", title: "Bệnh nhân chưa có mặt", text: err.message });
       }
     });
 
@@ -253,14 +234,6 @@ function CallPatientPage() {
               {pending === "start" ? "Đang xử lý..." : "Bắt đầu khám"}
             </button>
             <div className="cp-card__actions-right">
-              <button
-                type="button"
-                className="cp-btn cp-btn--outline"
-                onClick={handleRecall}
-                disabled={busy}
-              >
-                {pending === "recall" ? "Đang gọi lại..." : "Gọi lại"}
-              </button>
               <button
                 type="button"
                 className="cp-btn cp-btn--danger"
