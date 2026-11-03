@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { xuLyTuDongGoiLai } = require("../controllers/callNext.controller");
 // Lỗi từ kết nối đang rảnh trong pool (ví dụ Neon cắt kết nối): chỉ ghi log, không sập server
 pool.on("error", (err) => console.error("[C3-03] Lỗi kết nối rảnh trong pool:", err.message));
 
@@ -200,6 +201,7 @@ const lap = async () => {
     chuKyPhut = cfg.chu_ky_quet_phut;
     await xuLyQuaHan(cfg.checkin_toi_thieu_phut);
     await xuLyDenGio();
+    await xuLyTuDongGoiLai();
     if (isDryRun()) console.log("[C3-03][DRY-RUN] Lượt quét hoàn tất");
   } catch (err) {
     console.error("[C3-03] Lỗi lượt quét:", err.message);

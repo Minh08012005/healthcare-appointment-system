@@ -134,7 +134,8 @@ CREATE TABLE IF NOT EXISTS "HangDoi" (
     "trang_thai" VARCHAR(50),
     "thoi_gian_check_in" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     "so_lan_goi" INTEGER NOT NULL DEFAULT 0,
-    "so_lan_bo_luot" INTEGER NOT NULL DEFAULT 0
+    "so_lan_bo_luot" INTEGER NOT NULL DEFAULT 0,
+    "thoi_gian_goi_gan_nhat" TIMESTAMPTZ
 );
 
 -- C3-01: cập nhật bảng đã tồn tại mà không ảnh hưởng dữ liệu hiện có.
