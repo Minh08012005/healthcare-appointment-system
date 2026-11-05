@@ -191,27 +191,59 @@ const xuLyDenGio = async (onlyIds = null) => {
   return daXuLy;
 };
 
-// Lượt kế tiếp chỉ được hẹn SAU KHI lượt trước xong => không bao giờ chạy chồng nhau
+// Phạm vi tuỳ chọn cho test end-to-end (mặc định null = xử lý toàn bộ như cũ).
+// id 0 không tồn tại trong bảng nào nên dùng để vô hiệu hoá task C3-03 khi test.
+const layPhamViTest = () => {
+  const raw = (process.env.C3_JOB_ONLY_IDS || "").trim();
+  if (!raw) return null;
+  const ids = raw
+    .split(",")
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isInteger(n) && n >= 0);
+  return ids.length > 0 ? ids : null;
+};
+
+// Lượt kế tiếp chỉ được hẹn SAU KHI lượt trước xong => không bao giờ chạy chồng nhau.
+// Việc hẹn lượt kế tiếp nằm trong finally: một lượt lỗi không được phép làm job chết.
 let timer = null;
 let dung = false;
 const lap = async () => {
   let chuKyPhut = RETRY_PHUT;
+  const batDau = Date.now();
+  const phamVi = layPhamViTest();
+  const kq = { quaHan: 0, denGio: 0, goiLai: 0 };
+  console.log(
+    `[C3-JOB] Bắt đầu lượt quét${isDryRun() ? " (DRY-RUN)" : ""}` +
+      (phamVi ? ` [chỉ id: ${phamVi.join(",")}]` : "")
+  );
   try {
     const cfg = await layCauHinh();
     chuKyPhut = cfg.chu_ky_quet_phut;
-    await xuLyQuaHan(cfg.checkin_toi_thieu_phut);
-    await xuLyDenGio();
-    await xuLyTuDongGoiLai();
-    if (isDryRun()) console.log("[C3-03][DRY-RUN] Lượt quét hoàn tất");
+    kq.quaHan = await xuLyQuaHan(cfg.checkin_toi_thieu_phut, phamVi);
+    kq.denGio = await xuLyDenGio(phamVi);
+    kq.goiLai = await xuLyTuDongGoiLai(phamVi);
   } catch (err) {
-    console.error("[C3-03] Lỗi lượt quét:", err.message);
+    console.error("[C3-JOB] Lỗi lượt quét:", err.message);
+  } finally {
+    if (!dung) timer = setTimeout(lap, chuKyPhut * 60 * 1000);
+    const giay = ((Date.now() - batDau) / 1000).toFixed(1);
+    console.log(
+      `[C3-JOB] Lượt quét xong sau ${giay}s: quá hạn=${kq.quaHan}, vào hàng đợi=${kq.denGio}, ` +
+        `tự động gọi lại=${kq.goiLai}${isDryRun() ? " (DRY-RUN: không ghi DB)" : ""}; ` +
+        `lượt kế tiếp sau ${chuKyPhut} phút`
+    );
   }
-  if (!dung) timer = setTimeout(lap, chuKyPhut * 60 * 1000);
 };
 
 const batDauJobCheckin = () => {
   dung = false;
-  console.log(`[C3-03] Job check-in nền: BẬT${isDryRun() ? " (DRY-RUN, không ghi DB)" : ""}`);
+  console.log(
+    `[C3-JOB] Scheduler: BẬT (ENABLE_C3_BACKGROUND=${process.env.ENABLE_C3_BACKGROUND ?? "(unset)"}, ` +
+      `C3_JOB_DRY_RUN=${process.env.C3_JOB_DRY_RUN ?? "(unset)"}) - ` +
+      (isDryRun()
+        ? "DRY-RUN: chỉ đọc, KHÔNG ghi DB và KHÔNG auto-recall C3-09"
+        : "sẽ ghi DB và auto-recall C3-09")
+  );
   lap();
 };
 const dungJobCheckin = () => {

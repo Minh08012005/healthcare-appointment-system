@@ -362,27 +362,24 @@ const getCurrentCalling = async (req, res) => {
   }
   const client = await pool.connect();
   try {
-    const { bacSiId, roomId, errorStatus, errorMessage } = await getDoctorAndRoom(client, req.user.id);
+    const { bacSiId, errorStatus, errorMessage } = await getDoctorAndRoom(client, req.user.id);
     if (errorStatus === 403) {
       return res.status(403).json({ success: false, message: errorMessage });
     }
-    if (!roomId) {
-      return res.json({
-        success: true,
-        data: { has_calling: false, queue: null, patient: null, appointment: null, room: null, trieu_chung: null },
-      });
-    }
 
+    // Scope PHẢI giống hệt điều kiện chặn ALREADY_CALLING của POST /queue/next:
+    // "bác sĩ + lượt trong ngày", KHÔNG lọc theo phòng. Nếu lọc theo phòng thì khi ca khám
+    // đổi phòng / phòng không resolve được, F5 sẽ trả has_calling = false trong khi /next
+    // vẫn 409 ALREADY_CALLING => màn bác sĩ trống và không gọi được bệnh nhân nào.
     const calling = await client.query(
       `SELECT h.id
        FROM "HangDoi" h
        WHERE h.bac_si_id = $1
-         AND h.phong_kham_id = $2
-         AND h.trang_thai = $3
+         AND h.trang_thai = $2
          AND ${CHECKIN_DAY} = ${TODAY_VN}
-       ORDER BY h.id DESC
+       ORDER BY h.id ASC
        LIMIT 1`,
-      [bacSiId, roomId, ST_DANG_GOI]
+      [bacSiId, ST_DANG_GOI]
     );
 
     if (calling.rowCount === 0) {

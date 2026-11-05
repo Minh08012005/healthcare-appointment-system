@@ -638,6 +638,15 @@ const cleanup = async () => {
         activeInRoomAId, waitingInRoomB: waitingInRoomB.trang_thai,
         testCallingCount: testCallingCount.rows[0].n })
     );
+
+    const crossRoomCurrent = await api("GET", "/queue/current", null, doc1.token);
+    check(
+      "GET /queue/current (F5 recovery) khôi phục đúng DANG_GOI cùng bác sĩ ở phòng A",
+      crossRoomCurrent.status === 200 &&
+        crossRoomCurrent.data?.data?.has_calling === true &&
+        crossRoomCurrent.data?.data?.queue?.id === activeInRoomAId,
+      JSON.stringify({ status: crossRoomCurrent.status, data: crossRoomCurrent.data })
+    );
   } catch (e) {
     fail++;
     console.error("LỖI CHẠY SCRIPT TEST:", e);
