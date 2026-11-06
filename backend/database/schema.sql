@@ -179,12 +179,27 @@ CREATE TABLE IF NOT EXISTS "KetQuaKham" (
 );
 
 -- 14. Bảng ChiDinhXetNghiem: Các phiếu chỉ định cận lâm sàng / xét nghiệm
+-- C4 contract: trang_thai CHO_XU_LY | DANG_XU_LY | DA_XONG.
 CREATE TABLE IF NOT EXISTS "ChiDinhXetNghiem" (
     "id" SERIAL PRIMARY KEY,
     "ho_so_id" INTEGER NOT NULL REFERENCES "HoSoBenhAn"("id"),
     "phong_kham_id" INTEGER REFERENCES "PhongKham"("id"),
+    "ten_xet_nghiem" VARCHAR(255) NOT NULL,
+    "ghi_chu" TEXT,
+    "thoi_gian_chi_dinh" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     "trang_thai" VARCHAR(50)
 );
+
+-- C4-01: cập nhật bảng đã tồn tại mà không ảnh hưởng dữ liệu hiện có.
+ALTER TABLE "ChiDinhXetNghiem"
+    ADD COLUMN IF NOT EXISTS "ten_xet_nghiem" VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS "ghi_chu" TEXT,
+    ADD COLUMN IF NOT EXISTS "thoi_gian_chi_dinh" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP;
+UPDATE "ChiDinhXetNghiem"
+    SET "ten_xet_nghiem" = 'Chưa xác định'
+    WHERE "ten_xet_nghiem" IS NULL;
+ALTER TABLE "ChiDinhXetNghiem"
+    ALTER COLUMN "ten_xet_nghiem" SET NOT NULL;
 
 -- 15. Bảng KetQuaXetNghiem: Kết quả và tệp đính kèm của xét nghiệm
 CREATE TABLE IF NOT EXISTS "KetQuaXetNghiem" (
