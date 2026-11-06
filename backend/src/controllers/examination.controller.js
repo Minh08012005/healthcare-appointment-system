@@ -5,6 +5,9 @@ const LANE_LABEL = { ONLINE: "A", OFFLINE: "B" };
 const INT_MAX = 2147483647;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
+const HS_DANG_KHAM = "DANG_KHAM";
+const RESULT_FIELDS = ["trieu_chung_ghi_nhan", "chan_doan", "loi_dan", "don_thuoc"];
+const MAX_FIELD_LENGTH = 10000;
 
 const parseId = (v) => {
   if (typeof v !== "string" || !/^[1-9]\d{0,9}$/.test(v)) return null;
@@ -14,9 +17,9 @@ const parseId = (v) => {
 
 const fail = (res, status, message) => res.status(status).json({ success: false, message });
 
-const onlyDoctor = (req, res) => {
+const onlyDoctor = (req, res, message = "Chỉ bác sĩ mới được xem hồ sơ khám") => {
   if (!req.user || req.user.role !== ROLE_BAC_SI) {
-    fail(res, 403, "Chỉ bác sĩ mới được xem hồ sơ khám");
+    fail(res, 403, message);
     return false;
   }
   return true;
@@ -188,4 +191,125 @@ const getHistory = async (req, res) => {
   }
 };
 
-module.exports = { getExamination, getHistory };
+// Chuẩn hoá body của API lưu kết quả khám.
+// Cập nhật từng phần: trường không gửi -> giữ nguyên; chuỗi rỗng/null -> xoá nội dung (NULL).
+// Trả { values } (chỉ gồm các trường được gửi) hoặc { message } khi dữ liệu không hợp lệ.
+const parseResultBody = (body) => {
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return { message: "Body phải là JSON object" };
+  }
+  const values = {};
+  for (const key of RESULT_FIELDS) {
+    if (!Object.prototype.hasOwnProperty.call(body, key)) continue;
+    const v = body[key];
+    if (v === null) {
+      values[key] = null;
+      continue;
+    }
+    if (typeof v !== "string") return { message: `${key} phải là chuỗi hoặc null` };
+    const t = v.trim();
+    if (t.length > MAX_FIELD_LENGTH) {
+      return { message: `${key} không được vượt quá ${MAX_FIELD_LENGTH} ký tự` };
+    }
+    values[key] = t === "" ? null : t;
+  }
+  if (Object.keys(values).length === 0) {
+    return { message: `Cần gửi ít nhất một trong các trường: ${RESULT_FIELDS.join(", ")}` };
+  }
+  return { values };
+};
+
+// PUT /api/examinations/:hoSoId/result
+// Lưu/cập nhật KetQuaKham của hồ sơ đang khám (upsert, không tạo dòng trùng).
+const saveExamResult = async (req, res) => {
+  if (!onlyDoctor(req, res, "Chỉ bác sĩ mới được ghi nhận kết quả khám")) return;
+  const hoSoId = parseId(req.params.hoSoId);
+  if (!hoSoId) return fail(res, 400, "ho_so_id không hợp lệ");
+
+  const parsed = parseResultBody(req.body);
+  if (!parsed.values) return fail(res, 400, parsed.message);
+  const { values } = parsed;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const bs = await client.query(`SELECT id FROM "BacSi" WHERE tai_khoan_id = $1`, [req.user.id]);
+    if (bs.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return fail(res, 403, "Tài khoản chưa gắn với hồ sơ bác sĩ");
+    }
+
+    // Khoá dòng hồ sơ: các lần lưu đồng thời của cùng một hồ sơ được xếp hàng,
+    // nên không thể cùng lúc INSERT hai KetQuaKham cho một ho_so_id.
+    const hs = await client.query(
+      `SELECT hs.id, hs.trang_thai, COALESCE(hs.bac_si_id, h.bac_si_id) AS owner_bs_id
+       FROM "HoSoBenhAn" hs
+       LEFT JOIN "HangDoi" h ON h.id = hs.hang_doi_id
+       WHERE hs.id = $1
+       FOR UPDATE OF hs`,
+      [hoSoId]
+    );
+    if (hs.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return fail(res, 404, "Không tìm thấy hồ sơ khám");
+    }
+    const record = hs.rows[0];
+    if (record.owner_bs_id !== bs.rows[0].id) {
+      await client.query("ROLLBACK");
+      return fail(res, 403, "Bạn không có quyền cập nhật hồ sơ này");
+    }
+    if (record.trang_thai !== HS_DANG_KHAM) {
+      await client.query("ROLLBACK");
+      return fail(
+        res,
+        409,
+        `Chỉ được cập nhật kết quả khi hồ sơ đang khám (trạng thái hiện tại: ${record.trang_thai})`
+      );
+    }
+
+    // Cùng quy ước với API đọc C4-02: dòng KetQuaKham mới nhất (id lớn nhất) của hồ sơ.
+    const existing = await client.query(
+      `SELECT id FROM "KetQuaKham" WHERE ho_so_id = $1 ORDER BY id DESC LIMIT 1`,
+      [hoSoId]
+    );
+
+    let saved;
+    let created = false;
+    if (existing.rowCount > 0) {
+      const keys = Object.keys(values);
+      const sets = keys.map((k, i) => `"${k}" = $${i + 2}`).join(", ");
+      saved = await client.query(
+        `UPDATE "KetQuaKham" SET ${sets} WHERE id = $1
+         RETURNING id, trieu_chung_ghi_nhan, chan_doan, loi_dan, don_thuoc`,
+        [existing.rows[0].id, ...keys.map((k) => values[k])]
+      );
+    } else {
+      created = true;
+      saved = await client.query(
+        `INSERT INTO "KetQuaKham" (ho_so_id, trieu_chung_ghi_nhan, chan_doan, loi_dan, don_thuoc)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, trieu_chung_ghi_nhan, chan_doan, loi_dan, don_thuoc`,
+        [hoSoId, ...RESULT_FIELDS.map((k) => values[k] ?? null)]
+      );
+    }
+
+    await client.query("COMMIT");
+    return res.status(created ? 201 : 200).json({
+      success: true,
+      message: created ? "Đã lưu kết quả khám" : "Đã cập nhật kết quả khám",
+      data: {
+        ho_so: { id: hoSoId, trang_thai: record.trang_thai },
+        ket_qua_kham: saved.rows[0],
+      },
+    });
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    console.error("Lỗi saveExamResult:", err);
+    return fail(res, 500, "Lỗi server");
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = { getExamination, getHistory, saveExamResult };
