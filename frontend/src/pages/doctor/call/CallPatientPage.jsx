@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { doctorQueueApi } from "../../../api/doctorQueue";
 import "./callPatient.css";
 
@@ -37,6 +38,7 @@ function CallPatientPage() {
   const [pending, setPending] = useState(null); // "next" | "skip" | "start"
   const [notice, setNotice] = useState(null); // { type, title, text } — mỗi lúc 1 thông báo
   const busyRef = useRef(false); // chặn double-click trước khi state kịp render
+  const navigate = useNavigate();
 
   const applyCurrent = (data) => {
     setCurrent(data?.has_calling && data.queue ? data : null);
@@ -139,7 +141,13 @@ function CallPatientPage() {
     const name = current?.patient?.ho_ten;
     if (!queue?.id) return;
     runAction("start", async () => {
-      await doctorQueueApi.start(queue.id);
+      const res = await doctorQueueApi.start(queue.id);
+      // C4-03: chuyển sang màn khám bằng ho_so_id Backend trả về
+      const hoSoId = res?.data?.ho_so_id;
+      if (hoSoId != null) {
+        navigate(`/doctor/examination/${encodeURIComponent(hoSoId)}`);
+        return;
+      }
       setCurrent(null);
       setNotice({
         type: "success",
