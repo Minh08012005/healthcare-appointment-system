@@ -59,6 +59,19 @@ WHERE NOT EXISTS (
     SELECT 1 FROM "PhongKham" p WHERE p.ten_phong = v.ten_phong
 );
 
+-- Phòng xét nghiệm / cận lâm sàng (phục vụ chỉ định xét nghiệm C4-06 / C4-07)
+INSERT INTO "PhongKham" ("ten_phong", "chuyen_khoa_id", "loai_phong")
+SELECT v.ten_phong, NULL, v.loai_phong
+FROM (
+    VALUES
+        ('Phòng Xét nghiệm Huyết học', 'Phòng xét nghiệm'),
+        ('Phòng Xét nghiệm Sinh hóa', 'Phòng xét nghiệm'),
+        ('Phòng Chẩn đoán hình ảnh', 'Phòng xét nghiệm')
+) AS v(ten_phong, loai_phong)
+WHERE NOT EXISTS (
+    SELECT 1 FROM "PhongKham" p WHERE p.ten_phong = v.ten_phong
+);
+
 -- -----------------------------------------------------------------------------
 -- 4. Demo Data: BacSi (6 bác sĩ, đủ 4 chuyên khoa để test UC006)
 -- Idempotent: chỉ thêm bác sĩ chưa tồn tại (ho_ten + chuyen_khoa_id)
