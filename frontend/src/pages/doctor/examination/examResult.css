@@ -1,0 +1,9 @@
+/* C4-05 — Form nhập và lưu kết quả khám trên Examination Page */
+.er-form { display: flex; flex-direction: column; gap: 14px; }
+.er-field { display: flex; flex-direction: column; gap: 6px; }
+.er-field label { font-size: 13px; font-weight: 600; }
+.er-field textarea { width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); font: inherit; resize: vertical; }
+.er-field textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.er-field textarea:disabled { background: var(--bg); cursor: not-allowed; }
+.er-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+.er-hint { color: var(--text-secondary); font-size: 13px; }
