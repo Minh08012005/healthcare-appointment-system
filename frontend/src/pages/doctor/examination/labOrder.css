@@ -1,0 +1,23 @@
+/* C4-07 — Chỉ định xét nghiệm trên Examination Page */
+.lo-count { margin-left: 8px; padding: 2px 8px; color: var(--primary-dark); font-size: 12px; background: var(--primary-light); border-radius: var(--radius-pill); }
+.lo-subtitle { margin: 20px 0 10px; font-size: 14px; color: var(--text-secondary); }
+
+.lo-form { display: flex; flex-direction: column; gap: 14px; }
+.lo-field { display: flex; flex-direction: column; gap: 6px; }
+.lo-field label { font-size: 13px; font-weight: 600; }
+.lo-field input, .lo-field select, .lo-field textarea { width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); font: inherit; }
+.lo-field textarea { resize: vertical; }
+.lo-field input:focus-visible, .lo-field select:focus-visible, .lo-field textarea:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+.lo-field input:disabled, .lo-field select:disabled, .lo-field textarea:disabled { background: var(--bg); cursor: not-allowed; }
+.lo-hint { color: var(--text-secondary); }
+.lo-inline { display: flex; align-items: center; gap: 8px; color: var(--text-secondary); }
+.lo-inline--error { color: var(--danger); }
+.lo-actions { display: flex; justify-content: flex-end; }
+
+.lo-name { font-weight: 600; overflow-wrap: anywhere; }
+.lo-note { white-space: pre-line; overflow-wrap: anywhere; }
+.lo-time { white-space: nowrap; }
+
+.lo-pill--wait { color: #8a5a00; background: #fff6e5; }
+.lo-pill--doing { color: #1765a5; background: #e8f3fc; }
+.lo-pill--done { color: #1d6e3f; background: #e9f7ef; }

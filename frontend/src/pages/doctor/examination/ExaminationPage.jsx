@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFetch } from "../../../api/useFetch";
 import { examinationPaths } from "../../../api/examination";
+import LabOrderSection from "./LabOrderSection";
 import "../call/callPatient.css"; // tái dùng cp-btn, cp-state, cp-spinner, cp-pill
 import "./examination.css";
 
@@ -252,8 +253,8 @@ function ExaminationPage() {
             )}
           </section>
 
-          {/* Khu vực chỉ định xét nghiệm — C4-07 gắn tại đây */}
-          <div id="lab-order-area" />
+          {/* Khu vực chỉ định xét nghiệm (C4-07) */}
+          <LabOrderSection hoSoId={hoSoId} hoSoStatus={hoSo?.trang_thai} onRecordStale={reload} />
 
           <HistorySection hoSoId={hoSoId} />
         </div>
