@@ -241,7 +241,7 @@ function ExaminationPage() {
           <section className="ex-card" id="exam-result-area">
             <h3 className="ex-card__title">Kết quả khám hiện tại</h3>
             {hoSo?.trang_thai === "DANG_KHAM" ? (
-              <ExamResultForm hoSoId={hoSoId} ketQua={ketQua} onRecordStale={reload} />
+              <ExamResultForm key={hoSoId} hoSoId={hoSoId} ketQua={ketQua} onRecordStale={reload} />
             ) : (
               <>
                 <div className="cp-notice cp-notice--info">
