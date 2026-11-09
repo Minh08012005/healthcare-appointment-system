@@ -1,0 +1,42 @@
+.ex-page { display: flex; flex-direction: column; gap: 20px; }
+
+.ex-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.ex-header__main { min-width: 0; }
+.ex-header__name { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ex-header__name h1 { margin: 0; font-size: 24px; }
+.ex-header__sub { margin: 6px 0 0; color: var(--text-secondary); }
+.ex-header__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ex-pill--muted { color: var(--text-secondary); background: var(--bg); border: 1px solid var(--border); }
+
+.ex-grid { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 20px; align-items: start; }
+.ex-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+
+.ex-card { padding: 18px 20px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); }
+.ex-card__title, .ex-section__title { margin: 0 0 12px; font-size: 16px; }
+.ex-section { display: flex; flex-direction: column; }
+.ex-text { margin: 0; white-space: pre-line; }
+.ex-text--muted { color: var(--text-secondary); }
+
+.ex-info { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.ex-info__row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; }
+.ex-info dt { color: var(--text-secondary); }
+.ex-info dd { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+
+.ex-table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); }
+.ex-table { width: 100%; border-collapse: collapse; }
+.ex-table th, .ex-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+.ex-table th { color: var(--text-secondary); font-size: 13px; font-weight: 600; background: var(--bg); }
+.ex-table tbody tr:last-child td { border-bottom: 0; }
+.ex-table__date { font-weight: 600; white-space: nowrap; }
+.ex-table__action { text-align: right; }
+.ex-table__detail td { background: var(--bg); }
+.ex-link { padding: 0; color: var(--primary); font: inherit; font-weight: 600; background: none; border: 0; cursor: pointer; }
+.ex-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.ex-state { flex-direction: column; }
+.ex-state__actions { display: flex; gap: 10px; }
+.ex-state__actions a { text-decoration: none; }
+
+@media (max-width: 900px) {
+  .ex-grid { grid-template-columns: 1fr; }
+}

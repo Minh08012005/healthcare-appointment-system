@@ -12,6 +12,10 @@ function MainLayout({ role, userName, userTitle }) {
   const { user, logout } = useAuth();
   const menu = sidebarMenus[role] || { roleLabel: "", items: [] };
   const current = menu.items.find((item) => item.path === pathname);
+  // Route động không có trong menu (vd: /doctor/examination/:hoSoId)
+  const fallbackTitle = pathname.startsWith("/doctor/examination/")
+    ? "Hồ sơ bệnh nhân đang khám"
+    : "";
 
   // Mobile (<= 900px): sidebar là drawer. Lưu pathname lúc mở nên khi đổi trang
   // drawer tự đóng mà không cần useEffect. Desktop không dùng các class này.
@@ -47,7 +51,7 @@ function MainLayout({ role, userName, userTitle }) {
       />
       <div className="layout__main">
         <Topbar
-          title={current?.title ?? current?.label ?? ""}
+          title={current?.title ?? current?.label ?? fallbackTitle}
           userName={displayName}
           navOpen={navOpen}
           onOpenNav={openNav}

@@ -22,6 +22,8 @@ import OnlineCheckinPage from "../pages/receptionist/checkin/OnlineCheckinPage";
 import OfflineCheckinPage from "../pages/receptionist/checkin/OfflineCheckinPage";
 import ReceptionQueuePage from "../pages/receptionist/ReceptionQueuePage";
 import CallPatientPage from "../pages/doctor/call/CallPatientPage";
+import ExaminationPage from "../pages/doctor/examination/ExaminationPage";
+
 function AppRoutes() {
     return (
         <Routes>
@@ -83,6 +85,10 @@ function AppRoutes() {
             >
                 <Route path="/doctor" element={<DoctorHomePage />} />
                 <Route path="/doctor/call" element={<CallPatientPage />} />
+                <Route
+                    path="/doctor/examination/:hoSoId"
+                    element={<ExaminationPage />}
+                />
             </Route>
 
             {/* Lễ tân: phải đăng nhập với vai trò Lễ tân */}
