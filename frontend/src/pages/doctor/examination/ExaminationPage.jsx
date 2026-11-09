@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFetch } from "../../../api/useFetch";
 import { examinationPaths } from "../../../api/examination";
+import ExamResultForm from "./ExamResultForm";
 import LabOrderSection from "./LabOrderSection";
 import "../call/callPatient.css"; // tái dùng cp-btn, cp-state, cp-spinner, cp-pill
 import "./examination.css";
@@ -236,20 +237,29 @@ function ExaminationPage() {
             </p>
           </section>
 
-          {/* Khu vực kết quả khám hiện tại — C4-05 gắn form nhập/lưu tại đây */}
+          {/* Khu vực kết quả khám hiện tại (C4-05): nhập/lưu khi DANG_KHAM, còn lại chỉ xem */}
           <section className="ex-card" id="exam-result-area">
             <h3 className="ex-card__title">Kết quả khám hiện tại</h3>
-            {ketQua ? (
-              <InfoList
-                rows={[
-                  ["Triệu chứng", ketQua.trieu_chung_ghi_nhan],
-                  ["Chẩn đoán", ketQua.chan_doan],
-                  ["Lời dặn", ketQua.loi_dan],
-                  ["Đơn thuốc", ketQua.don_thuoc],
-                ]}
-              />
+            {hoSo?.trang_thai === "DANG_KHAM" ? (
+              <ExamResultForm hoSoId={hoSoId} ketQua={ketQua} onRecordStale={reload} />
             ) : (
-              <p className="ex-text ex-text--muted">Chưa có kết quả khám.</p>
+              <>
+                <div className="cp-notice cp-notice--info">
+                  Hồ sơ không còn ở trạng thái đang khám nên không thể chỉnh sửa kết quả khám.
+                </div>
+                {ketQua ? (
+                  <InfoList
+                    rows={[
+                      ["Triệu chứng", ketQua.trieu_chung_ghi_nhan],
+                      ["Chẩn đoán", ketQua.chan_doan],
+                      ["Lời dặn", ketQua.loi_dan],
+                      ["Đơn thuốc", ketQua.don_thuoc],
+                    ]}
+                  />
+                ) : (
+                  <p className="ex-text ex-text--muted">Chưa có kết quả khám.</p>
+                )}
+              </>
             )}
           </section>
 
