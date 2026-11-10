@@ -18,7 +18,8 @@
     "api:test-offline": "node scripts/test-offline-checkin.js",
     "db:seed-offline-demo": "node scripts/seed-offline-demo.js",
     "api:test-reception-queue": "node scripts/test-reception-queue.js",
-    "api:test-lab-order": "node scripts/test-c4-06.js"
+    "api:test-lab-order": "node scripts/test-c4-06.js",
+    "api:test-close-exam": "node scripts/test-c4-08.js"
   },
   "keywords": [],
   "author": "",

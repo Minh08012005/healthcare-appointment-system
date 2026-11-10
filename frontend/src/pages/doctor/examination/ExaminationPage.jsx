@@ -1,7 +1,7 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFetch } from "../../../api/useFetch";
-import { examinationPaths } from "../../../api/examination";
+import { examinationApi, examinationPaths } from "../../../api/examination";
 import ExamResultForm from "./ExamResultForm";
 import LabOrderSection from "./LabOrderSection";
 import "../call/callPatient.css"; // tái dùng cp-btn, cp-state, cp-spinner, cp-pill
@@ -138,6 +138,10 @@ function ExaminationPage() {
     validId ? examinationPaths.record(hoSoId) : null,
   );
 
+  const [closing, setClosing] = useState(false);
+  const [closeError, setCloseError] = useState(null);
+  const closingRef = useRef(false);
+
   if (!validId || (!loading && error)) {
     return (
       <div className="ex-page">
@@ -171,8 +175,51 @@ function ExaminationPage() {
 
   const { ho_so: hoSo, patient, queue, doctor, room, appointment } = data;
   const ketQua = data.ket_qua_kham;
+
+  const handleClose = async () => {
+    if (closingRef.current) return;
+    if (
+      !window.confirm(
+        "Xác nhận hoàn thành và đóng hồ sơ khám bệnh?\nSau khi đóng, hồ sơ sẽ chuyển sang chế độ chỉ đọc và không thể chỉnh sửa kết quả hoặc tạo thêm chỉ định."
+      )
+    ) {
+      return;
+    }
+
+    closingRef.current = true;
+    setClosing(true);
+    setCloseError(null);
+    try {
+      await examinationApi.close(hoSoId);
+      reload();
+    } catch (err) {
+      if (err?.code === "LAB_ORDER_PENDING" || err?.status === 409) {
+        setCloseError(
+          err?.message || "Không thể đóng hồ sơ khi còn chỉ định xét nghiệm chưa hoàn thành."
+        );
+      } else if (err?.status === 403) {
+        setCloseError("Bạn không có quyền đóng hồ sơ này.");
+      } else {
+        setCloseError(err?.message || "Không thể đóng hồ sơ. Vui lòng thử lại.");
+      }
+    } finally {
+      closingRef.current = false;
+      setClosing(false);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   const gioHen = formatTime(appointment?.gio_kham);
   const roomLabel = [room?.ten_phong, room?.ten_chuyen_khoa].filter(Boolean).join(" – ");
+  const doctorName = doctor ? [doctor.cap_bac, doctor.ho_ten].filter(Boolean).join(" ") : "—";
+  const trieuChungText = ketQua?.trieu_chung_ghi_nhan || appointment?.trieu_chung || "—";
+  const chanDoanText = ketQua?.chan_doan || "—";
+  const loiDanText = ketQua?.loi_dan || "—";
+  const donThuocText = ketQua?.don_thuoc || "—";
+
   const subline = [
     queue?.nhan_stt && `STT ${queue.nhan_stt}`,
     LANE_LABELS[queue?.loai],
@@ -195,9 +242,48 @@ function ExaminationPage() {
           </div>
           <p className="ex-header__sub">{subline.join(" · ")}</p>
         </div>
-        {/* Slot nút thao tác: C4-05 / C4-07 tự thêm nút vào đây */}
-        <div className="ex-header__actions" />
+        <div className="ex-header__actions">
+          {hoSo?.trang_thai === "DANG_KHAM" ? (
+            <>
+              <button
+                type="button"
+                className="cp-btn cp-btn--primary"
+                onClick={handleClose}
+                disabled={closing}
+              >
+                {closing ? "Đang đóng..." : "Đóng hồ sơ"}
+              </button>
+              <button
+                type="button"
+                className="cp-btn cp-btn--outline"
+                onClick={handlePrint}
+                disabled={closing}
+              >
+                In kết quả
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="cp-btn cp-btn--outline"
+                onClick={handlePrint}
+              >
+                In kết quả
+              </button>
+              <Link to="/doctor/call" className="cp-btn cp-btn--primary">
+                Về Gọi bệnh nhân
+              </Link>
+            </>
+          )}
+        </div>
       </header>
+
+      {closeError && (
+        <div className="cp-notice cp-notice--error" role="alert">
+          <strong>Lỗi đóng hồ sơ:</strong> {closeError}
+        </div>
+      )}
 
       <div className="ex-grid">
         <div className="ex-col">
@@ -267,6 +353,71 @@ function ExaminationPage() {
           <LabOrderSection hoSoId={hoSoId} hoSoStatus={hoSo?.trang_thai} onRecordStale={reload} />
 
           <HistorySection hoSoId={hoSoId} />
+        </div>
+      </div>
+
+      {/* Phiếu in kết quả khám (chỉ xuất hiện khi in qua window.print) */}
+      <div className="ex-print-sheet" aria-hidden="true">
+        <div className="ex-print__header">
+          <div className="ex-print__hospital">
+            <h2>PHÒNG KHÁM ĐA KHOA</h2>
+            <p>{roomLabel ? `Phòng khám: ${roomLabel}` : "Hệ thống khám chữa bệnh"}</p>
+          </div>
+          <div className="ex-print__meta">
+            <p><strong>Mã hồ sơ:</strong> #{hoSo?.id}</p>
+            <p><strong>Ngày khám:</strong> {formatDate(hoSo?.ngay_kham)}</p>
+          </div>
+        </div>
+
+        <h1 className="ex-print__title">PHIẾU KẾT QUẢ KHÁM BỆNH</h1>
+
+        <section className="ex-print__section">
+          <h3 className="ex-print__section-title">I. THÔNG TIN BỆNH NHÂN</h3>
+          <table className="ex-print__table">
+            <tbody>
+              <tr>
+                <td><strong>Họ và tên:</strong> {patient?.ho_ten || "—"}</td>
+                <td><strong>Ngày sinh:</strong> {patient?.ngay_sinh ? formatDate(patient.ngay_sinh) : "—"}</td>
+                <td><strong>Giới tính:</strong> {patient?.gioi_tinh || "—"}</td>
+              </tr>
+              <tr>
+                <td><strong>Số điện thoại:</strong> {patient?.so_dien_thoai || "—"}</td>
+                <td colSpan={2}><strong>Mã BHYT:</strong> {patient?.ma_bhyt || "—"}</td>
+              </tr>
+              <tr>
+                <td colSpan={3}><strong>Địa chỉ:</strong> {patient?.dia_chi || "—"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section className="ex-print__section">
+          <h3 className="ex-print__section-title">II. KẾT QUẢ KHÁM VÀ ĐIỀU TRỊ</h3>
+          <div className="ex-print__field">
+            <strong>Triệu chứng ghi nhận:</strong>
+            <p>{trieuChungText}</p>
+          </div>
+          <div className="ex-print__field">
+            <strong>Chẩn đoán:</strong>
+            <p className="ex-print__highlight">{chanDoanText}</p>
+          </div>
+          <div className="ex-print__field">
+            <strong>Lời dặn của bác sĩ:</strong>
+            <p>{loiDanText}</p>
+          </div>
+          <div className="ex-print__field">
+            <strong>Đơn thuốc:</strong>
+            <p className="ex-print__pre">{donThuocText}</p>
+          </div>
+        </section>
+
+        <div className="ex-print__footer">
+          <div className="ex-print__sign">
+            <p><em>Ngày {formatDate(hoSo?.ngay_kham)}</em></p>
+            <p><strong>Bác sĩ khám bệnh</strong></p>
+            <div className="ex-print__sign-space" />
+            <p><strong>{doctorName}</strong></p>
+          </div>
         </div>
       </div>
     </div>

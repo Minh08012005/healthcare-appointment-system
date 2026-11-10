@@ -11,10 +11,13 @@ export const examinationPaths = {
   // body: { trieu_chung_ghi_nhan?, chan_doan?, loi_dan?, don_thuoc? } (gửi trường nào cập nhật trường đó)
   // -> { message, data: { ho_so: { id, trang_thai }, ket_qua_kham: { id, 4 trường } } }
   result: (hoSoId) => `/api/examinations/${encodeURIComponent(hoSoId)}/result`,
+  // C4-08: đóng hồ sơ khám bệnh (chuyển HoSoBenhAn và HangDoi sang DA_XONG)
+  close: (hoSoId) => `/api/examinations/${encodeURIComponent(hoSoId)}/close`,
 };
 
 export const examinationApi = {
   getRecord: (hoSoId) => apiClient.get(examinationPaths.record(hoSoId)),
   getHistory: (hoSoId, limit) => apiClient.get(examinationPaths.history(hoSoId, limit)),
   saveResult: (hoSoId, body) => apiClient.put(examinationPaths.result(hoSoId), body),
+  close: (hoSoId) => apiClient.post(examinationPaths.close(hoSoId)),
 };

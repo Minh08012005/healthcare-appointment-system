@@ -6,6 +6,8 @@ const INT_MAX = 2147483647;
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 const HS_DANG_KHAM = "DANG_KHAM";
+const HS_DA_XONG = "DA_XONG";
+const CD_DA_XONG = "DA_XONG";
 const RESULT_FIELDS = ["trieu_chung_ghi_nhan", "chan_doan", "loi_dan", "don_thuoc"];
 const MAX_FIELD_LENGTH = 10000;
 
@@ -312,4 +314,102 @@ const saveExamResult = async (req, res) => {
   }
 };
 
-module.exports = { getExamination, getHistory, saveExamResult };
+// POST /api/examinations/:hoSoId/close
+// Đóng hồ sơ khám bệnh: HoSoBenhAn.trang_thai = 'DA_XONG', HangDoi.trang_thai = 'DA_XONG'.
+// Điều kiện:
+// - Đúng bác sĩ phụ trách (403);
+// - Hồ sơ tồn tại (404);
+// - Hồ sơ đang ở trạng thái DANG_KHAM (409);
+// - Không có ChiDinhXetNghiem nào của hồ sơ có trang_thai <> 'DA_XONG' (409 LAB_ORDER_PENDING).
+const closeExamination = async (req, res) => {
+  if (!onlyDoctor(req, res, "Chỉ bác sĩ mới được đóng hồ sơ khám")) return;
+  const hoSoId = parseId(req.params.hoSoId);
+  if (!hoSoId) return fail(res, 400, "ho_so_id không hợp lệ");
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const bs = await client.query(`SELECT id FROM "BacSi" WHERE tai_khoan_id = $1`, [req.user.id]);
+    if (bs.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return fail(res, 403, "Tài khoản chưa gắn với hồ sơ bác sĩ");
+    }
+
+    // Khóa dòng hồ sơ: các giao dịch close, saveResult, createLabOrder của cùng hồ sơ được tuần tự hóa
+    const hs = await client.query(
+      `SELECT hs.id, hs.trang_thai, hs.hang_doi_id, COALESCE(hs.bac_si_id, h.bac_si_id) AS owner_bs_id
+       FROM "HoSoBenhAn" hs
+       LEFT JOIN "HangDoi" h ON h.id = hs.hang_doi_id
+       WHERE hs.id = $1
+       FOR UPDATE OF hs`,
+      [hoSoId]
+    );
+    if (hs.rowCount === 0) {
+      await client.query("ROLLBACK");
+      return fail(res, 404, "Không tìm thấy hồ sơ khám");
+    }
+    const record = hs.rows[0];
+    if (record.owner_bs_id !== bs.rows[0].id) {
+      await client.query("ROLLBACK");
+      return fail(res, 403, "Bạn không có quyền đóng hồ sơ này");
+    }
+    if (record.trang_thai !== HS_DANG_KHAM) {
+      await client.query("ROLLBACK");
+      return fail(
+        res,
+        409,
+        `Chỉ có thể đóng hồ sơ khi đang khám (trạng thái hiện tại: ${record.trang_thai})`
+      );
+    }
+
+    // Kiểm tra chỉ định xét nghiệm chưa hoàn thành
+    const pending = await client.query(
+      `SELECT id, ten_xet_nghiem, trang_thai
+       FROM "ChiDinhXetNghiem"
+       WHERE ho_so_id = $1 AND trang_thai <> $2
+       LIMIT 1`,
+      [hoSoId, CD_DA_XONG]
+    );
+    if (pending.rowCount > 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({
+        success: false,
+        code: "LAB_ORDER_PENDING",
+        message: "Không thể đóng hồ sơ khi còn chỉ định xét nghiệm chưa hoàn thành",
+      });
+    }
+
+    // Cập nhật HoSoBenhAn và HangDoi trong cùng transaction
+    await client.query(
+      `UPDATE "HoSoBenhAn" SET trang_thai = $1 WHERE id = $2`,
+      [HS_DA_XONG, hoSoId]
+    );
+
+    if (record.hang_doi_id) {
+      await client.query(
+        `UPDATE "HangDoi" SET trang_thai = $1 WHERE id = $2`,
+        [HS_DA_XONG, record.hang_doi_id]
+      );
+    }
+
+    await client.query("COMMIT");
+    return res.json({
+      success: true,
+      message: "Đã đóng hồ sơ khám bệnh",
+      data: {
+        ho_so_id: hoSoId,
+        hang_doi_id: record.hang_doi_id || null,
+        trang_thai: HS_DA_XONG,
+      },
+    });
+  } catch (err) {
+    await client.query("ROLLBACK").catch(() => {});
+    console.error("Lỗi closeExamination:", err);
+    return fail(res, 500, "Lỗi server");
+  } finally {
+    client.release();
+  }
+};
+
+module.exports = { getExamination, getHistory, saveExamResult, closeExamination };
