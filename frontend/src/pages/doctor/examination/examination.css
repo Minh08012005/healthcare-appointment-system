@@ -40,3 +40,148 @@
 @media (max-width: 900px) {
   .ex-grid { grid-template-columns: 1fr; }
 }
+
+.ex-print-sheet {
+  display: none;
+}
+
+@media print {
+  /* Ẩn các thành phần giao diện không cần thiết khi in */
+  .sidebar,
+  .topbar,
+  .layout__backdrop,
+  .ex-header,
+  .ex-grid,
+  .cp-notice,
+  .ex-state,
+  #lab-order-area,
+  .ex-section {
+    display: none !important;
+  }
+
+  body,
+  .layout,
+  .layout__main,
+  .layout__content,
+  .ex-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+  }
+
+  .ex-print-sheet {
+    display: block !important;
+    padding: 20px 24px;
+    font-family: Arial, sans-serif;
+    color: #111;
+    line-height: 1.5;
+  }
+
+  .ex-print__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #222;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+
+  .ex-print__hospital h2 {
+    margin: 0;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
+
+  .ex-print__hospital p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #444;
+  }
+
+  .ex-print__meta p {
+    margin: 2px 0;
+    font-size: 13px;
+    text-align: right;
+  }
+
+  .ex-print__title {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 16px 0 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .ex-print__section {
+    margin-bottom: 16px;
+  }
+
+  .ex-print__section-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+  }
+
+  .ex-print__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+  }
+
+  .ex-print__table td {
+    padding: 4px 8px 4px 0;
+    font-size: 13px;
+    vertical-align: top;
+  }
+
+  .ex-print__field {
+    margin-bottom: 10px;
+  }
+
+  .ex-print__field strong {
+    font-size: 13px;
+    display: inline-block;
+    margin-bottom: 2px;
+  }
+
+  .ex-print__field p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    white-space: pre-line;
+  }
+
+  .ex-print__highlight {
+    font-weight: 600;
+  }
+
+  .ex-print__pre {
+    white-space: pre-line;
+    font-family: inherit;
+  }
+
+  .ex-print__footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 28px;
+    page-break-inside: avoid;
+  }
+
+  .ex-print__sign {
+    text-align: center;
+    min-width: 200px;
+  }
+
+  .ex-print__sign p {
+    margin: 2px 0;
+    font-size: 13px;
+  }
+
+  .ex-print__sign-space {
+    height: 60px;
+  }
+}
