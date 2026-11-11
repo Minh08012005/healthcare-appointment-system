@@ -10,6 +10,7 @@
     "db:migrate:c3-01": "node scripts/migrate-c3-01.js",
     "db:migrate:c3-09": "node scripts/migrate-c3-09.js",
     "db:migrate:c4-01": "node scripts/migrate-c4-01.js",
+    "db:migrate:c5-01": "node scripts/migrate-c5-01.js",
     "db:verify": "node scripts/verify-schema.js",
     "db:seed": "node scripts/run-seed.js",
     "db:seed-c3-demo": "node scripts/seed-c3-demo.js",
@@ -19,7 +20,8 @@
     "db:seed-offline-demo": "node scripts/seed-offline-demo.js",
     "api:test-reception-queue": "node scripts/test-reception-queue.js",
     "api:test-lab-order": "node scripts/test-c4-06.js",
-    "api:test-close-exam": "node scripts/test-c4-08.js"
+    "api:test-close-exam": "node scripts/test-c4-08.js",
+    "api:test-c5-01": "node scripts/test-c5-01.js"
   },
   "keywords": [],
   "author": "",

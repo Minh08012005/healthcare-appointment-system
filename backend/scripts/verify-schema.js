@@ -29,6 +29,8 @@ const REQUIRED_FOREIGN_KEYS = [
   { sourceTable: "KetQuaKham", sourceColumn: "ho_so_id", targetTable: "HoSoBenhAn", targetColumn: "id" },
   { sourceTable: "ChiDinhXetNghiem", sourceColumn: "ho_so_id", targetTable: "HoSoBenhAn", targetColumn: "id" },
   { sourceTable: "KetQuaXetNghiem", sourceColumn: "chi_dinh_id", targetTable: "ChiDinhXetNghiem", targetColumn: "id" },
+  { sourceTable: "TaiKhoan", sourceColumn: "phong_kham_id", targetTable: "PhongKham", targetColumn: "id" },
+  { sourceTable: "ChiDinhXetNghiem", sourceColumn: "nhan_vien_xu_ly_id", targetTable: "TaiKhoan", targetColumn: "id" },
 ];
 
 async function verifySchema() {
@@ -149,6 +151,45 @@ async function verifySchema() {
         console.log(`  [FAIL] ${relationName} (KHÔNG TÌM THẤY)`);
         allPass = false;
       }
+    }
+
+    // 3. Kiểm tra các cột và ràng buộc C5-01
+    console.log("\n3. Kiểm tra các cột và ràng buộc C5-01:");
+    const c5ColsRes = await pool.query(`
+      SELECT table_name, column_name, is_nullable
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND ((table_name = 'ChiDinhXetNghiem' AND column_name IN ('nhan_vien_xu_ly_id', 'thoi_gian_bat_dau', 'thoi_gian_hoan_thanh'))
+          OR (table_name = 'TaiKhoan' AND column_name = 'phong_kham_id'));
+    `);
+
+    const expectedC5Cols = [
+      'ChiDinhXetNghiem.nhan_vien_xu_ly_id',
+      'ChiDinhXetNghiem.thoi_gian_bat_dau',
+      'ChiDinhXetNghiem.thoi_gian_hoan_thanh',
+      'TaiKhoan.phong_kham_id',
+    ];
+
+    for (const item of expectedC5Cols) {
+      const [tName, cName] = item.split('.');
+      const col = c5ColsRes.rows.find((r) => r.table_name === tName && r.column_name === cName);
+      if (col && col.is_nullable === 'YES') {
+        console.log(`  [PASS] ${item} (NULLABLE)`);
+      } else {
+        console.log(`  [FAIL] ${item} thiếu hoặc không NULLABLE`);
+        allPass = false;
+      }
+    }
+
+    const uniqueRes = await pool.query(`
+      SELECT 1 FROM pg_constraint
+      WHERE conname = 'uq_ketquaxetnghiem_chidinh' AND contype = 'u';
+    `);
+    if (uniqueRes.rowCount > 0) {
+      console.log(`  [PASS] KetQuaXetNghiem UNIQUE(chi_dinh_id) (Constraint: uq_ketquaxetnghiem_chidinh)`);
+    } else {
+      console.log(`  [FAIL] KetQuaXetNghiem thiếu constraint UNIQUE(chi_dinh_id)`);
+      allPass = false;
     }
 
     console.log("\n=== KẾT QUẢ TỔNG QUAN ===");
