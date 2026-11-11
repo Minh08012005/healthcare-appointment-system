@@ -158,3 +158,38 @@ CROSS JOIN generate_series(1, 5) AS d(ngay_offset)
 CROSS JOIN hom_nay h
 ON CONFLICT ("bac_si_id", "ngay", "gio_bat_dau") DO NOTHING;
 
+-- -----------------------------------------------------------------------------
+-- 6. Demo Data: TaiKhoan Nhân viên Xét nghiệm (C5-01)
+-- Idempotent: chỉ thêm tài khoản chưa tồn tại (ten_dang_nhap)
+-- Mật khẩu mặc định: 123456 (hash bcrypt 10 rounds)
+-- -----------------------------------------------------------------------------
+INSERT INTO "TaiKhoan" ("ten_dang_nhap", "mat_khau", "email", "so_dien_thoai", "vai_tro_id", "trang_thai", "phong_kham_id")
+SELECT v.ten_dang_nhap, '$2b$10$/lxg4zcY2HZcPcrIHUJic.1VQFg/cdHYcDy7JhbBgiGGT9kLiamAi', v.email, v.so_dien_thoai, vt.id, 'HoatDong', pk.id
+FROM (
+    VALUES
+        ('ktv_huyethoc', 'ktv_huyethoc@phongkham.vn', '0905000001', 'Phòng Xét nghiệm Huyết học'),
+        ('ktv_sinhhoa', 'ktv_sinhhoa@phongkham.vn', '0905000002', 'Phòng Xét nghiệm Sinh hóa'),
+        ('ktv_cdha', 'ktv_cdha@phongkham.vn', '0905000003', 'Phòng Chẩn đoán hình ảnh')
+) AS v(ten_dang_nhap, email, so_dien_thoai, ten_phong)
+JOIN "VaiTro" vt ON vt.ten_vai_tro = 'Xét nghiệm'
+JOIN "PhongKham" pk ON pk.ten_phong = v.ten_phong
+WHERE NOT EXISTS (
+    SELECT 1 FROM "TaiKhoan" tk WHERE tk.ten_dang_nhap = v.ten_dang_nhap
+);
+
+UPDATE "TaiKhoan" tk
+SET "phong_kham_id" = pk.id
+FROM "PhongKham" pk
+WHERE tk.ten_dang_nhap = 'ktv_huyethoc' AND pk.ten_phong = 'Phòng Xét nghiệm Huyết học' AND tk.phong_kham_id IS NULL;
+
+UPDATE "TaiKhoan" tk
+SET "phong_kham_id" = pk.id
+FROM "PhongKham" pk
+WHERE tk.ten_dang_nhap = 'ktv_sinhhoa' AND pk.ten_phong = 'Phòng Xét nghiệm Sinh hóa' AND tk.phong_kham_id IS NULL;
+
+UPDATE "TaiKhoan" tk
+SET "phong_kham_id" = pk.id
+FROM "PhongKham" pk
+WHERE tk.ten_dang_nhap = 'ktv_cdha' AND pk.ten_phong = 'Phòng Chẩn đoán hình ảnh' AND tk.phong_kham_id IS NULL;
+
+

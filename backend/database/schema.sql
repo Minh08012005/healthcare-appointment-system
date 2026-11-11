@@ -49,8 +49,13 @@ CREATE TABLE IF NOT EXISTS "TaiKhoan" (
     "email" VARCHAR(100) UNIQUE,
     "so_dien_thoai" VARCHAR(20) UNIQUE,
     "vai_tro_id" INTEGER NOT NULL REFERENCES "VaiTro"("id"),
-    "trang_thai" VARCHAR(50)
+    "trang_thai" VARCHAR(50),
+    "phong_kham_id" INTEGER REFERENCES "PhongKham"("id")
 );
+
+-- C5-01: liên kết nhân viên xét nghiệm với phòng xét nghiệm phụ trách
+ALTER TABLE "TaiKhoan"
+    ADD COLUMN IF NOT EXISTS "phong_kham_id" INTEGER REFERENCES "PhongKham"("id");
 
 -- 6. Bảng BenhNhan: Hồ sơ thông tin cá nhân của bệnh nhân
 CREATE TABLE IF NOT EXISTS "BenhNhan" (
@@ -187,7 +192,10 @@ CREATE TABLE IF NOT EXISTS "ChiDinhXetNghiem" (
     "ten_xet_nghiem" VARCHAR(255) NOT NULL,
     "ghi_chu" TEXT,
     "thoi_gian_chi_dinh" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
-    "trang_thai" VARCHAR(50)
+    "trang_thai" VARCHAR(50),
+    "nhan_vien_xu_ly_id" INTEGER REFERENCES "TaiKhoan"("id"),
+    "thoi_gian_bat_dau" TIMESTAMPTZ,
+    "thoi_gian_hoan_thanh" TIMESTAMPTZ
 );
 
 -- C4-01: cập nhật bảng đã tồn tại mà không ảnh hưởng dữ liệu hiện có.
@@ -201,13 +209,31 @@ UPDATE "ChiDinhXetNghiem"
 ALTER TABLE "ChiDinhXetNghiem"
     ALTER COLUMN "ten_xet_nghiem" SET NOT NULL;
 
+-- C5-01: bổ sung field xử lý xét nghiệm (NULLABLE)
+ALTER TABLE "ChiDinhXetNghiem"
+    ADD COLUMN IF NOT EXISTS "nhan_vien_xu_ly_id" INTEGER REFERENCES "TaiKhoan"("id"),
+    ADD COLUMN IF NOT EXISTS "thoi_gian_bat_dau" TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS "thoi_gian_hoan_thanh" TIMESTAMPTZ;
+
 -- 15. Bảng KetQuaXetNghiem: Kết quả và tệp đính kèm của xét nghiệm
 CREATE TABLE IF NOT EXISTS "KetQuaXetNghiem" (
     "id" SERIAL PRIMARY KEY,
     "chi_dinh_id" INTEGER NOT NULL REFERENCES "ChiDinhXetNghiem"("id"),
     "file_ket_qua" TEXT,
-    "mo_ta" TEXT
+    "mo_ta" TEXT,
+    CONSTRAINT "uq_ketquaxetnghiem_chidinh" UNIQUE ("chi_dinh_id")
 );
+
+-- C5-01: đảm bảo mỗi chỉ định chỉ có 1 kết quả duy nhất
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'uq_ketquaxetnghiem_chidinh'
+    ) THEN
+        ALTER TABLE "KetQuaXetNghiem"
+            ADD CONSTRAINT "uq_ketquaxetnghiem_chidinh" UNIQUE ("chi_dinh_id");
+    END IF;
+END $$;
 
 -- -----------------------------------------------------------------------------
 -- NHÓM 6: INDEX HỖ TRỢ TRA CỨU CHUYÊN KHOA / BÁC SĨ / LỊCH KHÁM
