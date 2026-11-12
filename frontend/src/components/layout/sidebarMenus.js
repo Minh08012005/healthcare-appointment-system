@@ -19,9 +19,7 @@ export const sidebarMenus = {
   lab: {
     roleLabel: "XÉT NGHIỆM",
     items: [
-      { path: "/lab", label: "Danh sách chờ" },
-      { path: "/lab/orders", label: "Chỉ định xét nghiệm" },
-      { path: "/lab/results", label: "Kết quả / xử lý" },
+      { path: "/lab", label: "Danh sách xét nghiệm", title: "Danh sách xét nghiệm" },
     ],
   },
   admin: {

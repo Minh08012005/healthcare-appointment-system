@@ -15,7 +15,9 @@ function MainLayout({ role, userName, userTitle }) {
   // Route động không có trong menu (vd: /doctor/examination/:hoSoId)
   const fallbackTitle = pathname.startsWith("/doctor/examination/")
     ? "Hồ sơ bệnh nhân đang khám"
-    : "";
+    : pathname.startsWith("/lab/orders/")
+      ? "Chi tiết chỉ định"
+      : "";
 
   // Mobile (<= 900px): sidebar là drawer. Lưu pathname lúc mở nên khi đổi trang
   // drawer tự đóng mà không cần useEffect. Desktop không dùng các class này.
