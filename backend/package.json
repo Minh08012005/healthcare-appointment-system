@@ -21,7 +21,8 @@
     "api:test-reception-queue": "node scripts/test-reception-queue.js",
     "api:test-lab-order": "node scripts/test-c4-06.js",
     "api:test-close-exam": "node scripts/test-c4-08.js",
-    "api:test-c5-01": "node scripts/test-c5-01.js"
+    "api:test-c5-01": "node scripts/test-c5-01.js",
+    "api:test-c5-03": "node scripts/test-c5-03.js"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +34,7 @@
     "dotenv": "^18.0.8",
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3",
+    "multer": "^2.5.0",
     "pg": "^8.23.1"
   }
 }

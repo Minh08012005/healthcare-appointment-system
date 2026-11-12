@@ -40,6 +40,15 @@ const toChiDinh = (r) => ({
   thoi_gian_chi_dinh: r.thoi_gian_chi_dinh,
 });
 
+// C5-03: bổ sung kết quả xét nghiệm (nếu đã có) vào mỗi chỉ định ở API đọc danh sách
+const withResult = (r) => ({
+  ...toChiDinh(r),
+  thoi_gian_hoan_thanh: r.thoi_gian_hoan_thanh,
+  ket_qua: r.kq_id
+    ? { id: r.kq_id, mo_ta: r.mo_ta, file_url: r.file_ket_qua ? `/api/lab-orders/${r.id}/result/file` : null }
+    : null,
+});
+
 // Chuẩn hoá body tạo chỉ định. Trả { value } hoặc { message }.
 const parseCreateBody = (body) => {
   if (!body || typeof body !== "object" || Array.isArray(body)) {
@@ -172,9 +181,11 @@ const listLabOrders = async (req, res) => {
 
     const list = await pool.query(
       `SELECT c.id, c.ho_so_id, c.phong_kham_id, pk.ten_phong, c.ten_xet_nghiem, c.ghi_chu,
-              c.trang_thai, c.thoi_gian_chi_dinh
+              c.trang_thai, c.thoi_gian_chi_dinh, c.thoi_gian_hoan_thanh,
+              k.id AS kq_id, k.file_ket_qua, k.mo_ta
        FROM "ChiDinhXetNghiem" c
        LEFT JOIN "PhongKham" pk ON pk.id = c.phong_kham_id
+       LEFT JOIN "KetQuaXetNghiem" k ON k.chi_dinh_id = c.id
        WHERE c.ho_so_id = $1
        ORDER BY c.thoi_gian_chi_dinh, c.id`,
       [hoSoId]
@@ -185,7 +196,7 @@ const listLabOrders = async (req, res) => {
       data: {
         ho_so: { id: hoSoId, trang_thai: hs.rows[0].trang_thai },
         tong: list.rowCount,
-        chi_dinh: list.rows.map(toChiDinh),
+        chi_dinh: list.rows.map(withResult),
       },
     });
   } catch (err) {
