@@ -199,4 +199,4 @@ const startProcessing = async (req, res) => {
   }
 };
 
-module.exports = { listOrders, getOrder, startProcessing };
+module.exports = { listOrders, getOrder, startProcessing, getStaffRoom };
