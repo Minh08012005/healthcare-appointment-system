@@ -49,13 +49,8 @@ CREATE TABLE IF NOT EXISTS "TaiKhoan" (
     "email" VARCHAR(100) UNIQUE,
     "so_dien_thoai" VARCHAR(20) UNIQUE,
     "vai_tro_id" INTEGER NOT NULL REFERENCES "VaiTro"("id"),
-    "trang_thai" VARCHAR(50),
-    "phong_kham_id" INTEGER REFERENCES "PhongKham"("id")
+    "trang_thai" VARCHAR(50)
 );
-
--- C5-01: liên kết nhân viên xét nghiệm với phòng xét nghiệm phụ trách
-ALTER TABLE "TaiKhoan"
-    ADD COLUMN IF NOT EXISTS "phong_kham_id" INTEGER REFERENCES "PhongKham"("id");
 
 -- 6. Bảng BenhNhan: Hồ sơ thông tin cá nhân của bệnh nhân
 CREATE TABLE IF NOT EXISTS "BenhNhan" (
@@ -90,6 +85,10 @@ CREATE TABLE IF NOT EXISTS "PhongKham" (
     "chuyen_khoa_id" INTEGER REFERENCES "ChuyenKhoa"("id"),
     "loai_phong" VARCHAR(50)
 );
+
+-- C5-01: liên kết nhân viên xét nghiệm với phòng xét nghiệm phụ trách
+ALTER TABLE "TaiKhoan"
+    ADD COLUMN IF NOT EXISTS "phong_kham_id" INTEGER REFERENCES "PhongKham"("id");
 
 -- 9. Bảng LichKhamBacSi: Lịch trực, ca khám bệnh của từng bác sĩ
 CREATE TABLE IF NOT EXISTS "LichKhamBacSi" (
