@@ -6,7 +6,6 @@ import NotFoundPage from "../pages/common/NotFoundPage";
 import PatientHomePage from "../pages/patient/PatientHomePage";
 import DoctorHomePage from "../pages/doctor/DoctorHomePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
-import LabHomePage from "../pages/lab/LabHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
@@ -23,6 +22,8 @@ import OfflineCheckinPage from "../pages/receptionist/checkin/OfflineCheckinPage
 import ReceptionQueuePage from "../pages/receptionist/ReceptionQueuePage";
 import CallPatientPage from "../pages/doctor/call/CallPatientPage";
 import ExaminationPage from "../pages/doctor/examination/ExaminationPage";
+import LabOrderListPage from "../pages/lab/LabOrderListPage";
+import LabOrderDetailPage from "../pages/lab/LabOrderDetailPage";
 
 function AppRoutes() {
     return (
@@ -120,8 +121,20 @@ function AppRoutes() {
                 />
             </Route>
 
-            {/* Nhân viên phòng xét nghiệm */}
-            <Route path="/lab" element={<LabHomePage />} />
+            {/* Nhân viên phòng xét nghiệm: phải đăng nhập với vai trò Xét nghiệm */}
+            <Route
+                element={
+                    <ProtectedRoute role="Xét nghiệm">
+                        <MainLayout role="lab" />
+                    </ProtectedRoute>
+                }
+            >
+                <Route path="/lab" element={<LabOrderListPage />} />
+                <Route
+                    path="/lab/orders/:id"
+                    element={<LabOrderDetailPage />}
+                />
+            </Route>
 
             {/* Quản trị */}
             <Route path="/admin" element={<AdminHomePage />} />

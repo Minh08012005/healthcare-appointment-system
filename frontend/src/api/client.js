@@ -3,10 +3,12 @@ import { getToken } from "../auth/tokenStorage";
 
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-async function request(path, { method = "GET", body } = {}) {
+async function request(path, { method = "GET", body, responseType = "json" } = {}) {
     let response;
 
-    const headers = { "Content-Type": "application/json" };
+    // C5-04: FormData (upload file) để trình duyệt tự set multipart boundary
+    const isForm = body instanceof FormData;
+    const headers = isForm ? {} : { "Content-Type": "application/json" };
     const token = getToken();
     if (token) headers.Authorization = `Bearer ${token}`;
 
@@ -14,13 +16,16 @@ async function request(path, { method = "GET", body } = {}) {
         response = await fetch(`${BASE_URL}${path}`, {
             method,
             headers,
-            body: body ? JSON.stringify(body) : undefined,
+            body: body ? (isForm ? body : JSON.stringify(body)) : undefined,
         });
     } catch {
         throw new Error(
             "Không kết nối được tới Backend. Kiểm tra Backend đã chạy chưa.",
         );
     }
+
+    // C5-04: tải file cần token -> trả Blob; lỗi vẫn đọc JSON như cũ
+    if (responseType === "blob" && response.ok) return response.blob();
 
     const data = await response.json().catch(() => null);
 
@@ -42,4 +47,5 @@ export const apiClient = {
     put: (path, body) => request(path, { method: "PUT", body }),
     patch: (path, body) => request(path, { method: "PATCH", body }),
     delete: (path) => request(path, { method: "DELETE" }),
+    getBlob: (path) => request(path, { responseType: "blob" }),
 };
