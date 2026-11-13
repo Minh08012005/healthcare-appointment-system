@@ -11,6 +11,7 @@ const receptionRoutes = require("./reception.routes");
 const callNextRoutes = require("./callNext.routes");
 const examinationRoutes = require("./examination.routes");
 const labOrderRoutes = require("./labOrder.routes");
+const labRoomRoutes = require("./labRoom.routes"); 
 
 const router = express.Router();
 router.use("/health", healthRoutes);
@@ -25,5 +26,6 @@ router.use("/reception", receptionRoutes);
 router.use("/queue", callNextRoutes);
 router.use("/examinations", examinationRoutes); 
 router.use("/lab-orders", labOrderRoutes);
+router.use("/lab", labRoomRoutes); 
 
 module.exports = router;
