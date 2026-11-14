@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useFetch } from "../../../api/useFetch";
 import { labOrderApi, labOrderPaths } from "../../../api/labOrders";
 import "../call/callPatient.css"; // tái dùng cp-btn, cp-state, cp-spinner, cp-pill, cp-notice
@@ -43,6 +43,81 @@ const createErrorText = (err) => {
   if (err?.status === 404) return "Không tìm thấy hồ sơ khám.";
   return err?.message || "Không tạo được chỉ định. Vui lòng thử lại.";
 };
+
+// C5-05: kết quả của MỘT chỉ định đã DA_XONG (mô tả + thời gian hoàn thành + mở file).
+// File cần Authorization nên tải về dạng Blob qua apiClient rồi tạo blob URL để xem.
+function LabResult({ chiDinh }) {
+  const kq = chiDinh.ket_qua;
+  const [file, setFile] = useState(null); // { url, type }
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Thu hồi blob URL khi đóng file hoặc rời trang
+  useEffect(
+    () => () => {
+      if (file) URL.revokeObjectURL(file.url);
+    },
+    [file],
+  );
+
+  const openFile = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const blob = await labOrderApi.getResultFile(kq.file_url);
+      setFile({ url: URL.createObjectURL(blob), type: blob.type || kq.file_type || "" });
+    } catch (err) {
+      setError(err?.message || "Không mở được file kết quả.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isImage = file?.type.startsWith("image/");
+  const isPdf = file?.type === "application/pdf";
+
+  return (
+    <div className="lo-result">
+      <div className="lo-result__head">
+        <strong>Kết quả xét nghiệm</strong>
+        <span className="lo-result__time">Hoàn thành lúc {formatDateTime(chiDinh.thoi_gian_hoan_thanh)}</span>
+      </div>
+      <p className="lo-result__desc">{kq.mo_ta || "Không có mô tả kết quả."}</p>
+
+      {kq.file_url ? (
+        <div className="lo-result__file">
+          {!file && (
+            <button type="button" className="cp-btn cp-btn--outline" onClick={openFile} disabled={loading}>
+              {loading ? "Đang tải file..." : "Xem file kết quả"}
+            </button>
+          )}
+          {file && (
+            <>
+              <div className="lo-result__bar">
+                <a className="ex-link" href={file.url} target="_blank" rel="noopener noreferrer">
+                  Mở trong tab mới
+                </a>
+                <button type="button" className="ex-link" onClick={() => setFile(null)}>
+                  Đóng file
+                </button>
+              </div>
+              {isImage && <img className="lo-result__preview" src={file.url} alt="File kết quả xét nghiệm" />}
+              {isPdf && <iframe className="lo-result__preview lo-result__pdf" src={file.url} title="File kết quả xét nghiệm" />}
+              {!isImage && !isPdf && <p className="lo-hint">Không xem trước được định dạng này, hãy mở trong tab mới.</p>}
+            </>
+          )}
+          {error && (
+            <div className="lo-inline lo-inline--error" role="alert">
+              {error}
+            </div>
+          )}
+        </div>
+      ) : (
+        <p className="lo-hint">Chỉ định này không có file đính kèm.</p>
+      )}
+    </div>
+  );
+}
 
 // C4-07: Chỉ định xét nghiệm trên Examination Page.
 // hoSoId lấy từ URL -> F5 vẫn tải lại danh sách từ Backend (không giữ state tạm).
@@ -103,6 +178,11 @@ function LabOrderSection({ hoSoId, hoSoStatus, onRecordStale }) {
       <h3 className="ex-card__title">
         Chỉ định xét nghiệm
         {!list.loading && !list.error && <span className="lo-count">{items.length}</span>}
+        {!list.loading && !list.error && items.length > 0 && (
+          <button type="button" className="ex-link lo-refresh" onClick={list.reload}>
+            Làm mới kết quả
+          </button>
+        )}
       </h3>
 
       {canCreate ? (
@@ -233,17 +313,27 @@ function LabOrderSection({ hoSoId, hoSoStatus, onRecordStale }) {
             </thead>
             <tbody>
               {items.map((cd) => (
-                <tr key={cd.id}>
-                  <td className="lo-name">{cd.ten_xet_nghiem}</td>
-                  <td>{cd.phong?.ten_phong || "—"}</td>
-                  <td className="lo-note">{cd.ghi_chu || "—"}</td>
-                  <td>
-                    <span className={`cp-pill ${CD_PILL[cd.trang_thai] || "lo-pill--wait"}`}>
-                      {CD_LABELS[cd.trang_thai] || cd.trang_thai}
-                    </span>
-                  </td>
-                  <td className="lo-time">{formatDateTime(cd.thoi_gian_chi_dinh)}</td>
-                </tr>
+                <Fragment key={cd.id}>
+                  <tr>
+                    <td className="lo-name">{cd.ten_xet_nghiem}</td>
+                    <td>{cd.phong?.ten_phong || "—"}</td>
+                    <td className="lo-note">{cd.ghi_chu || "—"}</td>
+                    <td>
+                      <span className={`cp-pill ${CD_PILL[cd.trang_thai] || "lo-pill--wait"}`}>
+                        {CD_LABELS[cd.trang_thai] || cd.trang_thai}
+                      </span>
+                    </td>
+                    <td className="lo-time">{formatDateTime(cd.thoi_gian_chi_dinh)}</td>
+                  </tr>
+                  {/* Chỉ hiện kết quả khi chỉ định đã DA_XONG và backend trả ket_qua */}
+                  {cd.trang_thai === "DA_XONG" && cd.ket_qua && (
+                    <tr className="lo-result-row">
+                      <td colSpan={5}>
+                        <LabResult chiDinh={cd} />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
               ))}
             </tbody>
           </table>

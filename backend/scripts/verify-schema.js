@@ -17,6 +17,7 @@ const EXPECTED_TABLES = [
   "TinTuc",
   "QuyTrinhKham",
   "CauHinhHeThong",
+  "ThongBao", // C5-05
 ];
 
 const REQUIRED_FOREIGN_KEYS = [

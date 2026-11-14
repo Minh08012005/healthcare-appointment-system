@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const { FILE_TYPES, extOfStored } = require("../utils/labResultFile");
 
 // C4-06 — Chỉ định xét nghiệm của bác sĩ trong lúc khám (bảng ChiDinhXetNghiem).
 // Chỉ TẠO và ĐỌC chỉ định. Không xử lý / ghi kết quả xét nghiệm (Chặng 5), không đóng hồ sơ (C4-08).
@@ -8,6 +9,7 @@ const pool = require("../config/db");
 const ROLE_BAC_SI = "Bác sĩ";
 const HS_DANG_KHAM = "DANG_KHAM";
 const CD_CHO_XU_LY = "CHO_XU_LY"; // State đầu tiên của ChiDinhXetNghiem (CHO_XU_LY -> DANG_XU_LY -> DA_XONG)
+const CD_DA_XONG = "DA_XONG";
 const MAX_TEN_XET_NGHIEM = 255; // khớp VARCHAR(255) trong schema
 const MAX_GHI_CHU = 10000;
 const INT_MAX = 2147483647;
@@ -41,13 +43,24 @@ const toChiDinh = (r) => ({
 });
 
 // C5-03: bổ sung kết quả xét nghiệm (nếu đã có) vào mỗi chỉ định ở API đọc danh sách
-const withResult = (r) => ({
-  ...toChiDinh(r),
-  thoi_gian_hoan_thanh: r.thoi_gian_hoan_thanh,
-  ket_qua: r.kq_id
-    ? { id: r.kq_id, mo_ta: r.mo_ta, file_url: r.file_ket_qua ? `/api/lab-orders/${r.id}/result/file` : null }
-    : null,
-});
+// C5-05: chỉ trả kết quả khi chỉ định đã DA_XONG (chưa xong thì ket_qua = null)
+const withResult = (r) => {
+  const ext = extOfStored(r.file_ket_qua);
+  return {
+    ...toChiDinh(r),
+    thoi_gian_hoan_thanh: r.thoi_gian_hoan_thanh,
+    ket_qua:
+      r.trang_thai === CD_DA_XONG && r.kq_id
+        ? {
+            id: r.kq_id,
+            mo_ta: r.mo_ta,
+            file_ket_qua: r.file_ket_qua,
+            file_type: ext ? FILE_TYPES[ext].mime : null,
+            file_url: r.file_ket_qua ? `/api/lab-orders/${r.id}/result/file` : null,
+          }
+        : null,
+  };
+};
 
 // Chuẩn hoá body tạo chỉ định. Trả { value } hoặc { message }.
 const parseCreateBody = (body) => {
