@@ -1,46 +1,499 @@
-.ex-page { display: flex; flex-direction: column; gap: 20px; }
+/* ==================================================================
+   Doctor Examination Workstation (Clinical Outpatient HIS/EHR)
+   ================================================================== */
 
-.ex-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.ex-header__main { min-width: 0; }
-.ex-header__name { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.ex-header__name h1 { margin: 0; font-size: 24px; }
-.ex-header__sub { margin: 6px 0 0; color: var(--text-secondary); }
-.ex-header__actions { display: flex; gap: 10px; flex-wrap: wrap; }
-.ex-pill--muted { color: var(--text-secondary); background: var(--bg); border: 1px solid var(--border); }
-
-.ex-grid { display: grid; grid-template-columns: minmax(280px, 360px) 1fr; gap: 20px; align-items: start; }
-.ex-col { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
-
-.ex-card { padding: 18px 20px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); }
-.ex-card__title, .ex-section__title { margin: 0 0 12px; font-size: 16px; }
-.ex-section { display: flex; flex-direction: column; }
-.ex-text { margin: 0; white-space: pre-line; }
-.ex-text--muted { color: var(--text-secondary); }
-
-.ex-info { display: flex; flex-direction: column; gap: 10px; margin: 0; }
-.ex-info__row { display: grid; grid-template-columns: 120px 1fr; gap: 12px; }
-.ex-info dt { color: var(--text-secondary); }
-.ex-info dd { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
-
-.ex-table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); }
-.ex-table { width: 100%; border-collapse: collapse; }
-.ex-table th, .ex-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
-.ex-table th { color: var(--text-secondary); font-size: 13px; font-weight: 600; background: var(--bg); }
-.ex-table tbody tr:last-child td { border-bottom: 0; }
-.ex-table__date { font-weight: 600; white-space: nowrap; }
-.ex-table__action { text-align: right; }
-.ex-table__detail td { background: var(--bg); }
-.ex-link { padding: 0; color: var(--primary); font: inherit; font-weight: 600; background: none; border: 0; cursor: pointer; }
-.ex-link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-
-.ex-state { flex-direction: column; }
-.ex-state__actions { display: flex; gap: 10px; }
-.ex-state__actions a { text-decoration: none; }
-
-@media (max-width: 900px) {
-  .ex-grid { grid-template-columns: 1fr; }
+.ex-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* ------------------------------------------------------------------
+   Patient & Encounter Header
+   ------------------------------------------------------------------ */
+.ex-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  flex-wrap: wrap;
+}
+
+.ex-header__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ex-header__name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ex-header__name h1,
+.ex-header__title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 26px;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+}
+
+.ex-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 11.5px;
+  line-height: 16px;
+  font-weight: 600;
+  border: 1px solid transparent;
+}
+
+.ex-status-badge--active {
+  background-color: var(--primary-light, #f0fdfa);
+  color: var(--primary-dark, #115e59);
+  border-color: #ccfbf1;
+}
+
+.ex-status-badge--closed {
+  background-color: var(--neutral-bg, #f1f5f9);
+  color: var(--neutral-text, #475569);
+  border-color: var(--neutral-border, #e2e8f0);
+}
+
+.ex-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.ex-header__sub {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 17px;
+  color: var(--color-text-secondary, #64748b);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ex-sub-dot {
+  color: var(--color-text-muted, #94a3b8);
+}
+
+.ex-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ex-pill--muted {
+  color: var(--neutral-text, #475569);
+  background-color: var(--neutral-bg, #f1f5f9);
+  border: 1px solid var(--neutral-border, #e2e8f0);
+}
+
+/* ------------------------------------------------------------------
+   Clinical Workstation 2-Column Grid
+   ------------------------------------------------------------------ */
+.ex-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* ------------------------------------------------------------------
+   Left Patient Rail (Unified Context Anchor)
+   ------------------------------------------------------------------ */
+.ex-rail {
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.ex-rail__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ex-rail__heading {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.ex-rail__divider {
+  height: 1px;
+  background-color: var(--color-border-subtle, #f1f5f9);
+  margin: 2px 0;
+}
+
+/* Definition Lists inside Rail */
+.ex-info {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 0;
+}
+
+.ex-info__row {
+  display: grid;
+  grid-template-columns: 95px 1fr;
+  gap: 4px 8px;
+  align-items: baseline;
+}
+
+.ex-info dt {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-secondary, #64748b);
+  font-weight: 500;
+}
+
+.ex-info dd {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 17px;
+  color: var(--color-text, #0f172a);
+  font-weight: 600;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------------
+   Main Clinical Workspace (Right Column)
+   ------------------------------------------------------------------ */
+.ex-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Dominant Examination Workspace Surface */
+.ex-workspace__main {
+  box-sizing: border-box;
+  padding: 18px 20px;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-top: 3px solid var(--color-primary, #0f766e);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ex-workspace__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border-subtle, #f1f5f9);
+}
+
+.ex-workspace__title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+}
+
+.ex-workspace__subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.ex-symptom-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  background-color: var(--color-bg-app, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-sm, 4px);
+  font-size: 12px;
+  line-height: 16px;
+  max-width: 460px;
+}
+
+.ex-symptom-badge__label {
+  font-weight: 600;
+  color: var(--color-text-secondary, #64748b);
+  white-space: nowrap;
+}
+
+.ex-symptom-badge__text {
+  color: var(--color-text, #0f172a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Read-Only Examination Summary */
+.ex-readonly {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ex-readonly__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+@media (max-width: 768px) {
+  .ex-readonly__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ex-readonly__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background-color: var(--color-bg-app, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius, 6px);
+}
+
+.ex-readonly__field--diagnosis {
+  background-color: var(--color-bg-app, #f8fafc);
+  border-color: var(--color-border, #e2e8f0);
+}
+
+.ex-readonly__label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.ex-readonly__field--diagnosis .ex-readonly__label {
+  color: var(--color-text, #0f172a);
+}
+
+/* Clear Neutral Disabled Button Styling */
+.ex-page .cp-btn:disabled {
+  background-color: var(--neutral-bg, #f1f5f9) !important;
+  border-color: var(--neutral-border, #e2e8f0) !important;
+  color: var(--color-text-muted, #94a3b8) !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+}
+
+.ex-readonly__val {
+  margin: 0;
+  font-size: 13px;
+  line-height: 19px;
+  font-weight: 500;
+  color: var(--color-text, #0f172a);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.ex-readonly__val--pre {
+  white-space: pre-wrap;
+}
+
+/* ------------------------------------------------------------------
+   Subordinate Operational Panels (Lab & History)
+   ------------------------------------------------------------------ */
+.ex-panel {
+  box-sizing: border-box;
+  padding: 14px 18px;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ex-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border-subtle, #f1f5f9);
+}
+
+.ex-panel__title {
+  margin: 0;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+}
+
+.ex-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--color-text, #0f172a);
+  white-space: pre-line;
+}
+
+.ex-text--muted {
+  color: var(--color-text-secondary, #64748b);
+}
+
+/* ------------------------------------------------------------------
+   History Table & Accordion
+   ------------------------------------------------------------------ */
+.ex-table-wrap {
+  overflow-x: auto;
+  background-color: #ffffff;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius, 6px);
+}
+
+.ex-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.ex-table th,
+.ex-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.ex-table th {
+  color: var(--color-text-secondary, #64748b);
+  font-size: 11.5px;
+  font-weight: 600;
+  background-color: var(--color-bg-app, #f8fafc);
+}
+
+.ex-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ex-table tbody tr:hover {
+  background-color: #fafbfc;
+}
+
+.ex-table__date {
+  font-weight: 600;
+  color: var(--color-text, #0f172a);
+  white-space: nowrap;
+}
+
+.ex-table__action {
+  text-align: right;
+}
+
+.ex-table__detail td {
+  background-color: var(--color-bg-app, #f8fafc);
+  padding: 12px 14px;
+}
+
+.ex-link {
+  padding: 0;
+  color: var(--color-primary, #0f766e);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.ex-link:hover {
+  text-decoration: underline;
+  color: var(--color-primary-hover, #115e59);
+}
+
+.ex-link:focus-visible {
+  outline: 2px solid var(--color-primary, #0f766e);
+  outline-offset: 2px;
+}
+
+.ex-state {
+  flex-direction: column;
+}
+
+.ex-state__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.ex-state__actions a {
+  text-decoration: none;
+}
+
+/* ------------------------------------------------------------------
+   Responsive Layout (Mobile & Tablet <= 960px)
+   ------------------------------------------------------------------ */
+@media (max-width: 960px) {
+  .ex-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ex-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .ex-header__actions {
+    justify-content: stretch;
+  }
+
+  .ex-header__actions .cp-btn,
+  .ex-header__actions a {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Print Output Rules (@media print) — PRESERVED 100%
+   ------------------------------------------------------------------ */
 .ex-print-sheet {
   display: none;
 }
@@ -55,6 +508,7 @@
   .cp-notice,
   .ex-state,
   #lab-order-area,
+  .ex-panel,
   .ex-section {
     display: none !important;
   }

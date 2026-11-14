@@ -50,8 +50,10 @@ function HistorySection({ hoSoId }) {
   const history = data?.history || [];
 
   return (
-    <section className="ex-section">
-      <h3 className="ex-section__title">Lịch sử khám</h3>
+    <section className="ex-panel ex-panel--history">
+      <div className="ex-panel__head">
+        <h3 className="ex-panel__title">Lịch sử khám</h3>
+      </div>
 
       {loading && (
         <div className="cp-state" role="status">
@@ -233,14 +235,26 @@ function ExaminationPage() {
       <header className="ex-header">
         <div className="ex-header__main">
           <div className="ex-header__name">
-            <h1>{show(patient?.ho_ten)}</h1>
+            <h1 className="ex-header__title">{show(patient?.ho_ten)}</h1>
             <span
-              className={`cp-pill ${hoSo?.trang_thai === "DANG_KHAM" ? "cp-pill--calling" : "ex-pill--muted"}`}
+              className={`ex-status-badge ${
+                hoSo?.trang_thai === "DANG_KHAM"
+                  ? "ex-status-badge--active"
+                  : "ex-status-badge--closed"
+              }`}
             >
+              <span className="ex-status-dot" aria-hidden="true" />
               {statusText(hoSo?.trang_thai)}
             </span>
           </div>
-          <p className="ex-header__sub">{subline.join(" · ")}</p>
+          <p className="ex-header__sub">
+            {subline.map((item, idx) => (
+              <Fragment key={idx}>
+                {idx > 0 && <span className="ex-sub-dot" aria-hidden="true">·</span>}
+                <span>{item}</span>
+              </Fragment>
+            ))}
+          </p>
         </div>
         <div className="ex-header__actions">
           {hoSo?.trang_thai === "DANG_KHAM" ? (
@@ -286,9 +300,9 @@ function ExaminationPage() {
       )}
 
       <div className="ex-grid">
-        <div className="ex-col">
-          <section className="ex-card">
-            <h3 className="ex-card__title">Thông tin cá nhân</h3>
+        <aside className="ex-rail">
+          <div className="ex-rail__section">
+            <h3 className="ex-rail__heading">Bệnh nhân</h3>
             <InfoList
               rows={[
                 ["Họ tên", patient?.ho_ten],
@@ -299,10 +313,12 @@ function ExaminationPage() {
                 ["Địa chỉ", patient?.dia_chi],
               ]}
             />
-          </section>
+          </div>
 
-          <section className="ex-card">
-            <h3 className="ex-card__title">Thông tin lượt khám</h3>
+          <div className="ex-rail__divider" />
+
+          <div className="ex-rail__section">
+            <h3 className="ex-rail__heading">Lượt khám</h3>
             <InfoList
               rows={[
                 ["Mã hồ sơ", hoSo?.id],
@@ -312,40 +328,57 @@ function ExaminationPage() {
                 ["Mã đặt lịch", appointment?.ma_dat_lich],
               ]}
             />
-          </section>
-        </div>
+          </div>
+        </aside>
 
-        <div className="ex-col">
-          <section className="ex-card">
-            <h3 className="ex-card__title">Triệu chứng ban đầu</h3>
-            <p className="ex-text">
-              {appointment?.trieu_chung || "Không có (bệnh nhân không khai khi đặt lịch)."}
-            </p>
-          </section>
-
+        <main className="ex-workspace">
           {/* Khu vực kết quả khám hiện tại (C4-05): nhập/lưu khi DANG_KHAM, còn lại chỉ xem */}
-          <section className="ex-card" id="exam-result-area">
-            <h3 className="ex-card__title">Kết quả khám hiện tại</h3>
+          <section className="ex-workspace__main" id="exam-result-area">
+            <div className="ex-workspace__head">
+              <div>
+                <h2 className="ex-workspace__title">Kết quả khám lâm sàng</h2>
+                <p className="ex-workspace__subtitle">
+                  Chẩn đoán xác định, diễn biến lâm sàng và chỉ định điều trị
+                </p>
+              </div>
+              <div className="ex-symptom-badge" title="Triệu chứng ban đầu khi đặt lịch">
+                <span className="ex-symptom-badge__label">Lý do khám:</span>
+                <span className="ex-symptom-badge__text">
+                  {appointment?.trieu_chung || "Không có (bệnh nhân không khai khi đặt lịch)."}
+                </span>
+              </div>
+            </div>
+
             {hoSo?.trang_thai === "DANG_KHAM" ? (
               <ExamResultForm key={hoSoId} hoSoId={hoSoId} ketQua={ketQua} onRecordStale={reload} />
             ) : (
-              <>
+              <div className="ex-readonly">
                 <div className="cp-notice cp-notice--info">
                   Hồ sơ không còn ở trạng thái đang khám nên không thể chỉnh sửa kết quả khám.
                 </div>
                 {ketQua ? (
-                  <InfoList
-                    rows={[
-                      ["Triệu chứng", ketQua.trieu_chung_ghi_nhan],
-                      ["Chẩn đoán", ketQua.chan_doan],
-                      ["Lời dặn", ketQua.loi_dan],
-                      ["Đơn thuốc", ketQua.don_thuoc],
-                    ]}
-                  />
+                  <div className="ex-readonly__grid">
+                    <div className="ex-readonly__field">
+                      <span className="ex-readonly__label">Triệu chứng ghi nhận</span>
+                      <p className="ex-readonly__val">{show(ketQua.trieu_chung_ghi_nhan)}</p>
+                    </div>
+                    <div className="ex-readonly__field ex-readonly__field--diagnosis">
+                      <span className="ex-readonly__label">Chẩn đoán xác định</span>
+                      <p className="ex-readonly__val">{show(ketQua.chan_doan)}</p>
+                    </div>
+                    <div className="ex-readonly__field">
+                      <span className="ex-readonly__label">Đơn thuốc</span>
+                      <p className="ex-readonly__val ex-readonly__val--pre">{show(ketQua.don_thuoc)}</p>
+                    </div>
+                    <div className="ex-readonly__field">
+                      <span className="ex-readonly__label">Lời dặn</span>
+                      <p className="ex-readonly__val">{show(ketQua.loi_dan)}</p>
+                    </div>
+                  </div>
                 ) : (
                   <p className="ex-text ex-text--muted">Chưa có kết quả khám.</p>
                 )}
-              </>
+              </div>
             )}
           </section>
 
@@ -353,7 +386,7 @@ function ExaminationPage() {
           <LabOrderSection hoSoId={hoSoId} hoSoStatus={hoSo?.trang_thai} onRecordStale={reload} />
 
           <HistorySection hoSoId={hoSoId} />
-        </div>
+        </main>
       </div>
 
       {/* Phiếu in kết quả khám (chỉ xuất hiện khi in qua window.print) */}

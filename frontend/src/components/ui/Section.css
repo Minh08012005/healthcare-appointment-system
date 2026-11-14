@@ -1,0 +1,49 @@
+.ui-section {
+  box-sizing: border-box;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  padding: 18px 20px;
+}
+
+.ui-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.ui-section__headings {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ui-section__title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--color-text, #0f172a);
+}
+
+.ui-section__description {
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.ui-section__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.ui-section__body {
+  min-width: 0;
+}
+

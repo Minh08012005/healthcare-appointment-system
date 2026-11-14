@@ -8,8 +8,8 @@ const MAX_LEN = 10000; // khớp giới hạn của API C4-04
 const FIELDS = [
   { key: "trieu_chung_ghi_nhan", label: "Triệu chứng ghi nhận", placeholder: "Ví dụ: Ho kéo dài 5 ngày, sốt nhẹ về chiều" },
   { key: "chan_doan", label: "Chẩn đoán", placeholder: "Ví dụ: Viêm phế quản cấp" },
-  { key: "loi_dan", label: "Lời dặn", placeholder: "Ví dụ: Nghỉ ngơi, uống nhiều nước, tái khám sau 1 tuần" },
   { key: "don_thuoc", label: "Đơn thuốc", placeholder: "Ví dụ: Paracetamol 500mg x 2 viên/ngày" },
+  { key: "loi_dan", label: "Lời dặn", placeholder: "Ví dụ: Nghỉ ngơi, uống nhiều nước, tái khám sau 1 tuần" },
 ];
 
 // Dữ liệu từ Backend (null = chưa có) -> giá trị ô nhập
@@ -77,20 +77,27 @@ function ExamResultForm({ hoSoId, ketQua, onRecordStale }) {
 
   return (
     <form className="er-form" onSubmit={handleSubmit} noValidate>
-      {FIELDS.map(({ key, label, placeholder }) => (
-        <div className="er-field" key={key}>
-          <label htmlFor={`er-${key}`}>{label}</label>
-          <textarea
-            id={`er-${key}`}
-            rows={key === "chan_doan" ? 2 : 3}
-            value={values[key]}
-            maxLength={MAX_LEN}
-            placeholder={placeholder}
-            disabled={saving}
-            onChange={(e) => handleChange(key, e.target.value)}
-          />
-        </div>
-      ))}
+      <div className="er-grid">
+        {FIELDS.map(({ key, label, placeholder }) => (
+          <div
+            className={`er-field ${key === "chan_doan" ? "er-field--diagnosis" : ""}`}
+            key={key}
+          >
+            <div className="er-field__head">
+              <label htmlFor={`er-${key}`}>{label}</label>
+            </div>
+            <textarea
+              id={`er-${key}`}
+              rows={key === "don_thuoc" ? 4 : 3}
+              value={values[key]}
+              maxLength={MAX_LEN}
+              placeholder={placeholder}
+              disabled={saving}
+              onChange={(e) => handleChange(key, e.target.value)}
+            />
+          </div>
+        ))}
+      </div>
 
       {message && (
         <div
@@ -102,7 +109,14 @@ function ExamResultForm({ hoSoId, ketQua, onRecordStale }) {
       )}
 
       <div className="er-actions">
-        {dirty && !saving && <span className="er-hint">Có thay đổi chưa lưu</span>}
+        <div className="er-actions__status">
+          {dirty && !saving && (
+            <span className="er-hint">
+              <span className="er-hint__dot" aria-hidden="true" />
+              Có thay đổi chưa lưu
+            </span>
+          )}
+        </div>
         <button type="submit" className="cp-btn cp-btn--primary" disabled={saving || !dirty}>
           {saving ? "Đang lưu..." : "Lưu kết quả khám"}
         </button>

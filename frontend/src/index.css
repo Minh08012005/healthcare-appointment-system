@@ -1,17 +1,65 @@
 :root {
-  --primary: #1b6fd8;
-  --primary-dark: #0f4c9a;
-  --primary-light: #e8f1fc;
-  --teal: #14a3a3;
-  --success: #2e9e5b;
-  --warning: #f2a93b;
-  --danger: #d64545;
-  --text: #1f2937;
-  --text-secondary: #6b7280;
-  --border: #e5e7eb;
-  --bg: #f7f9fc;
-  --radius: 8px;
-  --radius-card: 12px;
+  /* Core Clinical Palette */
+  --primary: #0f766e;
+  --primary-dark: #115e59;
+  --primary-light: #f0fdfa;
+  --teal: #0d9488;
+  --teal-dark: #0f766e;
+  --teal-light: #f0fdfa;
+
+  /* Surfaces & Structural */
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --border-muted: #f1f5f9;
+
+  /* Typography */
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+
+  /* Semantic Feedback & Statuses (Restrained Clinical Tints) */
+  --success: #059669;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-text: #065f46;
+
+  --warning: #d97706;
+  --warning-bg: #fef3c7;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-text: #991b1b;
+
+  --info: #0284c7;
+  --info-bg: #f0f9ff;
+  --info-border: #bae6fd;
+  --info-text: #0369a1;
+
+  --neutral-bg: #f1f5f9;
+  --neutral-border: #e2e8f0;
+  --neutral-text: #475569;
+
+  /* CSS Custom Properties Aliases */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-dark);
+  --color-primary-subtle: var(--primary-light);
+  --color-bg-app: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-muted);
+  --color-text: var(--text);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-focus-ring: rgba(13, 148, 136, 0.4);
+
+  /* Geometry */
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-card: 8px;
   --radius-pill: 999px;
 
   font: 14px/20px Inter, system-ui, sans-serif;

@@ -1,51 +1,528 @@
-.cp-page { display: flex; flex-direction: column; gap: 20px; max-width: 1000px; }
-.cp-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.cp-room { margin: 0; color: var(--text-secondary); }
+/* ==================================================================
+   Doctor Call Workstation (Clinical Dispatch Console)
+   ================================================================== */
 
-.cp-btn { padding: 9px 16px; border: 1px solid transparent; border-radius: var(--radius); font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap; }
-.cp-btn:disabled { opacity: .6; cursor: not-allowed; }
-.cp-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.cp-btn--primary { color: #fff; background: var(--primary); }
-.cp-btn--danger { color: #fff; background: var(--danger); }
-.cp-btn--outline { color: var(--primary); background: #fff; border-color: var(--primary); }
+.cp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1080px;
+}
 
-.cp-notice { padding: 12px 16px; border: 1px solid; border-radius: var(--radius); }
-.cp-notice strong { display: block; }
-.cp-notice p { margin: 4px 0 0; color: var(--text); }
-.cp-notice--info { color: var(--primary-dark); background: var(--primary-light); border-color: var(--primary); }
-.cp-notice--warning { color: #8a5a00; background: #fff6e5; border-color: var(--warning); }
-.cp-notice--success { color: #1d6e3f; background: #e9f7ef; border-color: var(--success); }
-.cp-notice--error { color: var(--danger); background: #fdecec; border-color: var(--danger); }
+/* ------------------------------------------------------------------
+   Operational Toolbar (Header)
+   ------------------------------------------------------------------ */
+.cp-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
 
-.cp-state { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 100px; padding: 18px; color: var(--text-secondary); text-align: center; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); }
-.cp-state p { margin: 0; }
-.cp-state--error { color: var(--danger); }
-.cp-spinner { width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: cp-spin .7s linear infinite; }
-@keyframes cp-spin { to { transform: rotate(360deg); } }
+.cp-toolbar__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
 
-.cp-card { padding: 20px 22px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-card); }
-.cp-card__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.cp-card__head h2 { margin: 0; font-size: 18px; }
-.cp-card__body { display: flex; gap: 24px; margin: 18px 0; }
-.cp-stt { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-width: 180px; padding: 24px 16px; background: var(--primary-light); border-radius: var(--radius-card); }
-.cp-stt span { color: var(--primary); font-size: 12px; }
-.cp-stt strong { color: var(--primary-dark); font-size: 40px; line-height: 1; }
-.cp-info { min-width: 0; }
-.cp-info h3 { margin: 4px 0 12px; font-size: 20px; }
-.cp-info dl { display: grid; grid-template-columns: 120px 1fr; gap: 10px 16px; margin: 0; }
-.cp-info dt { color: var(--text-secondary); }
-.cp-info dd { margin: 0; font-weight: 600; }
-.cp-card__actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border); }
-.cp-card__actions-right { display: flex; gap: 10px; }
+.cp-room-badge {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm, 4px);
+  background-color: var(--neutral-bg, #f1f5f9);
+  color: var(--neutral-text, #475569);
+  border: 1px solid var(--neutral-border, #e2e8f0);
+  flex-shrink: 0;
+}
 
-.cp-pill { display: inline-block; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600; }
-.cp-pill--calling { color: #087e78; background: #e5f6f3; }
-.cp-pill--online { color: #1765a5; background: #e8f3fc; }
-.cp-pill--offline { color: #087e78; background: #e5f6f3; }
+.cp-room {
+  margin: 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--color-text, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-@media (max-width: 700px) {
-  .cp-toolbar, .cp-card__body, .cp-card__actions { flex-direction: column; align-items: stretch; }
-  .cp-card { padding: 16px; }
-  .cp-card__actions-right { justify-content: stretch; }
-  .cp-card__actions-right .cp-btn { flex: 1; }
+/* ------------------------------------------------------------------
+   Button Component (Preserved & Enhanced for other pages)
+   ------------------------------------------------------------------ */
+.cp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  min-height: 38px;
+  border: 1px solid transparent;
+  border-radius: var(--radius, 6px);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.cp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cp-btn:focus-visible {
+  outline: 2px solid var(--color-primary, #0f766e);
+  outline-offset: 2px;
+}
+
+.cp-btn--primary {
+  color: #ffffff;
+  background-color: var(--color-primary, #0f766e);
+  border-color: var(--color-primary, #0f766e);
+}
+
+.cp-btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover, #115e59);
+  border-color: var(--color-primary-hover, #115e59);
+}
+
+.cp-btn--danger {
+  color: var(--danger-text, #991b1b);
+  background-color: var(--danger-bg, #fef2f2);
+  border-color: var(--danger-border, #fecaca);
+}
+
+.cp-btn--danger:hover:not(:disabled) {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.cp-btn--outline {
+  color: var(--color-text, #0f172a);
+  background-color: #ffffff;
+  border-color: var(--color-border, #e2e8f0);
+}
+
+.cp-btn--outline:hover:not(:disabled) {
+  background-color: var(--color-bg-app, #f8fafc);
+  border-color: #cbd5e1;
+}
+
+.cp-btn--call-next {
+  min-height: 40px;
+  padding: 0 20px;
+  font-weight: 600;
+}
+
+.cp-btn--start {
+  min-height: 42px;
+  padding: 0 24px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------
+   Feedback Notices
+   ------------------------------------------------------------------ */
+.cp-notice {
+  box-sizing: border-box;
+  padding: 12px 16px;
+  border: 1px solid;
+  border-radius: var(--radius, 6px);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.cp-notice strong {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.cp-notice p {
+  margin: 0;
+  color: inherit;
+}
+
+.cp-notice--info {
+  color: var(--info-text, #0369a1);
+  background-color: var(--info-bg, #f0f9ff);
+  border-color: var(--info-border, #bae6fd);
+}
+
+.cp-notice--warning {
+  color: var(--warning-text, #92400e);
+  background-color: var(--warning-bg, #fef3c7);
+  border-color: var(--warning-border, #fde68a);
+}
+
+.cp-notice--success {
+  color: var(--success-text, #065f46);
+  background-color: var(--success-bg, #ecfdf5);
+  border-color: var(--success-border, #a7f3d0);
+}
+
+.cp-notice--error {
+  color: var(--danger-text, #991b1b);
+  background-color: var(--danger-bg, #fef2f2);
+  border-color: var(--danger-border, #fecaca);
+}
+
+/* ------------------------------------------------------------------
+   Loading & Feedback States
+   ------------------------------------------------------------------ */
+.cp-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 90px;
+  padding: 20px;
+  color: var(--color-text-secondary, #64748b);
+  text-align: center;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  font-size: 13px;
+}
+
+.cp-state p {
+  margin: 0;
+}
+
+.cp-state--error {
+  color: var(--danger-text, #991b1b);
+  border-color: var(--danger-border, #fecaca);
+}
+
+.cp-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-border, #e2e8f0);
+  border-top-color: var(--color-primary, #0f766e);
+  border-radius: 50%;
+  animation: cp-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes cp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Current Patient Card
+   ------------------------------------------------------------------ */
+.cp-card {
+  box-sizing: border-box;
+  padding: 24px;
+  background-color: var(--color-surface, #ffffff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.cp-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.cp-card__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cp-card__eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.cp-card__title {
+  margin: 0;
+  font-size: 17px;
+  line-height: 22px;
+  font-weight: 600;
+  color: var(--color-text, #0f172a);
+}
+
+.cp-card__body {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  margin: 20px 0;
+}
+
+/* Scannable Slate STT Block (Neutral-first, restrained accent) */
+.cp-stt {
+  min-width: 170px;
+  padding: 20px 16px;
+  background-color: var(--color-bg-app, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius, 6px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.cp-stt__label {
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-text-secondary, #64748b);
+}
+
+.cp-stt__num {
+  font-size: 42px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+  font-variant-numeric: tabular-nums;
+}
+
+.cp-stt__badge {
+  margin-top: 4px;
+}
+
+/* Patient Info & Details */
+.cp-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cp-info__header {
+  margin-bottom: 16px;
+}
+
+.cp-info__label {
+  display: block;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-secondary, #64748b);
+  margin-bottom: 4px;
+}
+
+.cp-info__name {
+  margin: 0;
+  font-size: 22px;
+  line-height: 28px;
+  font-weight: 700;
+  color: var(--color-text, #0f172a);
+}
+
+.cp-info__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 16px;
+  margin: 0;
+  padding: 14px 16px;
+  background-color: var(--color-bg-app, #f8fafc);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius, 6px);
+}
+
+.cp-info__item dt {
+  margin: 0 0 4px;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--color-text-secondary, #64748b);
+  font-weight: 500;
+}
+
+.cp-info__item dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--color-text, #0f172a);
+}
+
+/* Card Actions */
+.cp-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+.cp-card__actions-right {
+  display: flex;
+  gap: 12px;
+}
+
+/* ------------------------------------------------------------------
+   Pill / Badge Indicators (Restrained semantic clinical badges)
+   ------------------------------------------------------------------ */
+.cp-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm, 4px);
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.cp-pill--calling {
+  color: var(--primary-dark, #115e59);
+  background-color: var(--primary-light, #f0fdfa);
+  border-color: #ccfbf1;
+  font-weight: 600;
+}
+
+.cp-pill--online {
+  color: #0369a1;
+  background-color: #f0f9ff;
+  border-color: #bae6fd;
+}
+
+.cp-pill--offline {
+  color: #047857;
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+}
+
+/* ------------------------------------------------------------------
+   Empty / Standby State Card
+   ------------------------------------------------------------------ */
+.cp-card--empty {
+  padding: 0;
+}
+
+.cp-empty {
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.cp-empty__badge {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-sm, 4px);
+  background-color: var(--neutral-bg, #f1f5f9);
+  color: var(--neutral-text, #475569);
+  border: 1px solid var(--neutral-border, #e2e8f0);
+  margin-bottom: 12px;
+}
+
+.cp-empty__title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--color-text, #0f172a);
+}
+
+.cp-empty__text {
+  margin: 8px 0 24px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--color-text-secondary, #64748b);
+  max-width: 480px;
+}
+
+/* ------------------------------------------------------------------
+   Responsive Design (Mobile <= 768px)
+   ------------------------------------------------------------------ */
+@media (max-width: 768px) {
+  .cp-page {
+    gap: 16px;
+  }
+
+  .cp-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .cp-toolbar__meta {
+    justify-content: space-between;
+  }
+
+  .cp-btn--call-next {
+    width: 100%;
+  }
+
+  .cp-card {
+    padding: 18px 16px;
+  }
+
+  .cp-card__body {
+    flex-direction: column;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .cp-stt {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 16px;
+  }
+
+  .cp-info__name {
+    font-size: 20px;
+    line-height: 26px;
+  }
+
+  .cp-info__grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .cp-card__actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+    padding-top: 16px;
+  }
+
+  .cp-card__actions .cp-btn--start,
+  .cp-card__actions-right,
+  .cp-card__actions-right .cp-btn {
+    width: 100%;
+    flex: 1;
+  }
 }
