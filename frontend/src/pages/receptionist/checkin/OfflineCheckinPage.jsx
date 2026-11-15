@@ -79,11 +79,12 @@ function errorNotice(err) {
   return { type: "error", title: "Lưu hồ sơ thất bại", text: err.message };
 }
 
-function Field({ label, htmlFor, error, children }) {
+function Field({ label, htmlFor, error, required = false, children }) {
   return (
     <div className="ci-field">
       <label className="ci-label" htmlFor={htmlFor}>
         {label}
+        {required && <span className="ci-required" aria-hidden="true"> *</span>}
       </label>
       {children}
       {error && <span className="ci-field__error">{error}</span>}
@@ -91,11 +92,15 @@ function Field({ label, htmlFor, error, children }) {
   );
 }
 
-function InfoRow({ label, children }) {
+function InfoRow({ label, children, isCode = false, isRoom = false }) {
   return (
     <div className="ci-info__row">
-      <span>{label}</span>
-      <strong>{children || "—"}</strong>
+      <span className="ci-info__label">{label}</span>
+      <strong
+        className={`ci-info__value${isCode ? " ci-info__value--code" : ""}${isRoom ? " ci-info__value--room" : ""}`}
+      >
+        {children || "—"}
+      </strong>
     </div>
   );
 }
@@ -189,7 +194,7 @@ function OfflineCheckinPage() {
     setNotice({
       type: "success",
       title: "Đã đọc thông tin CCCD",
-      text: "Bổ sung triệu chứng và chọn chuyên khoa/phòng.",
+      text: "Bổ sung triệu chứng và chọn chuyên khoa/phòng khám.",
     });
     setStep(2);
   };
@@ -243,11 +248,27 @@ function OfflineCheckinPage() {
     setStep(1);
   };
 
-  // Lưu thành công: hiển thị STT Backend cấp
+  const pageHeader = (
+    <header className="ci-header">
+      <div className="ci-header__main">
+        <h1 className="ci-header__title">Tiếp đón &amp; Đăng ký Offline</h1>
+        <p className="ci-header__sub">
+          Tiếp nhận bệnh nhân vãng lai hoặc đăng ký khám trực tiếp tại quầy tiếp đón hôm nay
+        </p>
+      </div>
+      <div className="ci-header__badge">
+        <span className="ci-mode-badge">Luồng B · Trực tiếp</span>
+      </div>
+    </header>
+  );
+
+  // Lưu thành công: hiển thị STT Backend cấp (Stage 3)
   if (result) {
     const q = result.queue;
     return (
       <div className="ci-page">
+        {pageHeader}
+
         <CheckinNotice
           notice={{
             type: "success",
@@ -255,15 +276,22 @@ function OfflineCheckinPage() {
             text: `Bệnh nhân đã được đưa vào hàng đợi phòng ${result.room?.ten_phong || ""} với số thứ tự ${q?.stt_hien_thi || ""}.`,
           }}
         />
-        <section className="ci-card ci-card--center">
-          <span className="ci-badge ci-badge--teal">B · Offline</span>
-          <span>Số thứ tự</span>
+
+        <section className="ci-card ci-card--center ci-card--voucher">
+          <div className="ci-voucher__badge-wrap">
+            <span className="ci-badge ci-badge--offline">B · Trực tiếp (Offline)</span>
+          </div>
+          <span className="ci-voucher__stt-label">Số thứ tự khám bệnh hôm nay</span>
           <div className="ci-stt">{q?.stt_hien_thi}</div>
           <div className="ci-info ci-info--compact">
             <InfoRow label="Bệnh nhân">{result.patient?.ho_ten}</InfoRow>
-            <InfoRow label="Số CCCD">{result.patient?.so_cccd_ho_chieu}</InfoRow>
+            <InfoRow label="Số CCCD" isCode>
+              {result.patient?.so_cccd_ho_chieu}
+            </InfoRow>
             <InfoRow label="Chuyên khoa">{result.specialty?.ten_chuyen_khoa}</InfoRow>
-            <InfoRow label="Phòng khám">{result.room?.ten_phong}</InfoRow>
+            <InfoRow label="Phòng khám" isRoom>
+              {result.room?.ten_phong}
+            </InfoRow>
             <InfoRow label="Đang chờ trước">
               {q?.so_nguoi_cho_truoc != null ? `${q.so_nguoi_cho_truoc} người` : null}
             </InfoRow>
@@ -278,47 +306,68 @@ function OfflineCheckinPage() {
     );
   }
 
-  // LT-03 — Bước 1/2
+  // LT-03 — Bước 1/2: Quét CCCD hoặc chọn nhập thủ công (Stage 1)
   if (step === 1) {
     return (
       <div className="ci-page">
-        <p className="ci-desc">Bước 1/2 · Quét mã QR trên CCCD của bệnh nhân để tự điền thông tin hồ sơ.</p>
+        {pageHeader}
+
+        <div className="ci-step-indicator">
+          Bước 1/2 · Nhận diện bệnh nhân (Quét mã QR trên CCCD gắn chip hoặc chọn nhập thủ công)
+        </div>
 
         <CheckinNotice notice={notice} />
 
-        <section className="ci-card ci-card--center">
-          <h3 className="ci-card__title">Quét QR trên CCCD</h3>
+        <section className="ci-card ci-card--center ci-card--stage1">
+          <div className="ci-card__head ci-card__head--center">
+            <h2 className="ci-card__title">Quét mã QR trên Căn cước công dân</h2>
+          </div>
+          <p className="ci-card__subtitle">
+            Hệ thống sẽ tự động điền họ tên, số CCCD, ngày sinh, giới tính và địa chỉ vào hồ sơ tiếp đón.
+          </p>
+
           <QrScanner
             large
             title="Đưa mặt trước CCCD có mã QR vào khung quét"
             hint="Thông tin họ tên, ngày sinh, giới tính, số CCCD, địa chỉ sẽ được tự điền"
             onResult={handleScan}
           />
-          <button type="button" className="ci-btn ci-btn--outline" onClick={goManual}>
-            Nhập thủ công
+
+          <div className="ci-divider ci-divider--stage1">
+            <span>hoặc</span>
+          </div>
+
+          <button type="button" className="ci-btn ci-btn--outline ci-btn--lg" onClick={goManual}>
+            Nhập hồ sơ thủ công
           </button>
-          <p className="ci-help">Dùng khi bệnh nhân không mang CCCD gắn chip hoặc không quét được mã.</p>
+          <p className="ci-help">
+            Dùng khi bệnh nhân không mang CCCD gắn chip, mã bị mờ hoặc camera không nhận diện được.
+          </p>
         </section>
       </div>
     );
   }
 
-  // LT-04 — Bước 2/2
+  // LT-04 — Bước 2/2: Điền và kiểm tra thông tin hồ sơ (Stage 2)
   return (
     <div className="ci-page">
-      <p className="ci-desc">Bước 2/2 · Kiểm tra thông tin tự điền từ CCCD, nhập triệu chứng và chọn nơi khám.</p>
+      {pageHeader}
+
+      <div className="ci-step-indicator">
+        Bước 2/2 · Kiểm tra thông tin hành chính, nhập triệu chứng và chọn phòng khám
+      </div>
 
       <CheckinNotice notice={notice} />
 
       <form className="ci-stack" onSubmit={handleSubmit} noValidate>
         <section className="ci-card">
           <div className="ci-card__head ci-card__head--left">
-            <h3 className="ci-card__title">Thông tin cá nhân</h3>
+            <h2 className="ci-card__title">Thông tin cá nhân</h2>
             {fromQr && <span className="ci-badge ci-badge--teal">Tự điền từ CCCD</span>}
           </div>
 
           <div className="ci-form-grid ci-form-grid--3">
-            <Field label="Họ và tên" htmlFor="off-ho-ten" error={errors.ho_ten}>
+            <Field label="Họ và tên" htmlFor="off-ho-ten" error={errors.ho_ten} required>
               <input
                 id="off-ho-ten"
                 className="ci-input"
@@ -355,7 +404,7 @@ function OfflineCheckinPage() {
           </div>
 
           <div className="ci-form-grid ci-form-grid--2">
-            <Field label="Số CCCD" htmlFor="off-cccd" error={errors.so_cccd_ho_chieu}>
+            <Field label="Số CCCD" htmlFor="off-cccd" error={errors.so_cccd_ho_chieu} required>
               <input
                 id="off-cccd"
                 className="ci-input"
@@ -371,6 +420,7 @@ function OfflineCheckinPage() {
                 className="ci-input"
                 value={form.ma_bhyt}
                 onChange={(e) => setField("ma_bhyt", e.target.value)}
+                placeholder="Tùy chọn"
                 disabled={submitting}
                 autoComplete="off"
               />
@@ -383,6 +433,7 @@ function OfflineCheckinPage() {
               className="ci-input"
               value={form.dia_chi}
               onChange={(e) => setField("dia_chi", e.target.value)}
+              placeholder="Tùy chọn"
               disabled={submitting}
               autoComplete="off"
             />
@@ -390,10 +441,12 @@ function OfflineCheckinPage() {
         </section>
 
         <section className="ci-card">
-          <h3 className="ci-card__title">Thông tin khám</h3>
+          <div className="ci-card__head ci-card__head--left">
+            <h2 className="ci-card__title">Thông tin khám bệnh</h2>
+          </div>
 
           <div className="ci-form-grid ci-form-grid--2">
-            <Field label="Triệu chứng" htmlFor="off-trieu-chung" error={errors.trieu_chung}>
+            <Field label="Triệu chứng" htmlFor="off-trieu-chung" error={errors.trieu_chung} required>
               <textarea
                 id="off-trieu-chung"
                 className="ci-input ci-textarea"
@@ -410,6 +463,7 @@ function OfflineCheckinPage() {
                 label="Chuyên khoa"
                 htmlFor="off-chuyen-khoa"
                 error={errors.chuyen_khoa_id || specialtiesError}
+                required
               >
                 <select
                   id="off-chuyen-khoa"
@@ -427,7 +481,12 @@ function OfflineCheckinPage() {
                 </select>
               </Field>
 
-              <Field label="Phòng khám" htmlFor="off-phong" error={errors.phong_kham_id || roomsError}>
+              <Field
+                label="Phòng khám"
+                htmlFor="off-phong"
+                error={errors.phong_kham_id || roomsError}
+                required
+              >
                 <select
                   id="off-phong"
                   className="ci-input"

@@ -9,6 +9,13 @@ const STATUS_LABELS = {
   BO_LUOT: "Bỏ lượt",
 };
 
+const STATUS_CLASSES = {
+  CHO_KHAM: "rq-status--cho_kham",
+  DANG_GOI: "rq-status--dang_goi",
+  DANG_KHAM: "rq-status--dang_kham",
+  BO_LUOT: "rq-status--bo_luot",
+};
+
 function formatCheckinTime(value) {
   if (!value) return "—";
   const date = new Date(value);
@@ -105,91 +112,119 @@ function ReceptionQueuePage() {
     }
   };
 
+  const statusText = (status) =>
+    Object.hasOwn(STATUS_LABELS, status)
+      ? STATUS_LABELS[status]
+      : typeof status === "string" && status
+        ? status
+        : "Không rõ";
+
+  const statusClass = (status) =>
+    STATUS_CLASSES[status] || "rq-status--default";
+
   return (
     <div className="rq-page">
       <header className="rq-header">
-        <div>
-          <h1>Hàng đợi lễ tân</h1>
-          <p className="rq-description">
-            Chọn phòng khám để xem danh sách bệnh nhân đang chờ hôm nay.
+        <div className="rq-header__main">
+          <h1 className="rq-header__title">Hàng đợi tiếp đón & điều phối</h1>
+          <p className="rq-header__sub">
+            Theo dõi danh sách bệnh nhân chờ khám và xử lý xếp lại hàng hôm nay
           </p>
         </div>
       </header>
-      <section className="rq-card rq-room-picker">
-        <label className="rq-label" htmlFor="rq-room">
-          Phòng khám
-        </label>
-        {roomsError ? (
-          <div className="rq-state rq-state--error" role="alert">
-            <p>
-              {roomsError.message || "Không tải được danh sách phòng khám."}
-            </p>
-            <button type="button" className="rq-button" onClick={retryRoomLoad}>
-              Thử lại
-            </button>
-          </div>
-        ) : (
-          <select
-            id="rq-room"
-            className="rq-select"
-            value={selectedRoomId}
-            onChange={handleRoomChange}
-            disabled={roomsLoading}
-          >
-            <option value="">
-              {roomsLoading ? "Đang tải phòng khám..." : "— Chọn phòng khám —"}
-            </option>
-            {rooms.map((room) => (
-              <option key={room.id} value={room.id}>
-                {room.ten_phong}
-                {room.ten_chuyen_khoa ? ` · ${room.ten_chuyen_khoa}` : ""}
+
+      <section className="rq-toolbar">
+        <div className="rq-room-select-wrap">
+          <label className="rq-label" htmlFor="rq-room">
+            Phòng khám
+          </label>
+          {roomsError ? (
+            <div className="rq-inline-error" role="alert">
+              <span>{roomsError.message || "Không tải được danh sách phòng khám."}</span>
+              <button type="button" className="rq-btn-retry" onClick={retryRoomLoad}>
+                Thử lại
+              </button>
+            </div>
+          ) : (
+            <select
+              id="rq-room"
+              className="rq-select"
+              value={selectedRoomId}
+              onChange={handleRoomChange}
+              disabled={roomsLoading}
+            >
+              <option value="">
+                {roomsLoading ? "Đang tải phòng khám..." : "— Chọn phòng khám —"}
               </option>
-            ))}
-          </select>
+              {rooms.map((room) => (
+                <option key={room.id} value={room.id}>
+                  {room.ten_phong}
+                  {room.ten_chuyen_khoa ? ` · ${room.ten_chuyen_khoa}` : ""}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {queueData?.room && (
+          <div className="rq-room-meta">
+            <span className="rq-room-badge">
+              {queueData.room.ten_phong}
+              {queueData.room.ten_chuyen_khoa && ` · ${queueData.room.ten_chuyen_khoa}`}
+            </span>
+            {queueData.ngay && <span className="rq-date-badge">Ngày {queueData.ngay}</span>}
+            <span className="rq-count-badge">
+              {queueData.summary?.tong ?? queueData.queue?.length ?? 0} bệnh nhân
+            </span>
+          </div>
         )}
       </section>
 
       {!selectedRoomId && !roomsLoading && !roomsError && (
-        <div className="rq-state" role="status">
+        <div className="rq-state rq-state--card" role="status">
           {rooms.length
             ? "Vui lòng chọn phòng khám để xem hàng đợi."
             : "Hiện chưa có phòng khám để lựa chọn."}
         </div>
       )}
+
       {selectedRoomId && queueLoading && (
-        <div className="rq-state" role="status">
+        <div className="rq-state rq-state--card" role="status">
           <span className="rq-spinner" aria-hidden="true" />
           Đang tải hàng đợi...
         </div>
       )}
+
       {selectedRoomId && queueError && (
-        <div className="rq-state rq-state--error" role="alert">
+        <div className="rq-state rq-state--card rq-state--error" role="alert">
           <p>{queueError.message || "Không tải được hàng đợi."}</p>
-          <button type="button" className="rq-button" onClick={retryQueueLoad}>
+          <button type="button" className="rq-btn-primary" onClick={retryQueueLoad}>
             Thử lại
           </button>
         </div>
       )}
+
       {selectedRoomId && !queueLoading && !queueError && queueData && (
         <section className="rq-card">
           <div className="rq-list-header">
             <div>
-              <h2>{queueData.room?.ten_phong || "Hàng đợi"}</h2>
-              <p>
+              <h2 className="rq-list-title">{queueData.room?.ten_phong || "Hàng đợi"}</h2>
+              <p className="rq-list-sub">
                 {queueData.room?.ten_chuyen_khoa || ""}
                 {queueData.ngay ? ` · ${queueData.ngay}` : ""}
               </p>
             </div>
             <span className="rq-count">
-              {queueData.summary?.tong ?? queueData.queue?.length ?? 0} bệnh
-              nhân
+              {queueData.summary?.tong ?? queueData.queue?.length ?? 0} bệnh nhân
             </span>
           </div>
+
           {requeueError && (
             <div className="rq-action-error" role="alert">
-              {requeueError}
+              <strong>Lỗi xếp lại hàng:</strong> {requeueError}
             </div>
           )}
+
           {queueData.queue?.length ? (
             <div className="rq-table-wrap">
               <table className="rq-table">
@@ -208,13 +243,21 @@ function ReceptionQueuePage() {
                 <tbody>
                   {queueData.queue.map((item) => (
                     <tr key={item.id}>
-                      <td className="rq-number">{item.stt_hien_thi || "—"}</td>
-                      <td className="rq-patient">
-                        {item.patient?.ho_ten || "—"}
+                      <td className="rq-col-stt">
+                        <span className="rq-number">{item.stt_hien_thi || "—"}</span>
                       </td>
-                      <td>
+                      <td className="rq-col-patient">
+                        <span className="rq-patient">{item.patient?.ho_ten || "—"}</span>
+                      </td>
+                      <td className="rq-col-lane">
                         <span
-                          className={`rq-badge ${item.loai === "ONLINE" ? "rq-badge--online" : "rq-badge--offline"}`}
+                          className={`rq-badge ${
+                            item.loai === "ONLINE"
+                              ? "rq-badge--online"
+                              : item.loai === "OFFLINE"
+                                ? "rq-badge--offline"
+                                : "rq-badge--default"
+                          }`}
                         >
                           {item.loai === "ONLINE"
                             ? "ONLINE"
@@ -223,34 +266,26 @@ function ReceptionQueuePage() {
                               : item.loai || "—"}
                         </span>
                       </td>
-                      <td>
-                        <span className="rq-status">
-                          {Object.hasOwn(STATUS_LABELS, item.trang_thai)
-                            ? STATUS_LABELS[item.trang_thai]
-                            : typeof item.trang_thai === "string" &&
-                                item.trang_thai
-                              ? item.trang_thai
-                              : "Không rõ"}
+                      <td className="rq-col-status">
+                        <span className={`rq-status ${statusClass(item.trang_thai)}`}>
+                          <span className="rq-status-dot" aria-hidden="true" />
+                          {statusText(item.trang_thai)}
                         </span>
                       </td>
-                      <td>{queueData.room?.ten_phong || "—"}</td>
-                      <td>
-                        {item.doctor?.ho_ten
-                          ? `BS. ${item.doctor.ho_ten}`
-                          : "—"}
+                      <td className="rq-col-room">{queueData.room?.ten_phong || "—"}</td>
+                      <td className="rq-col-doctor">
+                        {item.doctor?.ho_ten ? `BS. ${item.doctor.ho_ten}` : "—"}
                       </td>
-                      <td>{formatCheckinTime(item.thoi_gian_check_in)}</td>
-                      <td>
+                      <td className="rq-col-time">{formatCheckinTime(item.thoi_gian_check_in)}</td>
+                      <td className="rq-col-action">
                         {item.trang_thai === "BO_LUOT" && (
                           <button
                             type="button"
-                            className="rq-button rq-button--small"
+                            className="rq-btn-requeue"
                             onClick={() => handleRequeue(item.id)}
                             disabled={requeueingId !== null}
                           >
-                            {requeueingId === item.id
-                              ? "Đang xếp lại..."
-                              : "Xếp lại hàng"}
+                            {requeueingId === item.id ? "Đang xếp lại..." : "Xếp lại hàng"}
                           </button>
                         )}
                       </td>
@@ -260,7 +295,7 @@ function ReceptionQueuePage() {
               </table>
             </div>
           ) : (
-            <div className="rq-state">
+            <div className="rq-state rq-state--empty">
               Phòng khám chưa có bệnh nhân trong hàng đợi hôm nay.
             </div>
           )}
