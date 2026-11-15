@@ -7,13 +7,6 @@ import { formatDate, formatFee, formatTime } from "./bookingFormat";
 import { useBooking } from "../../../booking/useBooking";
 import "./booking.css";
 
-// Logo dấu "+" ở giữa QR như Figma (chỉ trang trí, nội dung QR vẫn là qr_code từ backend)
-const QR_LOGO =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1a62c9"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>',
-  );
-
 // BN13 — Đặt lịch thành công + QR (dữ liệu lấy từ response C2-06)
 function BookingSuccessPage() {
   const navigate = useNavigate();
@@ -80,12 +73,11 @@ function BookingSuccessPage() {
               <QRCodeCanvas
                 ref={qrRef}
                 value={appointment.qr_code}
-                size={150}
-                level="H"
-                fgColor="#1f2937"
-                bgColor="#eef3fb"
-                marginSize={0}
-                imageSettings={{ src: QR_LOGO, width: 30, height: 30, excavate: true }}
+                size={160}
+                level="M"
+                fgColor="#000000"
+                bgColor="#ffffff"
+                marginSize={4}
               />
             ) : (
               <p className="bk-muted">Chưa có mã QR.</p>

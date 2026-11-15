@@ -12,13 +12,6 @@ import { getStatusKey, getStatusLabel } from "./appointmentHelpers";
 import "../booking/booking.css";
 import "./appointments.css";
 
-// Logo dấu "+" ở giữa QR (giống BN13)
-const QR_LOGO =
-  "data:image/svg+xml;utf8," +
-  encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1a62c9"/><path d="M12 6.5v11M6.5 12h11" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>',
-  );
-
 // BN15 — Chi tiết lịch hẹn + QR + Hủy lịch (API C2-08A: GET :id, PATCH :id/cancel)
 function AppointmentDetailPage() {
   const { id } = useParams();
@@ -154,11 +147,10 @@ function AppointmentDetailPage() {
                       ref={qrRef}
                       value={appointment.qr_code}
                       size={170}
-                      level="H"
-                      fgColor="#1f2937"
-                      bgColor="#eef3fb"
-                      marginSize={0}
-                      imageSettings={{ src: QR_LOGO, width: 34, height: 34, excavate: true }}
+                      level="M"
+                      fgColor="#000000"
+                      bgColor="#ffffff"
+                      marginSize={4}
                     />
                   </div>
                   <p className="ap-qr-hint">
