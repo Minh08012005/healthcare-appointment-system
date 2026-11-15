@@ -333,9 +333,18 @@
   font-family: inherit;
 }
 
-.booking__day:hover {
-  background-color: #F8FAFC;
-  border-color: #D1D5DB;
+.booking__day:hover:not(.booking__day--active):not(:disabled) {
+  background-color: var(--color-primary-subtle, #EFF6FF);
+  border-color: var(--primary-border, #BFDBFE);
+  color: var(--color-text, #1F2937);
+}
+
+.booking__day:hover:not(.booking__day--active):not(:disabled) small {
+  color: var(--color-text-secondary, #4B5563);
+}
+
+.booking__day:hover:not(.booking__day--active):not(:disabled) strong {
+  color: var(--color-text, #111827);
 }
 
 /* Selected date: unmistakable primary blue active state */
@@ -351,6 +360,23 @@
 
 .booking__day--active strong {
   color: #FFFFFF;
+}
+
+/* Disabled / unavailable date: faded and low emphasis */
+.booking__day:disabled,
+.booking__day--disabled {
+  background-color: #F9FAFB;
+  border-color: #E5E7EB;
+  color: var(--color-text-muted, #9CA3AF);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.booking__day:disabled small,
+.booking__day--disabled small,
+.booking__day:disabled strong,
+.booking__day--disabled strong {
+  color: var(--color-text-muted, #9CA3AF);
 }
 
 .booking__day small {
@@ -394,9 +420,10 @@
   font-family: inherit;
 }
 
-.booking__slot:hover {
-  background-color: #F8FAFC;
-  border-color: #D1D5DB;
+.booking__slot:hover:not(.booking__slot--active):not(:disabled) {
+  background-color: var(--color-primary-subtle, #EFF6FF);
+  border-color: var(--primary-border, #BFDBFE);
+  color: var(--color-text, #111827);
 }
 
 /* Selected slot: unmistakable primary blue active state */
@@ -404,6 +431,16 @@
   background-color: var(--color-primary, #1E88E5);
   border-color: var(--color-primary, #1E88E5);
   color: #FFFFFF;
+}
+
+/* Disabled / unavailable slot: faded and low emphasis */
+.booking__slot:disabled,
+.booking__slot--disabled {
+  background-color: #F9FAFB;
+  border-color: #E5E7EB;
+  color: var(--color-text-muted, #9CA3AF);
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .booking__summary {
