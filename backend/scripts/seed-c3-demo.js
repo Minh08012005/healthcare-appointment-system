@@ -367,8 +367,10 @@ async function seedC3Demo() {
     };
     const allPatientIds = Object.values(patientIds);
     const foreignQueue = await client.query(
-      `SELECT h.id
+      `SELECT h.id, h.so_thu_tu, h.loai, h.trang_thai, h.benh_nhan_id,
+              bn.ho_ten, bn.so_cccd_ho_chieu
        FROM "HangDoi" h
+       JOIN "BenhNhan" bn ON bn.id = h.benh_nhan_id
        WHERE h.phong_kham_id = $1
          AND (h.thoi_gian_check_in AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
              = (NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
@@ -377,8 +379,12 @@ async function seedC3Demo() {
       [roomId, allPatientIds],
     );
     if (foreignQueue.rowCount > 0) {
+      const f = foreignQueue.rows[0];
       throw new Error(
-        `Phòng '${ROOM_NAME}' đang có queue hôm nay ngoài fixture C3 demo`,
+        `Phòng '${ROOM_NAME}' đang có queue hôm nay ngoài fixture C3 demo: ` +
+        `HangDoi #${f.id} (STT ${f.loai === "ONLINE" ? "A" : "B"}${f.so_thu_tu}, ${f.trang_thai}), ` +
+        `Bệnh nhân: ${f.ho_ten} (CCCD: ${f.so_cccd_ho_chieu}, ID: ${f.benh_nhan_id}). ` +
+        `Vui lòng kiểm tra hoặc giải phóng lượt khám này trước khi seed lại fixture C3.`,
       );
     }
 
@@ -432,50 +438,101 @@ async function seedC3Demo() {
       [doctorId, roomId],
     );
 
-    const anchorSchedule = await client.query(
-      `WITH vn AS (SELECT NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh' AS now_vn)
-       INSERT INTO "LichKhamBacSi"
-         (bac_si_id, phong_kham_id, ngay, gio_bat_dau, gio_ket_thuc,
-          so_slot_toi_da, so_slot_online, so_slot_da_dat, trang_thai)
-       SELECT $1, $2, now_vn::date,
-              date_trunc('hour', now_vn)::time,
-              CASE
-                WHEN now_vn::time >= TIME '23:00' THEN TIME '23:59:59.999999'
-                ELSE (date_trunc('hour', now_vn) + INTERVAL '1 hour')::time
-              END,
-              6, 4, 2, 'HoatDong'
-       FROM vn
-       RETURNING id, ngay::text, gio_bat_dau::text`,
-      [doctorId, roomId],
+    const timeRes = await client.query(
+      `SELECT
+         to_char(NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh', 'YYYY-MM-DD') AS today_vn,
+         to_char(NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh', 'HH24:MI:SS') AS now_time_vn,
+         to_char((NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh') + INTERVAL '1 day', 'YYYY-MM-DD') AS tomorrow_vn`,
     );
-    const anchor = anchorSchedule.rows[0];
+    const { today_vn, now_time_vn, tomorrow_vn } = timeRes.rows[0];
 
-    const checkinSchedule = await client.query(
-      `WITH vn AS (
-         SELECT (NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh') + INTERVAL '20 minutes' AS appointment_at
-       )
-       INSERT INTO "LichKhamBacSi"
-         (bac_si_id, phong_kham_id, ngay, gio_bat_dau, gio_ket_thuc,
-          so_slot_toi_da, so_slot_online, so_slot_da_dat, trang_thai)
-       SELECT $1, $2, appointment_at::date, appointment_at::time,
-              CASE
-                WHEN appointment_at::time >= TIME '23:00' THEN TIME '23:59:59.999999'
-                ELSE (appointment_at + INTERVAL '1 hour')::time
-              END,
-              6, 4, 1, 'HoatDong'
-       FROM vn
-       RETURNING id, ngay::text, gio_bat_dau::text`,
-      [doctorId, roomId],
-    );
-    const checkinSlot = checkinSchedule.rows[0];
+    // Chỉ hỗ trợ slot check-in cùng ngày nếu seed chạy trong giờ hành chính ban ngày (08:00 - 16:00).
+    // Ngoài giờ hành chính (buổi tối/đêm), chuyển lịch sang 08:00 sáng mai để tuân thủ rule 60 phút,
+    // tuyệt đối không tạo slot ban đêm và không bypass business rules.
+    const canSameDay = now_time_vn >= "08:00:00" && now_time_vn <= "16:00:00";
+
+    const todaySlots = [
+      { start: "08:00:00", end: "09:00:00", booked: 2 }, // Khung giờ cho A1 và A2
+      { start: "09:00:00", end: "10:00:00", booked: 0 },
+      { start: "10:00:00", end: "11:00:00", booked: 0 },
+      { start: "11:00:00", end: "12:00:00", booked: 0 },
+      { start: "13:30:00", end: "14:30:00", booked: 0 },
+      { start: "14:30:00", end: "15:30:00", booked: 0 },
+      { start: "15:30:00", end: "16:30:00", booked: 0 },
+    ];
+
+    for (const s of todaySlots) {
+      await client.query(
+        `INSERT INTO "LichKhamBacSi"
+           (bac_si_id, phong_kham_id, ngay, gio_bat_dau, gio_ket_thuc,
+            so_slot_toi_da, so_slot_online, so_slot_da_dat, trang_thai)
+         VALUES ($1, $2, $3::date, $4::time, $5::time, 6, 4, $6, 'HoatDong')
+         ON CONFLICT (bac_si_id, ngay, gio_bat_dau)
+         DO UPDATE SET so_slot_da_dat = EXCLUDED.so_slot_da_dat,
+                       so_slot_online = EXCLUDED.so_slot_online,
+                       so_slot_toi_da = EXCLUDED.so_slot_toi_da,
+                       trang_thai = EXCLUDED.trang_thai,
+                       phong_kham_id = EXCLUDED.phong_kham_id`,
+        [doctorId, roomId, today_vn, s.start, s.end, s.booked],
+      );
+    }
+
+    let checkinDate = tomorrow_vn;
+    let checkinTime = "08:00:00";
+
+    if (canSameDay) {
+      const sameDayRes = await client.query(
+        `WITH vn AS (
+           SELECT date_trunc('minute', (NOW() AT TIME ZONE 'Asia/Ho_Chi_Minh') + INTERVAL '20 minutes')::time AS start_time
+         )
+         INSERT INTO "LichKhamBacSi"
+           (bac_si_id, phong_kham_id, ngay, gio_bat_dau, gio_ket_thuc,
+            so_slot_toi_da, so_slot_online, so_slot_da_dat, trang_thai)
+         SELECT $1, $2, $3::date, start_time,
+                (start_time + INTERVAL '1 hour')::time,
+                6, 4, 1, 'HoatDong'
+         FROM vn
+         ON CONFLICT (bac_si_id, ngay, gio_bat_dau)
+         DO UPDATE SET so_slot_da_dat = "LichKhamBacSi".so_slot_da_dat + 1
+         RETURNING id, to_char(gio_bat_dau, 'HH24:MI:SS') AS gio_bat_dau`,
+        [doctorId, roomId, today_vn],
+      );
+      checkinDate = today_vn;
+      checkinTime = sameDayRes.rows[0].gio_bat_dau;
+    }
+
+    const tomorrowSlots = [
+      { start: "08:00:00", end: "09:00:00", booked: !canSameDay ? 1 : 0 },
+      { start: "09:00:00", end: "10:00:00", booked: 0 },
+      { start: "10:00:00", end: "11:00:00", booked: 0 },
+      { start: "13:30:00", end: "14:30:00", booked: 0 },
+      { start: "14:30:00", end: "15:30:00", booked: 0 },
+      { start: "15:30:00", end: "16:30:00", booked: 0 },
+    ];
+
+    for (const s of tomorrowSlots) {
+      await client.query(
+        `INSERT INTO "LichKhamBacSi"
+           (bac_si_id, phong_kham_id, ngay, gio_bat_dau, gio_ket_thuc,
+            so_slot_toi_da, so_slot_online, so_slot_da_dat, trang_thai)
+         VALUES ($1, $2, $3::date, $4::time, $5::time, 6, 4, $6, 'HoatDong')
+         ON CONFLICT (bac_si_id, ngay, gio_bat_dau)
+         DO UPDATE SET so_slot_da_dat = EXCLUDED.so_slot_da_dat,
+                       so_slot_online = EXCLUDED.so_slot_online,
+                       so_slot_toi_da = EXCLUDED.so_slot_toi_da,
+                       trang_thai = EXCLUDED.trang_thai,
+                       phong_kham_id = EXCLUDED.phong_kham_id`,
+        [doctorId, roomId, tomorrow_vn, s.start, s.end, s.booked],
+      );
+    }
 
     const readyAppointments = await client.query(
       `INSERT INTO "DatLichKham"
          (ma_dat_lich, benh_nhan_id, bac_si_id, phong_kham_id, chuyen_khoa_id,
           ngay_kham, gio_kham, trieu_chung, phi_kham, trang_thai, qr_code)
        VALUES
-         ($1::text, $3, $5, $6, $7, $8::date, $9::time, 'Khám tổng quát demo A1', 300000, 'DA_CHECK_IN', $1::text),
-         ($2::text, $4, $5, $6, $7, $8::date, $9::time, 'Khám tổng quát demo A2', 300000, 'DA_CHECK_IN', $2::text)
+         ($1::text, $3, $5, $6, $7, $8::date, '08:00:00'::time, 'Khám tổng quát demo A1', 300000, 'DA_CHECK_IN', $1::text),
+         ($2::text, $4, $5, $6, $7, $8::date, '08:00:00'::time, 'Khám tổng quát demo A2', 300000, 'DA_CHECK_IN', $2::text)
        RETURNING id, ma_dat_lich`,
       [
         APPOINTMENT.readyA1,
@@ -485,8 +542,7 @@ async function seedC3Demo() {
         doctorId,
         roomId,
         specialtyId,
-        anchor.ngay,
-        anchor.gio_bat_dau,
+        today_vn,
       ],
     );
     const appointmentIds = new Map(
@@ -505,8 +561,8 @@ async function seedC3Demo() {
         doctorId,
         roomId,
         specialtyId,
-        checkinSlot.ngay,
-        checkinSlot.gio_bat_dau,
+        checkinDate,
+        checkinTime,
       ],
     );
 
@@ -553,10 +609,17 @@ async function seedC3Demo() {
     await client.query("COMMIT");
 
     console.log("\nC3 demo seed: PASS");
-    console.log(`Phòng: ${ROOM_NAME}`);
-    console.log(`Hàng đợi: A1 -> B1 -> A2 -> B2`);
+    console.log(`Phòng: ${ROOM_NAME} (ID: ${roomId})`);
     console.log(
-      `Lịch Online Check-in: ${APPOINTMENT.checkin} lúc ${checkinSlot.ngay} ${checkinSlot.gio_bat_dau}`,
+      `Bác sĩ: ${DOCTOR_NAME} (ID: ${doctorId}, Account: ${ACCOUNT.doctor.username})`,
+    );
+    console.log(`Hàng đợi hôm nay (${today_vn}): A1 -> B1 -> A2 -> B2`);
+    console.log(
+      `Lịch Online Check-in: ${APPOINTMENT.checkin} lúc ${checkinDate} ${checkinTime}` +
+        (canSameDay ? " (same-day test)" : " (ngày mai, test check-in window)"),
+    );
+    console.log(
+      `Lịch khám ngày mai (${tomorrow_vn}): 6 khung giờ sẵn sàng cho Patient booking (08:00, 09:00, 10:00, 13:30, 14:30, 15:30)`,
     );
     console.log("Tài khoản:");
     console.log(`  Bệnh nhân: ${ACCOUNT.patient.username} / ${PASSWORD}`);
