@@ -15,32 +15,31 @@
 
 /* Semantic variants */
 .ui-badge--neutral {
-  background-color: var(--neutral-bg, #f1f5f9);
-  color: var(--neutral-text, #475569);
-  border-color: var(--neutral-border, #e2e8f0);
+  background-color: var(--neutral-bg, #F3F4F6);
+  color: var(--neutral-text, #4B5563);
+  border-color: var(--neutral-border, #E5E7EB);
 }
 
 .ui-badge--pending {
-  background-color: var(--warning-bg, #fef3c7);
-  color: var(--warning-text, #92400e);
-  border-color: var(--warning-border, #fde68a);
+  background-color: var(--warning-bg, #FEF8EC);
+  color: var(--warning-text, #9A6214);
+  border-color: var(--warning-border, #FCD89C);
 }
 
 .ui-badge--progress {
-  background-color: var(--primary-light, #f0fdfa);
-  color: var(--primary-dark, #115e59);
-  border-color: #ccfbf1;
+  background-color: var(--primary-light, #EFF6FF);
+  color: var(--primary-dark, #0E4C9A);
+  border-color: var(--primary-border, #BFDBFE);
 }
 
 .ui-badge--success {
-  background-color: var(--success-bg, #ecfdf5);
-  color: var(--success-text, #065f46);
-  border-color: var(--success-border, #a7f3d0);
+  background-color: var(--success-bg, #EDF8F2);
+  color: var(--success-text, #1E6B3C);
+  border-color: var(--success-border, #A3E0BA);
 }
 
 .ui-badge--danger {
-  background-color: var(--danger-bg, #fef2f2);
-  color: var(--danger-text, #991b1b);
-  border-color: var(--danger-border, #fecaca);
+  background-color: var(--danger-bg, #FDF2F2);
+  color: var(--danger-text, #9B2222);
+  border-color: var(--danger-border, #F8B4B4);
 }
-

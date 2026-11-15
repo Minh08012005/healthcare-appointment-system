@@ -96,13 +96,13 @@
 
 .rq-select:focus-visible {
   outline: none;
-  border-color: var(--color-primary, #0f766e);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  border-color: var(--color-primary, #1E88E5);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
 }
 
 .rq-select:disabled {
-  background-color: var(--color-bg-app, #f8fafc);
-  color: var(--color-text-secondary, #64748b);
+  background-color: var(--color-bg-app, #F7F8FC);
+  color: var(--color-text-secondary, #6B7280);
   cursor: not-allowed;
 }
 
@@ -120,9 +120,9 @@
   padding: 3px 8px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--neutral-text, #475569);
-  background-color: var(--neutral-bg, #f1f5f9);
-  border: 1px solid var(--neutral-border, #e2e8f0);
+  color: var(--neutral-text, #4B5563);
+  background-color: var(--neutral-bg, #F3F4F6);
+  border: 1px solid var(--neutral-border, #E5E7EB);
   border-radius: var(--radius-sm, 4px);
 }
 
@@ -133,9 +133,9 @@
   padding: 3px 10px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-primary-dark, #115e59);
-  background-color: var(--color-primary-light, #f0fdfa);
-  border: 1px solid #ccfbf1;
+  color: var(--color-primary-dark, #0E4C9A);
+  background-color: var(--color-primary-light, #EFF6FF);
+  border: 1px solid var(--primary-border, #BFDBFE);
   border-radius: var(--radius-pill, 9999px);
   white-space: nowrap;
 }
@@ -231,7 +231,7 @@
 .rq-number {
   font-size: 14px;
   font-weight: 700;
-  color: var(--color-primary-dark, #115e59);
+  color: var(--color-primary-dark, #0E4C9A);
 }
 
 .rq-patient {
@@ -269,21 +269,21 @@
 }
 
 .rq-badge--online {
-  color: #0369a1;
-  background-color: #e0f2fe;
-  border-color: #bae6fd;
+  color: #0E4C9A;
+  background-color: #EFF6FF;
+  border-color: #BFDBFE;
 }
 
 .rq-badge--offline {
-  color: #115e59;
-  background-color: #f0fdfa;
-  border-color: #ccfbf1;
+  color: #1E6B3C;
+  background-color: #EDF8F2;
+  border-color: #A3E0BA;
 }
 
 .rq-badge--default {
-  color: var(--neutral-text, #475569);
-  background-color: var(--neutral-bg, #f1f5f9);
-  border-color: var(--neutral-border, #e2e8f0);
+  color: var(--neutral-text, #4B5563);
+  background-color: var(--neutral-bg, #F3F4F6);
+  border-color: var(--neutral-border, #E5E7EB);
 }
 
 /* ------------------------------------------------------------------
@@ -310,30 +310,30 @@
 
 /* CHO_KHAM -> amber */
 .rq-status--cho_kham {
-  color: #b45309;
-  background-color: #fef3c7;
-  border-color: #fde68a;
+  color: #9A6214;
+  background-color: #FEF8EC;
+  border-color: #FCD89C;
 }
 
 /* DANG_GOI -> blue */
 .rq-status--dang_goi {
-  color: #0369a1;
-  background-color: #e0f2fe;
-  border-color: #bae6fd;
+  color: #0E4C9A;
+  background-color: #EFF6FF;
+  border-color: #BFDBFE;
 }
 
-/* DANG_KHAM -> teal */
+/* DANG_KHAM -> teal accent */
 .rq-status--dang_kham {
-  color: #115e59;
-  background-color: #f0fdfa;
-  border-color: #ccfbf1;
+  color: #0D7A7A;
+  background-color: #F0FDFA;
+  border-color: #99F6E4;
 }
 
 /* BO_LUOT -> danger/red */
 .rq-status--bo_luot {
-  color: #b91c1c;
-  background-color: #fef2f2;
-  border-color: #fecaca;
+  color: #9B2222;
+  background-color: #FDF2F2;
+  border-color: #F8B4B4;
 }
 
 .rq-status--default {
@@ -352,9 +352,9 @@
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-primary, #0f766e);
+  color: var(--color-primary, #1E88E5);
   background-color: #ffffff;
-  border: 1px solid var(--color-border, #e2e8f0);
+  border: 1px solid var(--color-border, #E5E7EB);
   border-radius: var(--radius-sm, 4px);
   cursor: pointer;
   transition: all 0.15s ease;
@@ -362,20 +362,20 @@
 }
 
 .rq-btn-requeue:hover:not(:disabled) {
-  background-color: var(--color-primary-light, #f0fdfa);
-  border-color: var(--color-primary, #0f766e);
-  color: var(--color-primary-dark, #115e59);
+  background-color: var(--color-primary-light, #EFF6FF);
+  border-color: var(--color-primary, #1E88E5);
+  color: var(--color-primary-dark, #0E4C9A);
 }
 
 .rq-btn-requeue:focus-visible {
-  outline: 2px solid var(--color-primary, #0f766e);
+  outline: 2px solid var(--color-primary, #1E88E5);
   outline-offset: 1px;
 }
 
 .rq-btn-requeue:disabled {
-  background-color: var(--neutral-bg, #f1f5f9) !important;
-  border-color: var(--neutral-border, #e2e8f0) !important;
-  color: var(--color-text-muted, #94a3b8) !important;
+  background-color: var(--neutral-bg, #F3F4F6) !important;
+  border-color: var(--neutral-border, #E5E7EB) !important;
+  color: var(--color-text-muted, #9CA3AF) !important;
   opacity: 1 !important;
   cursor: not-allowed !important;
   box-shadow: none !important;
@@ -424,16 +424,16 @@
   padding: 3px 8px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--color-primary, #0f766e);
+  color: var(--color-primary, #1E88E5);
   background: none;
-  border: 1px solid var(--color-border, #e2e8f0);
+  border: 1px solid var(--color-border, #E5E7EB);
   border-radius: var(--radius-sm, 4px);
   cursor: pointer;
 }
 
 .rq-btn-retry:hover {
-  background-color: var(--color-primary-light, #f0fdfa);
-  border-color: var(--color-primary, #0f766e);
+  background-color: var(--color-primary-light, #EFF6FF);
+  border-color: var(--color-primary, #1E88E5);
 }
 
 .rq-btn-primary {
@@ -444,16 +444,16 @@
   font-size: 13px;
   font-weight: 500;
   color: #ffffff;
-  background-color: var(--color-primary, #0f766e);
-  border: 1px solid var(--color-primary, #0f766e);
-  border-radius: var(--radius, 6px);
+  background-color: var(--color-primary, #1E88E5);
+  border: 1px solid var(--color-primary, #1E88E5);
+  border-radius: var(--radius, 8px);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .rq-btn-primary:hover {
-  background-color: var(--color-primary-hover, #115e59);
-  border-color: var(--color-primary-hover, #115e59);
+  background-color: var(--color-primary-hover, #0E4C9A);
+  border-color: var(--color-primary-hover, #0E4C9A);
 }
 
 .rq-action-error {
@@ -468,8 +468,8 @@
 .rq-spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--color-border, #e2e8f0);
-  border-top-color: var(--color-primary, #0f766e);
+  border: 2px solid var(--color-border, #E5E7EB);
+  border-top-color: var(--color-primary, #1E88E5);
   border-radius: 50%;
   animation: rq-spin 0.7s linear infinite;
 }

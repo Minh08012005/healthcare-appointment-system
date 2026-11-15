@@ -42,7 +42,7 @@ function AppointmentListPage() {
   const total = Array.isArray(data) ? data.length : 0;
 
   return (
-    <div className="booking">
+    <div className="ap-page">
       <header className="ap-header">
         <h1>Lịch hẹn của tôi</h1>
         <button
@@ -55,7 +55,7 @@ function AppointmentListPage() {
         </button>
       </header>
 
-      <main className="booking__main">
+      <main className="ap-main">
         {loading && <LoadingState text="Đang tải lịch hẹn..." />}
 
         {!loading && error && (
@@ -64,43 +64,45 @@ function AppointmentListPage() {
 
         {!loading && !error && (
           <>
-            <div className="ap-title-row">
-              <h2>Lịch khám của bạn</h2>
-              <span className="ap-count">{total}</span>
-            </div>
+            <div className="ap-filter-card">
+              <div className="ap-title-row">
+                <h2>Lịch khám của bạn</h2>
+                <span className="ap-count">{total}</span>
+              </div>
 
-            <input
-              className="ap-search"
-              type="search"
-              placeholder="Tìm theo mã lịch hẹn hoặc tên bác sĩ..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              aria-label="Tìm lịch hẹn"
-            />
+              <input
+                className="ap-search"
+                type="search"
+                placeholder="Tìm theo mã lịch hẹn hoặc tên bác sĩ..."
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                aria-label="Tìm lịch hẹn"
+              />
 
-            <div className="ap-tabs" role="tablist">
-              {TABS.map((t) => (
-                <button
-                  key={t.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === t.key}
-                  className={`ap-tab${tab === t.key ? " ap-tab--active" : ""}`}
-                  onClick={() => setTab(t.key)}
-                >
-                  {t.label}
+              <div className="ap-tabs" role="tablist">
+                {TABS.map((t) => (
+                  <button
+                    key={t.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === t.key}
+                    className={`ap-tab${tab === t.key ? " ap-tab--active" : ""}`}
+                    onClick={() => setTab(t.key)}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="ap-result-row">
+                <span>
+                  Hiển thị <strong>{visible.length}</strong> kết quả
+                </span>
+                <button type="button" className="ap-sort" onClick={() => setNewestFirst((v) => !v)}>
+                  <BookingIcon name="clock" size={13} />
+                  {newestFirst ? "Gần đây nhất" : "Cũ nhất"}
                 </button>
-              ))}
-            </div>
-
-            <div className="ap-result-row">
-              <span>
-                Hiển thị <strong>{visible.length}</strong> kết quả
-              </span>
-              <button type="button" className="ap-sort" onClick={() => setNewestFirst((v) => !v)}>
-                <BookingIcon name="clock" size={13} />
-                {newestFirst ? "Gần đây nhất" : "Cũ nhất"}
-              </button>
+              </div>
             </div>
 
             {total === 0 ? (
@@ -167,9 +169,9 @@ function AppointmentListPage() {
                 <BookingIcon name="info" size={20} />
               </span>
               <div>
-                <strong>Cần trợ giúp kiểm tra lịch?</strong>
+                <strong>Lưu ý khi đến khám tại bệnh viện</strong>
                 <p>
-                  Tổng đài viên MEDICARE sẵn sàng 24/7 qua <a href="tel:19006868">1900 6868</a>
+                  Vui lòng có mặt trước giờ hẹn ít nhất 15 phút tại quầy tiếp đón và xuất trình mã QR lịch hẹn để hoàn tất thủ tục check-in.
                 </p>
               </div>
             </div>

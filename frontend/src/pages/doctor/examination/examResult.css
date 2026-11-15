@@ -57,8 +57,8 @@
 
 .er-field textarea:focus-visible {
   outline: none;
-  border-color: var(--color-primary, #0f766e);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  border-color: var(--color-primary, #1E88E5);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
 }
 
 .er-field textarea:disabled {
@@ -82,8 +82,8 @@
 }
 
 .er-field--diagnosis textarea:focus-visible {
-  border-color: var(--color-primary, #0f766e);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  border-color: var(--color-primary, #1E88E5);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
 }
 
 /* Integrated Workstation Actions Footer */

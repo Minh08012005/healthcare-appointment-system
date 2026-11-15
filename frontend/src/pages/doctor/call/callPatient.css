@@ -83,19 +83,19 @@
 }
 
 .cp-btn:focus-visible {
-  outline: 2px solid var(--color-primary, #0f766e);
+  outline: 2px solid var(--color-primary, #1E88E5);
   outline-offset: 2px;
 }
 
 .cp-btn--primary {
   color: #ffffff;
-  background-color: var(--color-primary, #0f766e);
-  border-color: var(--color-primary, #0f766e);
+  background-color: var(--color-primary, #1E88E5);
+  border-color: var(--color-primary, #1E88E5);
 }
 
 .cp-btn--primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover, #115e59);
-  border-color: var(--color-primary-hover, #115e59);
+  background-color: var(--color-primary-hover, #0E4C9A);
+  border-color: var(--color-primary-hover, #0E4C9A);
 }
 
 .cp-btn--danger {
@@ -212,8 +212,8 @@
 .cp-spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid var(--color-border, #e2e8f0);
-  border-top-color: var(--color-primary, #0f766e);
+  border: 2px solid var(--color-border, #E5E7EB);
+  border-top-color: var(--color-primary, #1E88E5);
   border-radius: 50%;
   animation: cp-spin 0.7s linear infinite;
   flex-shrink: 0;
@@ -399,9 +399,9 @@
 }
 
 .cp-pill--calling {
-  color: var(--primary-dark, #115e59);
-  background-color: var(--primary-light, #f0fdfa);
-  border-color: #ccfbf1;
+  color: var(--primary-dark, #0E4C9A);
+  background-color: var(--primary-light, #EFF6FF);
+  border-color: var(--primary-border, #BFDBFE);
   font-weight: 600;
 }
 
