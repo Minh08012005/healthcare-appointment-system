@@ -10,6 +10,12 @@ const HO_SO_STATUS = { DANG_KHAM: "Đang khám", DA_XONG: "Đã xong" };
 const ACCEPT = ".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp";
 const MAX_MO_TA = 10000;
 
+const STAGES = [
+  { key: "CHO_XU_LY", label: "Chờ xử lý" },
+  { key: "DANG_XU_LY", label: "Đang xử lý" },
+  { key: "DA_XONG", label: "Đã xong" },
+];
+
 function InfoList({ rows }) {
   return (
     <dl className="lab-info">
@@ -53,33 +59,50 @@ function UploadForm({ id, onDone, onStale }) {
   };
 
   return (
-    <form className="lab-card" onSubmit={handleSubmit}>
-      <h3 className="lab-card__title">Tải kết quả xét nghiệm</h3>
+    <form className="lab-card lab-card--workspace" onSubmit={handleSubmit}>
+      <div className="lab-card__header">
+        <h3 className="lab-card__title">Tải kết quả xét nghiệm</h3>
+        <p className="lab-card__subtitle">
+          Đính kèm file kết quả và ghi nhận mô tả chuyên môn để hoàn tất chỉ định xét nghiệm
+        </p>
+      </div>
 
-      <label className="lab-field">
-        <span>File kết quả (PDF, JPG, PNG, WebP · tối đa 10MB)</span>
-        <input
-          type="file"
-          accept={ACCEPT}
-          disabled={submitting}
-          onChange={(e) => {
-            setFile(e.target.files?.[0] || null);
-            setError(null);
-          }}
-        />
-      </label>
+      <div className="lab-field">
+        <label htmlFor="lab-file-input">
+          File kết quả (PDF, JPG, PNG, WebP · tối đa 10MB)
+        </label>
+        <div className="lab-file-input-wrapper">
+          <input
+            id="lab-file-input"
+            type="file"
+            accept={ACCEPT}
+            disabled={submitting}
+            onChange={(e) => {
+              setFile(e.target.files?.[0] || null);
+              setError(null);
+            }}
+          />
+          {file && (
+            <div className="lab-file-chosen">
+              <span className="lab-file-chosen__name">{file.name}</span>
+              <span className="lab-file-chosen__size">({(file.size / 1024).toFixed(1)} KB)</span>
+            </div>
+          )}
+        </div>
+      </div>
 
-      <label className="lab-field">
-        <span>Mô tả kết quả (tùy chọn)</span>
+      <div className="lab-field">
+        <label htmlFor="lab-mota-input">Mô tả kết quả (tùy chọn)</label>
         <textarea
+          id="lab-mota-input"
           rows={4}
           maxLength={MAX_MO_TA}
           value={moTa}
           disabled={submitting}
           onChange={(e) => setMoTa(e.target.value)}
-          placeholder="Nhập mô tả ngắn cho kết quả..."
+          placeholder="Nhập mô tả kết luận, nhận định chuyên môn hoặc ghi chú xét nghiệm..."
         />
-      </label>
+      </div>
 
       {error && (
         <div className="cp-notice cp-notice--error" role="alert">
@@ -130,8 +153,19 @@ function ResultView({ id }) {
   const isImage = ketQua?.file_type?.startsWith("image/");
 
   return (
-    <section className="lab-card">
-      <h3 className="lab-card__title">Kết quả xét nghiệm</h3>
+    <section className="lab-card lab-card--result">
+      <div className="lab-card__header">
+        <div className="lab-result-badge-row">
+          <h3 className="lab-card__title">Kết quả xét nghiệm</h3>
+          <span className="lab-result-completed-tag">
+            <span className="lab-result-completed-dot" aria-hidden="true" />
+            Đã hoàn thành
+          </span>
+        </div>
+        <p className="lab-card__subtitle">
+          Chỉ định đã hoàn tất và kết quả đã sẵn sàng cho Bác sĩ điều trị xem
+        </p>
+      </div>
 
       {loading && (
         <div className="cp-state" role="status">
@@ -150,11 +184,11 @@ function ResultView({ id }) {
       )}
 
       {!loading && !error && (
-        <>
+        <div className="lab-result-content">
           <InfoList
             rows={[
               ["Hoàn thành lúc", formatDateTime(data?.chi_dinh?.thoi_gian_hoan_thanh)],
-              ["Mô tả", ketQua?.mo_ta],
+              ["Mô tả", ketQua?.mo_ta || "Không có mô tả kết quả."],
             ]}
           />
 
@@ -182,17 +216,24 @@ function ResultView({ id }) {
 
           {fileDone && file.url && (
             <div className="lab-file">
-              <a className="lab-link" href={file.url} target="_blank" rel="noreferrer">
-                Mở file kết quả trong tab mới
-              </a>
+              <div className="lab-file__bar">
+                <span className="lab-file__title">File kết quả:</span>
+                <a className="lab-link" href={file.url} target="_blank" rel="noreferrer">
+                  Mở file kết quả trong tab mới
+                </a>
+              </div>
               {isImage ? (
                 <img className="lab-file__preview" src={file.url} alt="File kết quả xét nghiệm" />
               ) : (
-                <iframe className="lab-file__preview lab-file__pdf" src={file.url} title="File kết quả xét nghiệm" />
+                <iframe
+                  className="lab-file__preview lab-file__pdf"
+                  src={file.url}
+                  title="File kết quả xét nghiệm"
+                />
               )}
             </div>
           )}
-        </>
+        </div>
       )}
     </section>
   );
@@ -278,18 +319,50 @@ function LabOrderDetailPage() {
       {!loading && !error && data && (
         <>
           <header className="lab-header">
-            <div className="lab-header__name">
-              <h1>
-                {show(data.patient?.ho_ten)} · {show(data.ten_xet_nghiem)}
-              </h1>
-              <span className={statusClass(data.trang_thai)}>{statusLabel(data.trang_thai)}</span>
+            <div className="lab-header__main">
+              <div className="lab-header__title-row">
+                <h1 className="lab-header__title">
+                  {show(data.patient?.ho_ten)} · {show(data.ten_xet_nghiem)}
+                </h1>
+                <span className={statusClass(data.trang_thai)}>
+                  <span className="lab-pill-dot" aria-hidden="true" />
+                  {statusLabel(data.trang_thai)}
+                </span>
+              </div>
+              <p className="lab-header__sub">
+                Chi tiết chỉ định xét nghiệm và quy trình xử lý kết quả
+              </p>
             </div>
             {backLink}
           </header>
 
+          <div className="lab-stepper" aria-label="Tiến trình xét nghiệm">
+            {STAGES.map((s, idx) => {
+              const isCurrent = data.trang_thai === s.key;
+              const isDone =
+                (data.trang_thai === "DANG_XU_LY" && idx === 0) ||
+                data.trang_thai === "DA_XONG";
+              let stepClass = "lab-step--pending";
+              if (isCurrent) {
+                stepClass = `lab-step--active lab-step--${s.key.toLowerCase()}`;
+              } else if (isDone) {
+                stepClass = "lab-step--done";
+              }
+
+              return (
+                <div key={s.key} className={`lab-step ${stepClass}`}>
+                  <span className="lab-step__dot" aria-hidden="true" />
+                  <span className="lab-step__label">{s.label}</span>
+                </div>
+              );
+            })}
+          </div>
+
           <div className="lab-grid">
             <section className="lab-card">
-              <h3 className="lab-card__title">Bệnh nhân và hồ sơ</h3>
+              <div className="lab-card__header">
+                <h3 className="lab-card__title">Bệnh nhân và hồ sơ</h3>
+              </div>
               <InfoList
                 rows={[
                   ["Họ tên", data.patient?.ho_ten],
@@ -303,7 +376,9 @@ function LabOrderDetailPage() {
             </section>
 
             <section className="lab-card">
-              <h3 className="lab-card__title">Chỉ định xét nghiệm</h3>
+              <div className="lab-card__header">
+                <h3 className="lab-card__title">Chỉ định xét nghiệm</h3>
+              </div>
               <InfoList
                 rows={[
                   ["Tên xét nghiệm", data.ten_xet_nghiem],
@@ -323,16 +398,24 @@ function LabOrderDetailPage() {
           </div>
 
           {data.trang_thai === "CHO_XU_LY" && (
-            <div className="lab-actions">
-              <button
-                type="button"
-                className="cp-btn cp-btn--primary"
-                onClick={handleStart}
-                disabled={starting}
-              >
-                {starting ? "Đang xử lý..." : "Bắt đầu xử lý"}
-              </button>
-            </div>
+            <section className="lab-panel lab-panel--action">
+              <div className="lab-panel__body">
+                <div>
+                  <h3 className="lab-panel__title">Tiếp nhận chỉ định xét nghiệm</h3>
+                  <p className="lab-panel__desc">
+                    Chỉ định đang ở trạng thái chờ xử lý. Nhấn nút để bắt đầu thực hiện xét nghiệm và chuyển sang trạng thái đang xử lý.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="cp-btn cp-btn--primary"
+                  onClick={handleStart}
+                  disabled={starting}
+                >
+                  {starting ? "Đang xử lý..." : "Bắt đầu xử lý"}
+                </button>
+              </div>
+            </section>
           )}
 
           {data.trang_thai === "DANG_XU_LY" && (
