@@ -174,70 +174,74 @@ function LabOrderSection({ hoSoId, hoSoStatus, onRecordStale }) {
   };
 
   return (
-    <section className="ex-card" id="lab-order-area">
-      <h3 className="ex-card__title">
-        Chỉ định xét nghiệm
-        {!list.loading && !list.error && <span className="lo-count">{items.length}</span>}
+    <section className="ex-panel ex-panel--lab" id="lab-order-area">
+      <div className="ex-panel__head">
+        <h3 className="ex-panel__title">
+          Chỉ định xét nghiệm
+          {!list.loading && !list.error && <span className="lo-count">{items.length}</span>}
+        </h3>
         {!list.loading && !list.error && items.length > 0 && (
           <button type="button" className="ex-link lo-refresh" onClick={list.reload}>
             Làm mới kết quả
           </button>
         )}
-      </h3>
+      </div>
 
       {canCreate ? (
         <form className="lo-form" onSubmit={handleSubmit} noValidate>
-          <div className="lo-field">
-            <label htmlFor="lo-ten">Tên xét nghiệm</label>
-            <input
-              id="lo-ten"
-              type="text"
-              value={ten}
-              maxLength={MAX_TEN}
-              placeholder="Ví dụ: Công thức máu"
-              disabled={submitting}
-              onChange={(e) => setTen(e.target.value)}
-            />
-          </div>
+          <div className="lo-form-row">
+            <div className="lo-field">
+              <label htmlFor="lo-ten">Tên xét nghiệm</label>
+              <input
+                id="lo-ten"
+                type="text"
+                value={ten}
+                maxLength={MAX_TEN}
+                placeholder="Ví dụ: Công thức máu"
+                disabled={submitting}
+                onChange={(e) => setTen(e.target.value)}
+              />
+            </div>
 
-          <div className="lo-field">
-            <label htmlFor="lo-phong">Phòng xét nghiệm</label>
-            {rooms.loading && (
-              <div className="lo-inline" role="status">
-                <span className="cp-spinner" aria-hidden="true" /> Đang tải danh sách phòng...
-              </div>
-            )}
-            {!rooms.loading && rooms.error && (
-              <div className="lo-inline lo-inline--error" role="alert">
-                Không tải được danh sách phòng.
-                <button type="button" className="ex-link" onClick={rooms.reload}>
-                  Thử lại
-                </button>
-              </div>
-            )}
-            {!rooms.loading && !rooms.error && (
-              <>
-                <select
-                  id="lo-phong"
-                  value={phongId}
-                  disabled={submitting || roomOptions.length === 0}
-                  onChange={(e) => setPhongId(e.target.value)}
-                >
-                  <option value="">— Chọn phòng —</option>
-                  {roomOptions.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.ten_phong}
-                    </option>
-                  ))}
-                </select>
-                {usingFallback && (
-                  <small className="lo-hint">
-                    Hệ thống chưa có phòng được đánh dấu là phòng xét nghiệm, đang hiển thị tất cả phòng.
-                  </small>
-                )}
-                {roomOptions.length === 0 && <small className="lo-hint">Chưa có phòng nào để chọn.</small>}
-              </>
-            )}
+            <div className="lo-field">
+              <label htmlFor="lo-phong">Phòng xét nghiệm</label>
+              {rooms.loading && (
+                <div className="lo-inline" role="status">
+                  <span className="cp-spinner" aria-hidden="true" /> Đang tải danh sách phòng...
+                </div>
+              )}
+              {!rooms.loading && rooms.error && (
+                <div className="lo-inline lo-inline--error" role="alert">
+                  Không tải được danh sách phòng.
+                  <button type="button" className="ex-link" onClick={rooms.reload}>
+                    Thử lại
+                  </button>
+                </div>
+              )}
+              {!rooms.loading && !rooms.error && (
+                <>
+                  <select
+                    id="lo-phong"
+                    value={phongId}
+                    disabled={submitting || roomOptions.length === 0}
+                    onChange={(e) => setPhongId(e.target.value)}
+                  >
+                    <option value="">— Chọn phòng —</option>
+                    {roomOptions.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.ten_phong}
+                      </option>
+                    ))}
+                  </select>
+                  {usingFallback && (
+                    <small className="lo-hint">
+                      Hệ thống chưa có phòng được đánh dấu là phòng xét nghiệm, đang hiển thị tất cả phòng.
+                    </small>
+                  )}
+                  {roomOptions.length === 0 && <small className="lo-hint">Chưa có phòng nào để chọn.</small>}
+                </>
+              )}
+            </div>
           </div>
 
           <div className="lo-field">

@@ -164,10 +164,13 @@ function CallPatientPage() {
   return (
     <div className="cp-page">
       <div className="cp-toolbar">
-        <p className="cp-room">{roomLabel}</p>
+        <div className="cp-toolbar__meta">
+          <span className="cp-room-badge">Phòng khám</span>
+          <p className="cp-room">{roomLabel || "Chưa xác định phòng khám"}</p>
+        </div>
         <button
           type="button"
-          className="cp-btn cp-btn--primary"
+          className="cp-btn cp-btn--primary cp-btn--call-next"
           onClick={handleNext}
           disabled={busy || loading || Boolean(loadError)}
         >
@@ -204,30 +207,49 @@ function CallPatientPage() {
       {!loading && queue && (
         <section className="cp-card">
           <div className="cp-card__head">
-            <h2>Bệnh nhân đang gọi</h2>
+            <div className="cp-card__title-group">
+              <span className="cp-card__eyebrow">Đang điều phối</span>
+              <h2 className="cp-card__title">Bệnh nhân đang gọi</h2>
+            </div>
             <span className="cp-pill cp-pill--calling">{statusText(queue.trang_thai)}</span>
           </div>
 
           <div className="cp-card__body">
             <div className="cp-stt">
-              <span>Số thứ tự</span>
-              <strong>{queue.nhan_stt || "—"}</strong>
+              <span className="cp-stt__label">Số thứ tự</span>
+              <strong className="cp-stt__num">{queue.nhan_stt || "—"}</strong>
+              <span
+                className={`cp-stt__badge cp-pill cp-pill--${queue.loai === "OFFLINE" ? "offline" : "online"}`}
+              >
+                {LANE_LABELS[queue.loai] || queue.loai || "—"}
+              </span>
             </div>
+
             <div className="cp-info">
-              <h3>{current.patient?.ho_ten || "—"}</h3>
-              <dl>
-                <dt>Loại hàng đợi</dt>
-                <dd>
-                  <span
-                    className={`cp-pill cp-pill--${queue.loai === "OFFLINE" ? "offline" : "online"}`}
-                  >
-                    {LANE_LABELS[queue.loai] || queue.loai || "—"}
-                  </span>
-                </dd>
-                <dt>Giờ hẹn</dt>
-                <dd>{formatTime(current.appointment?.gio_kham)}</dd>
-                <dt>Lần gọi</dt>
-                <dd>{queue.so_lan_goi ?? "—"}</dd>
+              <div className="cp-info__header">
+                <span className="cp-info__label">Họ và tên bệnh nhân</span>
+                <h3 className="cp-info__name">{current.patient?.ho_ten || "—"}</h3>
+              </div>
+
+              <dl className="cp-info__grid">
+                <div className="cp-info__item">
+                  <dt>Hàng đợi tiếp nhận</dt>
+                  <dd>
+                    <span
+                      className={`cp-pill cp-pill--${queue.loai === "OFFLINE" ? "offline" : "online"}`}
+                    >
+                      {LANE_LABELS[queue.loai] || queue.loai || "—"}
+                    </span>
+                  </dd>
+                </div>
+                <div className="cp-info__item">
+                  <dt>Giờ hẹn khám</dt>
+                  <dd>{formatTime(current.appointment?.gio_kham)}</dd>
+                </div>
+                <div className="cp-info__item">
+                  <dt>Số lần đã gọi</dt>
+                  <dd>{queue.so_lan_goi ?? "—"}</dd>
+                </div>
               </dl>
             </div>
           </div>
@@ -235,7 +257,7 @@ function CallPatientPage() {
           <div className="cp-card__actions">
             <button
               type="button"
-              className="cp-btn cp-btn--primary"
+              className="cp-btn cp-btn--primary cp-btn--start"
               onClick={handleStart}
               disabled={busy}
             >
@@ -256,8 +278,22 @@ function CallPatientPage() {
       )}
 
       {!loading && !loadError && !queue && !notice && (
-        <div className="cp-state">
-          Chưa có bệnh nhân đang gọi. Bấm “Bệnh nhân tiếp theo” để gọi.
+        <div className="cp-card cp-card--empty">
+          <div className="cp-empty">
+            <span className="cp-empty__badge">Sẵn sàng tiếp nhận</span>
+            <h3 className="cp-empty__title">Chưa có bệnh nhân đang gọi</h3>
+            <p className="cp-empty__text">
+              Phòng khám đang ở trạng thái sẵn sàng tiếp nhận. Bấm nút <strong>“Bệnh nhân tiếp theo”</strong> để gọi số khám kế tiếp vào phòng.
+            </p>
+            <button
+              type="button"
+              className="cp-btn cp-btn--primary cp-btn--call-next"
+              onClick={handleNext}
+              disabled={busy}
+            >
+              {pending === "next" ? "Đang gọi..." : "Bệnh nhân tiếp theo"}
+            </button>
+          </div>
         </div>
       )}
     </div>

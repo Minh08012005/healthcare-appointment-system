@@ -36,7 +36,7 @@ function MainLayout({ role, userName, userTitle }) {
   };
 
   return (
-    <div className="layout">
+    <div className={`layout${role ? ` layout--${role}` : ""}`}>
       <Sidebar
         roleLabel={menu.roleLabel}
         items={menu.items}

@@ -24,6 +24,20 @@ function LabOrderListPage() {
 
   return (
     <div className="lab-page">
+      <header className="lab-header">
+        <div className="lab-header__main">
+          <div className="lab-header__title-row">
+            <h1 className="lab-header__title">Danh sách chỉ định xét nghiệm</h1>
+            {data?.room?.ten_phong && (
+              <span className="lab-room-badge">
+                Phòng: <strong>{data.room.ten_phong}</strong>
+              </span>
+            )}
+          </div>
+          <p className="lab-header__sub">Hàng đợi xét nghiệm và tiếp nhận xử lý mẫu bệnh phẩm</p>
+        </div>
+      </header>
+
       <div className="lab-toolbar">
         <div className="lab-tabs" role="tablist" aria-label="Lọc theo trạng thái">
           {FILTERS.map((f) => (
@@ -39,7 +53,6 @@ function LabOrderListPage() {
             </button>
           ))}
         </div>
-        {data?.room?.ten_phong && <p className="lab-room">{data.room.ten_phong}</p>}
       </div>
 
       {loading && (
@@ -59,7 +72,7 @@ function LabOrderListPage() {
       )}
 
       {!loading && !error && items.length === 0 && (
-        <div className="cp-state">
+        <div className="cp-state lab-empty">
           {trangThai
             ? `Không có chỉ định nào ở trạng thái "${statusLabel(trangThai)}".`
             : "Phòng chưa có chỉ định xét nghiệm nào."}
@@ -82,17 +95,20 @@ function LabOrderListPage() {
             <tbody>
               {items.map((item) => (
                 <tr key={item.chi_dinh_id}>
-                  <td className="lab-strong">{show(item.patient?.ho_ten)}</td>
-                  <td>{show(item.ten_xet_nghiem)}</td>
-                  <td>{show(item.room?.ten_phong)}</td>
-                  <td className="lab-nowrap">{formatDateTime(item.thoi_gian_chi_dinh)}</td>
-                  <td>
+                  <td className="lab-col-patient">
+                    <span className="lab-patient-name">{show(item.patient?.ho_ten)}</span>
+                  </td>
+                  <td className="lab-col-test">{show(item.ten_xet_nghiem)}</td>
+                  <td className="lab-col-room">{show(item.room?.ten_phong)}</td>
+                  <td className="lab-col-time">{formatDateTime(item.thoi_gian_chi_dinh)}</td>
+                  <td className="lab-col-status">
                     <span className={statusClass(item.trang_thai)}>
+                      <span className="lab-pill-dot" aria-hidden="true" />
                       {statusLabel(item.trang_thai)}
                     </span>
                   </td>
-                  <td className="lab-action">
-                    <Link className="lab-link" to={`/lab/orders/${item.chi_dinh_id}`}>
+                  <td className="lab-col-action">
+                    <Link className="lab-btn-open" to={`/lab/orders/${item.chi_dinh_id}`}>
                       Mở
                     </Link>
                   </td>

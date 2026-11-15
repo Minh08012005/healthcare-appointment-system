@@ -40,12 +40,38 @@ function errorNotice(err) {
   return { type: "error", title: "Check-in thất bại", text: err.message };
 }
 
-function InfoRow({ label, children }) {
+function InfoRow({ label, children, isCode = false, isRoom = false }) {
   return (
     <div className="ci-info__row">
-      <span>{label}</span>
-      <strong>{children || "—"}</strong>
+      <span className="ci-info__label">{label}</span>
+      <strong
+        className={`ci-info__value${isCode ? " ci-info__value--code" : ""}${isRoom ? " ci-info__value--room" : ""}`}
+      >
+        {children || "—"}
+      </strong>
     </div>
+  );
+}
+
+function EmptyCalendarIcon() {
+  return (
+    <svg
+      width="40"
+      height="40"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <path d="M9 16l2 2 4-4" />
+    </svg>
   );
 }
 
@@ -104,28 +130,40 @@ function OnlineCheckinPage() {
 
   return (
     <div className="ci-page">
-      <p className="ci-desc">
-        Quét mã QR trên lịch hẹn của bệnh nhân hoặc nhập mã đặt lịch để check-in.
-      </p>
+      <header className="ci-header">
+        <div className="ci-header__main">
+          <h1 className="ci-header__title">Tiếp đón &amp; Check-in Online</h1>
+          <p className="ci-header__sub">
+            Quét mã QR trên lịch hẹn hoặc nhập mã đặt lịch để xác nhận bệnh nhân đến khám hôm nay
+          </p>
+        </div>
+      </header>
 
       <CheckinNotice notice={notice} />
 
       <div className="ci-grid">
         <section className="ci-card">
-          <h3 className="ci-card__title">Quét mã QR</h3>
-          <QrScanner
-            title="Đưa mã QR vào khung quét"
-            hint="Hệ thống tự nhận diện mã đặt lịch"
-            onResult={handleScan}
-          />
+          <div className="ci-card__head">
+            <h2 className="ci-card__title">Tiếp nhận check-in</h2>
+            <span className="ci-mode-badge">Luồng A · Trực tuyến</span>
+          </div>
+
+          <div className="ci-section-block">
+            <label className="ci-section-label">Phương thức 1: Quét mã QR</label>
+            <QrScanner
+              title="Đưa mã QR vào khung quét"
+              hint="Hệ thống tự nhận diện mã đặt lịch"
+              onResult={handleScan}
+            />
+          </div>
 
           <div className="ci-divider">
             <span>hoặc nhập thủ công</span>
           </div>
 
-          <form onSubmit={handleSubmit} noValidate>
+          <form onSubmit={handleSubmit} noValidate className="ci-manual-form">
             <label className="ci-label" htmlFor="ma-dat-lich">
-              Mã đặt lịch
+              Phương thức 2: Nhập mã đặt lịch
             </label>
             <div className="ci-inline">
               <input
@@ -147,31 +185,40 @@ function OnlineCheckinPage() {
 
         <section className="ci-card">
           <div className="ci-card__head">
-            <h3 className="ci-card__title">Thông tin lịch hẹn</h3>
+            <h2 className="ci-card__title">Thông tin lịch hẹn</h2>
             {a && <span className="ci-badge ci-badge--success">Đã check-in</span>}
           </div>
 
           {a ? (
             <div className="ci-info">
-              <InfoRow label="Mã đặt lịch">{a.ma_dat_lich}</InfoRow>
+              <InfoRow label="Mã đặt lịch" isCode>
+                {a.ma_dat_lich}
+              </InfoRow>
               <InfoRow label="Bệnh nhân">{result.patient?.ho_ten}</InfoRow>
               <InfoRow label="Số điện thoại">{result.patient?.so_dien_thoai}</InfoRow>
               <InfoRow label="Chuyên khoa">{result.specialty?.ten_chuyen_khoa}</InfoRow>
               <InfoRow label="Bác sĩ">
                 {result.doctor?.ho_ten && `BS. ${result.doctor.ho_ten}`}
               </InfoRow>
-              <InfoRow label="Phòng khám">{result.room?.ten_phong}</InfoRow>
+              <InfoRow label="Phòng khám" isRoom>
+                {result.room?.ten_phong}
+              </InfoRow>
               <InfoRow label="Thời gian">{formatDateTime(a.ngay_kham, a.gio_kham)}</InfoRow>
               <InfoRow label="Loại hàng đợi">
-                <span className="ci-badge">A · Online</span>
+                <span className="ci-badge ci-badge--online">A · Online</span>
               </InfoRow>
             </div>
           ) : (
-            <p className="ci-empty">
-              {submitting
-                ? "Đang check-in..."
-                : "Quét mã QR hoặc nhập mã đặt lịch để check-in và xem thông tin lịch hẹn."}
-            </p>
+            <div className="ci-empty">
+              <span className="ci-empty__icon">
+                <EmptyCalendarIcon />
+              </span>
+              <p className="ci-empty__text">
+                {submitting
+                  ? "Đang kiểm tra và check-in..."
+                  : "Quét mã QR hoặc nhập mã đặt lịch để check-in và xem thông tin lịch hẹn."}
+              </p>
+            </div>
           )}
         </section>
       </div>

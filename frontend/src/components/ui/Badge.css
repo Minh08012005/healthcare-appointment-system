@@ -1,0 +1,45 @@
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 500;
+  border-radius: var(--radius-sm, 4px);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* Semantic variants */
+.ui-badge--neutral {
+  background-color: var(--neutral-bg, #F3F4F6);
+  color: var(--neutral-text, #4B5563);
+  border-color: var(--neutral-border, #E5E7EB);
+}
+
+.ui-badge--pending {
+  background-color: var(--warning-bg, #FEF8EC);
+  color: var(--warning-text, #9A6214);
+  border-color: var(--warning-border, #FCD89C);
+}
+
+.ui-badge--progress {
+  background-color: var(--primary-light, #EFF6FF);
+  color: var(--primary-dark, #0E4C9A);
+  border-color: var(--primary-border, #BFDBFE);
+}
+
+.ui-badge--success {
+  background-color: var(--success-bg, #EDF8F2);
+  color: var(--success-text, #1E6B3C);
+  border-color: var(--success-border, #A3E0BA);
+}
+
+.ui-badge--danger {
+  background-color: var(--danger-bg, #FDF2F2);
+  color: var(--danger-text, #9B2222);
+  border-color: var(--danger-border, #F8B4B4);
+}

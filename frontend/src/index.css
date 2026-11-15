@@ -1,32 +1,98 @@
 :root {
-  --primary: #1b6fd8;
-  --primary-dark: #0f4c9a;
-  --primary-light: #e8f1fc;
-  --teal: #14a3a3;
-  --success: #2e9e5b;
-  --warning: #f2a93b;
-  --danger: #d64545;
-  --text: #1f2937;
-  --text-secondary: #6b7280;
-  --border: #e5e7eb;
-  --bg: #f7f9fc;
+  /* ==================================================================
+     Approved Figma Design Tokens (Source of Truth)
+     ================================================================== */
+
+  /* Primary Blue (Action, Selected, Focus, Interactive) */
+  --primary: #1E88E5;
+  --primary-dark: #0E4C9A;
+  --primary-light: #EFF6FF;
+  --primary-subtle: #EBF5FF;
+  --primary-border: #BFDBFE;
+
+  /* Secondary Accent (Restrained Clinical Accent) */
+  --teal: #14A3A3;
+  --teal-dark: #0D7A7A;
+  --teal-light: #F0FDFA;
+  --teal-border: #99F6E4;
+
+  /* Semantic Feedback & Statuses */
+  --success: #2E9E59;
+  --success-bg: #EDF8F2;
+  --success-border: #A3E0BA;
+  --success-text: #1E6B3C;
+
+  --warning: #F2A93B;
+  --warning-bg: #FEF8EC;
+  --warning-border: #FCD89C;
+  --warning-text: #9A6214;
+
+  --danger: #D64545;
+  --danger-bg: #FDF2F2;
+  --danger-border: #F8B4B4;
+  --danger-text: #9B2222;
+
+  --info: #1E88E5;
+  --info-bg: #EFF6FF;
+  --info-border: #BFDBFE;
+  --info-text: #0E4C9A;
+
+  /* Surfaces & Structural */
+  --background: #F7F8FC;
+  --bg: var(--background);
+  --surface: #FFFFFF;
+  --border: #E5E7EB;
+  --border-muted: #F3F4F6;
+
+  /* Neutral Typography */
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --text: var(--text-primary);
+
+  --neutral-bg: #F3F4F6;
+  --neutral-border: #E5E7EB;
+  --neutral-text: #4B5563;
+
+  /* Aliases for Shared Components */
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-dark);
+  --color-primary-subtle: var(--primary-light);
+  --color-bg-app: var(--background);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-border-subtle: var(--border-muted);
+  --color-text: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-focus-ring: rgba(30, 136, 229, 0.35);
+
+  /* Geometry & Spacing (Figma defaults: radius 8, card radius 12) */
+  --radius-sm: 4px;
   --radius: 8px;
   --radius-card: 12px;
   --radius-pill: 999px;
 
-  font: 14px/20px Inter, system-ui, sans-serif;
-  color: var(--text);
-  background: var(--bg);
+  /* Typography scale */
+  font: 14px/20px Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text-primary);
+  background: var(--background);
 }
 
 body {
   margin: 0;
+  color: var(--text-primary);
+  background-color: var(--background);
+  font-family: inherit;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1 {
   font-size: 24px;
   line-height: 32px;
   font-weight: 700;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -34,5 +100,6 @@ h2 {
   font-size: 20px;
   line-height: 28px;
   font-weight: 600;
+  color: var(--text-primary);
   margin: 0;
 }

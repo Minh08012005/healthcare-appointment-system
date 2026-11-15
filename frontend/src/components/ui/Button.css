@@ -1,0 +1,105 @@
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  box-sizing: border-box;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: var(--radius, 8px);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.ui-btn:focus-visible {
+  outline: 2px solid var(--color-primary, #1E88E5);
+  outline-offset: 2px;
+}
+
+.ui-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Sizes */
+.ui-btn--sm {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+  line-height: 18px;
+  border-radius: var(--radius-sm, 6px);
+}
+
+/* Variants */
+.ui-btn--primary {
+  background-color: var(--color-primary, #1E88E5);
+  color: #ffffff;
+  border-color: var(--color-primary, #1E88E5);
+}
+
+.ui-btn--primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover, #0E4C9A);
+  border-color: var(--color-primary-hover, #0E4C9A);
+}
+
+.ui-btn--outline {
+  background-color: #ffffff;
+  color: var(--color-text, #1F2937);
+  border-color: var(--color-border, #E5E7EB);
+}
+
+.ui-btn--outline:hover:not(:disabled) {
+  background-color: var(--color-bg-app, #F7F8FC);
+  border-color: #D1D5DB;
+}
+
+.ui-btn--danger {
+  background-color: var(--danger-bg, #FDF2F2);
+  color: var(--danger-text, #9B2222);
+  border-color: var(--danger-border, #F8B4B4);
+}
+
+.ui-btn--danger:hover:not(:disabled) {
+  background-color: #FEE2E2;
+  border-color: #FCA5A5;
+}
+
+.ui-btn--ghost {
+  background-color: transparent;
+  color: var(--color-text-secondary, #6B7280);
+  border-color: transparent;
+}
+
+.ui-btn--ghost:hover:not(:disabled) {
+  background-color: var(--neutral-bg, #F3F4F6);
+  color: var(--color-text, #1F2937);
+}
+
+/* Loading state */
+.ui-btn--loading {
+  position: relative;
+}
+
+.ui-btn__spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ui-btn-spin 0.6s linear infinite;
+}
+
+@keyframes ui-btn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
