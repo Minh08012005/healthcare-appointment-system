@@ -168,6 +168,22 @@ function AppointmentDetailPage() {
                     </button>
                   </div>
                 </>
+              ) : statusKey === "checkedIn" ? (
+                <div className="ap-qr-checked-in">
+                  <span className="ap-qr-checked-in__icon">
+                    <BookingIcon name="checkCircle" size={26} />
+                  </span>
+                  <strong>Đã hoàn tất check-in</strong>
+                  <p>Bạn đã hoàn tất thủ tục check-in. Vui lòng chờ đến lượt khám.</p>
+                </div>
+              ) : statusKey === "completed" ? (
+                <div className="ap-qr-checked-in">
+                  <span className="ap-qr-checked-in__icon">
+                    <BookingIcon name="checkCircle" size={26} />
+                  </span>
+                  <strong>Lịch khám đã hoàn thành</strong>
+                  <p>Lượt khám của lịch hẹn này đã hoàn tất.</p>
+                </div>
               ) : (
                 <div className="ap-qr-invalid">
                   <span className="ap-qr-invalid__icon">
@@ -238,7 +254,9 @@ function AppointmentDetailPage() {
               <div>
                 <strong>Lưu ý tiếp đón tại bệnh viện</strong>
                 <p>
-                  Vui lòng đến trước giờ hẹn tối thiểu 10 phút, nếu không mã QR tiếp đón sẽ hết hiệu lực phục vụ.
+                  {statusKey === "checkedIn"
+                    ? "Bạn đã hoàn tất tiếp đón. Vui lòng theo dõi thông báo số thứ tự tại khu vực chờ của phòng khám."
+                    : "Vui lòng đến trước giờ hẹn tối thiểu 10 phút, nếu không mã QR tiếp đón sẽ hết hiệu lực phục vụ."}
                 </p>
               </div>
             </div>
@@ -255,6 +273,8 @@ function AppointmentDetailPage() {
                   <span>
                     {appointment.co_the_huy
                       ? "Chỉ được phép hủy lịch hẹn trước giờ khám 2 tiếng."
+                      : statusKey === "checkedIn"
+                      ? "Lịch hẹn đã check-in không thể hủy."
                       : "Đã quá thời hạn hủy (cần hủy trước giờ khám ít nhất 2 tiếng)."}
                   </span>
                 </p>
