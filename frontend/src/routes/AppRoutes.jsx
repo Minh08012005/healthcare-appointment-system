@@ -8,6 +8,7 @@ import DoctorHomePage from "../pages/doctor/DoctorHomePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import AdminPlaceholderPage from "../pages/admin/AdminPlaceholderPage";
+import AdminAccountsPage from "../pages/admin/AdminAccountsPage";
 import AdminSpecialtiesPage from "../pages/admin/AdminSpecialtiesPage";
 import AdminDoctorsPage from "../pages/admin/AdminDoctorsPage";
 import MainLayout from "../components/layout/MainLayout";
@@ -150,13 +151,7 @@ function AppRoutes() {
                 <Route path="/admin" element={<AdminHomePage />} />
                 <Route
                     path="/admin/accounts"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý tài khoản nhân viên"
-                            taskCode="C6-03"
-                            description="Quản lý danh sách, tạo mới, chỉnh sửa thông tin và khóa tài khoản nhân viên y tế."
-                        />
-                    }
+                    element={<AdminAccountsPage />}
                 />
                 <Route
                     path="/admin/specialties"
