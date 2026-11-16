@@ -481,14 +481,40 @@
 /* ---------- Step 4: Patient Info Form ---------- */
 .bk-summary {
   display: flex;
+  flex-direction: row;
+  align-items: flex-start;
   gap: 14px;
-  align-items: center;
+  padding: 16px 18px;
+  text-align: left;
 }
 
-/* Header icon box: warm ivory */
+.bk-summary__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+}
+
+.bk-summary__body .bk-pill {
+  margin: 0;
+  align-self: flex-start;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  padding: 2px 9px;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-navy, #0B1F33);
+  border-radius: 999px;
+}
+
+/* Header icon box: warm ivory, anchored to top-left of content axis */
 .bk-icon-box {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
   background-color: var(--patient-ivory, #F5F1E8);
   border: 1px solid var(--patient-border, #DDD8CF);
@@ -497,26 +523,32 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .bk-doctor-name {
-  font-size: 16px;
+  margin: 0;
+  font-size: 15.5px;
   font-weight: 700;
-  line-height: 22px;
+  line-height: 20px;
   color: var(--patient-navy, #0B1F33);
+  text-align: left;
 }
 
 .bk-meta {
-  display: flex;
+  margin: 0;
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 3px;
+  gap: 6px;
   font-size: 12.5px;
+  line-height: 18px;
   color: var(--patient-muted, #6D706F);
+  text-align: left;
 }
 
 .bk-meta svg {
   color: var(--patient-muted, #6D706F);
+  flex-shrink: 0;
 }
 
 .bk-label {

@@ -45,15 +45,15 @@ function PatientInfoPage() {
 
       <main className="booking__main">
         <div className="bk-card bk-summary">
-          <span className="bk-icon-box">
-            <BookingIcon name="calendar" size={22} />
+          <span className="bk-icon-box" aria-hidden="true">
+            <BookingIcon name="calendar" size={20} />
           </span>
-          <div>
+          <div className="bk-summary__body">
             <span className="bk-pill">{specialty?.ten_chuyen_khoa ?? doctor.ten_chuyen_khoa}</span>
             <div className="bk-doctor-name">BS. {doctor.ho_ten}</div>
             <div className="bk-meta">
               <BookingIcon name="clock" size={13} />
-              {formatTime(slot.gio_bat_dau)}, {formatDate(date)}
+              <span>{formatTime(slot.gio_bat_dau)}, {formatDate(date)}</span>
             </div>
           </div>
         </div>
