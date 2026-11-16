@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
+import PatientLayout from "./PatientLayout";
 import { sidebarMenus } from "./sidebarMenus";
 import { useAuth } from "../../auth/useAuth";
 import "./MainLayout.css";
@@ -34,6 +35,11 @@ function MainLayout({ role, userName, userTitle }) {
     await logout();
     navigate("/login", { replace: true });
   };
+
+  // Patient role: dùng horizontal navigation riêng, không dùng sidebar
+  if (role === "patient") {
+    return <PatientLayout />;
+  }
 
   return (
     <div className={`layout${role ? ` layout--${role}` : ""}`}>
