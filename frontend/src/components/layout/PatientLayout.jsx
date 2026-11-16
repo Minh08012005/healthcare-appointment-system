@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import { BOOKING_PATHS } from "../../pages/patient/booking/bookingPaths";
+import { PUBLIC_PATHS } from "../../pages/public/publicPaths";
 import "./PatientLayout.css";
 
 function getInitials(name) {
@@ -73,6 +74,18 @@ function PatientLayout() {
               className={({ isActive }) => `pl-nav__link${isActive ? " pl-nav__link--active" : ""}`}
             >
               Lịch hẹn
+            </NavLink>
+            <NavLink
+              to={PUBLIC_PATHS.news}
+              className={({ isActive }) => `pl-nav__link${isActive ? " pl-nav__link--active" : ""}`}
+            >
+              Tin tức
+            </NavLink>
+            <NavLink
+              to={PUBLIC_PATHS.procedure}
+              className={({ isActive }) => `pl-nav__link${isActive ? " pl-nav__link--active" : ""}`}
+            >
+              Quy trình khám
             </NavLink>
           </nav>
 
@@ -178,6 +191,20 @@ function PatientLayout() {
             >
               Lịch hẹn
             </NavLink>
+            <NavLink
+              to={PUBLIC_PATHS.news}
+              className={({ isActive }) => `pl-mobile-nav__link${isActive ? " pl-mobile-nav__link--active" : ""}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              Tin tức
+            </NavLink>
+            <NavLink
+              to={PUBLIC_PATHS.procedure}
+              className={({ isActive }) => `pl-mobile-nav__link${isActive ? " pl-mobile-nav__link--active" : ""}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              Quy trình khám
+            </NavLink>
             <div className="pl-mobile-nav__divider" />
             <button
               type="button"
@@ -223,6 +250,12 @@ function PatientLayout() {
             </NavLink>
             <NavLink to={BOOKING_PATHS.appointments} className="pl-footer__link">
               Lịch hẹn của tôi
+            </NavLink>
+            <NavLink to={PUBLIC_PATHS.news} className="pl-footer__link">
+              Tin tức
+            </NavLink>
+            <NavLink to={PUBLIC_PATHS.procedure} className="pl-footer__link">
+              Quy trình khám
             </NavLink>
           </nav>
         </div>
