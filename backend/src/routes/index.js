@@ -13,6 +13,7 @@ const examinationRoutes = require("./examination.routes");
 const labOrderRoutes = require("./labOrder.routes");
 const labRoomRoutes = require("./labRoom.routes"); 
 const notificationRoutes = require("./notification.routes");
+const adminContentRoutes = require("./adminContent.routes");
 
 const router = express.Router();
 router.use("/health", healthRoutes);
@@ -29,5 +30,6 @@ router.use("/examinations", examinationRoutes);
 router.use("/lab-orders", labOrderRoutes);
 router.use("/lab", labRoomRoutes); 
 router.use("/notifications", notificationRoutes);
+router.use("/admin/content", adminContentRoutes);
 
 module.exports = router;
