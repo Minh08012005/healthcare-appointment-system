@@ -193,3 +193,4 @@ FROM "PhongKham" pk
 WHERE tk.ten_dang_nhap = 'ktv_cdha' AND pk.ten_phong = 'Phòng Chẩn đoán hình ảnh' AND tk.phong_kham_id IS NULL;
 
 
+
