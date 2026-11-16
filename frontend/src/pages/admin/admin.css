@@ -384,6 +384,16 @@
   background: var(--danger-bg, #fdf2f2);
 }
 
+.admin-btn-sm--success {
+  background: transparent;
+  border-color: var(--success-border, #a3e0ba);
+  color: var(--success-text, #1e6b3c);
+}
+
+.admin-btn-sm--success:hover {
+  background: var(--success-bg, #edf8f2);
+}
+
 /* Modal Dialogs */
 .admin-modal-backdrop {
   position: fixed;
