@@ -7,6 +7,7 @@ import PatientHomePage from "../pages/patient/PatientHomePage";
 import DoctorHomePage from "../pages/doctor/DoctorHomePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
+import AdminPlaceholderPage from "../pages/admin/AdminPlaceholderPage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import SelectSpecialtyPage from "../pages/patient/booking/SelectSpecialtyPage";
@@ -136,8 +137,106 @@ function AppRoutes() {
                 />
             </Route>
 
-            {/* Quản trị */}
-            <Route path="/admin" element={<AdminHomePage />} />
+            {/* Quản trị viên: phải đăng nhập với vai trò Quản trị viên */}
+            <Route
+                element={
+                    <ProtectedRoute role="Quản trị viên">
+                        <MainLayout role="admin" userTitle="Quản trị viên" />
+                    </ProtectedRoute>
+                }
+            >
+                <Route path="/admin" element={<AdminHomePage />} />
+                <Route
+                    path="/admin/accounts"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Quản lý tài khoản nhân viên"
+                            taskCode="C6-03"
+                            description="Quản lý danh sách, tạo mới, chỉnh sửa thông tin và khóa tài khoản nhân viên y tế."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/specialties"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Quản lý chuyên khoa"
+                            taskCode="C6-02"
+                            description="Quản lý danh mục các chuyên khoa khám bệnh, tạo mới và cập nhật thông tin mô tả."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/doctors"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Quản lý bác sĩ"
+                            taskCode="C6-02"
+                            description="Quản lý hồ sơ bác sĩ, phân bổ chuyên khoa, thiết lập mức phí khám và cấp bậc chuyên môn."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/rooms"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Quản lý phòng"
+                            taskCode="C6-04"
+                            description="Quản lý danh mục phòng khám bệnh và các phòng xét nghiệm, chẩn đoán hình ảnh."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/schedules"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Quản lý lịch trực"
+                            taskCode="C6-07"
+                            description="Phân công ca khám và lịch làm việc của bác sĩ theo ngày, ca và phòng khám."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/time-slots"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Cấu hình khung giờ & Slot"
+                            taskCode="C6-06"
+                            description="Cấu hình khung giờ hoạt động và thiết lập phân bổ số lượng slot đặt khám."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/queue-settings"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Cấu hình hệ thống"
+                            taskCode="C6-05"
+                            description="Cấu hình quy tắc điều phối hàng đợi khám bệnh, tỉ lệ online/offline và mốc check-in."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/overview"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Tổng quan lịch khám"
+                            taskCode="C6-07"
+                            description="Xem bức tranh tổng thể lịch khám của tất cả bác sĩ theo ngày hoặc tuần."
+                        />
+                    }
+                />
+                <Route
+                    path="/admin/content"
+                    element={
+                        <AdminPlaceholderPage
+                            title="Quản lý nội dung"
+                            taskCode="C6-09"
+                            description="Quản lý tin tức bệnh viện và quy trình hướng dẫn khám bệnh cho bệnh nhân."
+                        />
+                    }
+                />
+            </Route>
 
             {/* URL không tồn tại: phải nằm cuối cùng */}
             <Route path="*" element={<NotFoundPage />} />
