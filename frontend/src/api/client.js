@@ -35,6 +35,7 @@ async function request(path, { method = "GET", body, responseType = "json" } = {
         );
         error.status = response.status;
         error.code = data?.code; // C3-02: TOO_EARLY / TOO_LATE / INVALID_STATE
+        error.data = data?.data;
         throw error;
     }
 
