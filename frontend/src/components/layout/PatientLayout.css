@@ -1,0 +1,570 @@
+/* ==================================================================
+   Patient Layout — Horizontal navigation header
+   MEDICARE Patient Portal — Deep Navy + Warm Ivory + Muted Teal + Action Blue
+   Luminous Warm-White Canvas Balance (#FBFAF7)
+   ================================================================== */
+
+.pl-layout {
+  /* ── Patient-specific Design Tokens (Non-leaking) ───────────── */
+  --patient-navy: #0B1F33;
+  --patient-ivory: #F5F1E8;
+  --patient-bg: #FBFAF7;
+  --patient-surface: #FFFFFF;
+  --patient-text: #1F2328;
+  --patient-muted: #6D706F;
+  --patient-border: #DDD8CF;
+  --patient-border-subtle: #EAE6DE;
+  --patient-teal: #4F8C87;
+  --patient-teal-subtle: #EDF4F3;
+  --patient-action: #1E88E5;
+  --patient-action-hover: #1565C0;
+
+  /* Aliases for inner patient components without altering staff tokens */
+  --color-bg-app: var(--patient-bg);
+  --color-surface: var(--patient-surface);
+  --color-border: var(--patient-border);
+  --color-border-subtle: var(--patient-border-subtle);
+  --color-text: var(--patient-text);
+  --color-text-secondary: var(--patient-muted);
+  --color-text-muted: var(--patient-muted);
+  --color-primary: var(--patient-action);
+  --color-primary-hover: var(--patient-action-hover);
+  --background: var(--patient-bg);
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--patient-bg);
+  color: var(--patient-text);
+}
+
+/* ── Header (Luminous White Surface + Warm Neutral Border) ──────── */
+.pl-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--patient-surface);
+  border-bottom: 1px solid var(--patient-border);
+  flex-shrink: 0;
+}
+
+.pl-header__inner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 32px;
+  height: 60px;
+  box-sizing: border-box;
+}
+
+/* ── Brand ───────────────────────────────────────────────────────── */
+.pl-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  flex-shrink: 0;
+  margin-right: 36px;
+  transition: opacity 180ms ease;
+}
+
+.pl-brand:hover {
+  opacity: 0.9;
+}
+
+.pl-brand__cross {
+  color: var(--patient-teal);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.pl-brand__wordmark {
+  font-size: 17.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--patient-navy);
+}
+
+/* ── Desktop Nav ─────────────────────────────────────────────────── */
+.pl-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.pl-nav__link {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--patient-muted);
+  text-decoration: none;
+  transition: color 180ms ease, background-color 180ms ease, transform 180ms ease;
+  white-space: nowrap;
+}
+
+.pl-nav__link:hover {
+  color: var(--patient-text);
+  background-color: var(--patient-border-subtle);
+}
+
+.pl-nav__link:active {
+  transform: scale(0.98);
+}
+
+.pl-nav__link--active {
+  color: var(--patient-action);
+  font-weight: 600;
+  background-color: rgba(30, 136, 229, 0.08);
+}
+
+/* ── Header Right / Account ──────────────────────────────────────── */
+.pl-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+/* ── Account Dropdown ────────────────────────────────────────────── */
+.pl-account {
+  position: relative;
+}
+
+.pl-account__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 6px;
+  border: 1px solid var(--patient-border);
+  border-radius: 999px;
+  background-color: var(--patient-surface);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--patient-text);
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.pl-account__trigger:hover {
+  border-color: #BDB7AB;
+  background-color: var(--patient-bg);
+}
+
+.pl-account__trigger:active {
+  transform: scale(0.98);
+}
+
+/* Neutral avatar — clean warm-white */
+.pl-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--patient-bg);
+  border: 1px solid var(--patient-border);
+  color: var(--patient-navy);
+  font-size: 11.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.pl-account__name {
+  max-width: 160px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 500;
+  color: var(--patient-text);
+}
+
+.pl-account__caret {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--patient-muted);
+  flex-shrink: 0;
+}
+
+.pl-account__caret--open {
+  transform: rotate(180deg);
+}
+
+/* ── Dropdown panel with smooth fade + translate entrance ────────── */
+.pl-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 200px;
+  background-color: var(--patient-surface);
+  border: 1px solid var(--patient-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(11, 31, 51, 0.08);
+  overflow: hidden;
+  z-index: 200;
+  transform-origin: top right;
+  animation: plDropdownIn 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes plDropdownIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.pl-dropdown__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px;
+  background-color: var(--patient-bg);
+  border-bottom: 1px solid var(--patient-border);
+}
+
+.pl-dropdown__name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--patient-text);
+}
+
+.pl-dropdown__role {
+  font-size: 11.5px;
+  color: var(--patient-muted);
+}
+
+.pl-dropdown__divider {
+  height: 1px;
+  background-color: var(--patient-border);
+}
+
+.pl-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--patient-text);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.pl-dropdown__item:hover {
+  background-color: var(--patient-border-subtle);
+}
+
+.pl-dropdown__item--danger {
+  color: #DC2626;
+}
+
+.pl-dropdown__item--danger:hover {
+  background-color: #FEF2F2;
+  color: #B91C1C;
+}
+
+/* ── Hamburger (mobile) ──────────────────────────────────────────── */
+.pl-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--patient-border);
+  border-radius: 6px;
+  background-color: var(--patient-surface);
+  cursor: pointer;
+  padding: 0 8px;
+  box-sizing: border-box;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.pl-hamburger:hover {
+  background-color: var(--patient-border-subtle);
+}
+
+.pl-hamburger:active {
+  transform: scale(0.96);
+}
+
+.pl-hamburger__bar {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--patient-text);
+  border-radius: 2px;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+/* ── Mobile Nav ──────────────────────────────────────────────────── */
+.pl-mobile-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 16px;
+  border-top: 1px solid var(--patient-border);
+  background-color: var(--patient-surface);
+  animation: plMobileNavIn 200ms ease-out forwards;
+}
+
+@keyframes plMobileNavIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pl-mobile-nav__link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--patient-text);
+  text-decoration: none;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.pl-mobile-nav__link:hover {
+  color: var(--patient-text);
+  background-color: var(--patient-border-subtle);
+}
+
+.pl-mobile-nav__link--active {
+  color: var(--patient-action);
+  font-weight: 600;
+  background-color: rgba(30, 136, 229, 0.08);
+}
+
+.pl-mobile-nav__divider {
+  height: 1px;
+  background-color: var(--patient-border);
+  margin: 8px 0;
+}
+
+.pl-mobile-nav__logout {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: #DC2626;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 150ms ease;
+}
+
+.pl-mobile-nav__logout:hover {
+  background-color: #FEF2F2;
+}
+
+/* ── Page content ────────────────────────────────────────────────── */
+.pl-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 0;
+}
+
+/* ── Shared Patient Footer ───────────────────────────────────────── */
+.pl-footer {
+  margin-top: auto;
+  background-color: var(--patient-surface);
+  border-top: 1px solid var(--patient-border);
+  color: var(--patient-muted);
+  font-size: 13.5px;
+  flex-shrink: 0;
+}
+
+.pl-footer__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 36px 32px 28px;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.pl-footer__brand-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 380px;
+}
+
+.pl-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--patient-navy);
+}
+
+.pl-footer__wordmark {
+  font-size: 16.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--patient-navy);
+}
+
+.pl-footer__desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--patient-muted);
+}
+
+.pl-footer__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pl-footer__nav-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--patient-navy);
+  margin-bottom: 2px;
+}
+
+.pl-footer__link {
+  color: var(--patient-muted);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 150ms ease;
+}
+
+.pl-footer__link:hover {
+  color: var(--patient-action);
+}
+
+.pl-footer__bottom {
+  border-top: 1px solid var(--patient-border-subtle);
+  background-color: var(--patient-bg);
+}
+
+.pl-footer__bottom-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 32px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pl-footer__copy {
+  font-size: 12px;
+  color: var(--patient-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .pl-header__inner {
+    padding: 0 16px;
+    height: 50px;
+  }
+
+  .pl-brand {
+    margin-right: auto;
+    gap: 7px;
+  }
+
+  .pl-brand__wordmark {
+    font-size: 16.5px;
+    letter-spacing: 0.5px;
+  }
+
+  .pl-nav {
+    display: none;
+  }
+
+  .pl-account {
+    display: none;
+  }
+
+  .pl-hamburger {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    padding: 0 6px;
+    gap: 4px;
+  }
+
+  .pl-hamburger__bar {
+    height: 1.5px;
+  }
+
+  .pl-footer__inner {
+    padding: 24px 16px 20px;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .pl-footer__bottom-inner {
+    padding: 12px 16px;
+  }
+}
+
+@media (min-width: 769px) {
+  .pl-mobile-nav {
+    display: none;
+  }
+}
+
+/* ── Accessibility: Reduced Motion ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .pl-dropdown,
+  .pl-mobile-nav {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .pl-brand,
+  .pl-nav__link,
+  .pl-account__trigger,
+  .pl-account__caret,
+  .pl-dropdown__item,
+  .pl-hamburger,
+  .pl-mobile-nav__link,
+  .pl-mobile-nav__logout {
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
+}

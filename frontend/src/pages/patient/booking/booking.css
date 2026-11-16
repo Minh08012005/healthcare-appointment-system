@@ -1,21 +1,29 @@
 /* ==================================================================
-   Patient Booking Workflow (Figma Source of Truth Alignment)
-   Primary Blue (#1E88E5) + Neutral Canvas (#F7F8FC) + Semantic Accents
+   Patient Booking Workflow (C5 Final UI Completion)
+   Deep Navy + Warm Ivory + Muted Teal + Restrained Action Blue
+   Luminous Warm-White Canvas Balance (#FBFAF7)
    ================================================================== */
 
 /* ---------- Container & Layout ---------- */
 .booking {
-  max-width: 720px;
+  max-width: 760px;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 0 0 32px;
+  padding: 32px 32px 48px;
   min-height: 100%;
   text-align: left;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
+}
+
+@media (max-width: 768px) {
+  .booking {
+    padding: 18px 16px 36px;
+    gap: 14px;
+  }
 }
 
 .booking--with-footer {
@@ -39,10 +47,10 @@
   flex-direction: column;
   gap: 12px;
   padding: 20px 24px;
-  background-color: var(--color-surface, #FFFFFF);
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.03);
 }
 
 .booking__header-top {
@@ -55,9 +63,9 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid var(--color-border, #E5E7EB);
-  background-color: #F8FAFC;
-  color: var(--color-text, #1F2937);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  background-color: var(--patient-surface, #FFFFFF);
+  color: var(--patient-text, #1F2328);
   font-size: 16px;
   font-weight: 600;
   display: flex;
@@ -71,9 +79,9 @@
 }
 
 .booking__back:hover {
-  background-color: #F1F5F9;
-  border-color: #D1D5DB;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .booking__title {
@@ -81,7 +89,7 @@
   font-size: 22px;
   line-height: 28px;
   font-weight: 700;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .booking__step {
@@ -89,28 +97,28 @@
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
   font-weight: 500;
 }
 
 .booking__step-label {
-  color: var(--color-primary, #1E88E5);
-  font-weight: 600;
+  color: var(--patient-teal, #4F8C87);
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 11.5px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .booking__progress {
   height: 6px;
-  background-color: #E5E7EB;
+  background-color: var(--patient-border-subtle, #EAE6DE);
   border-radius: 999px;
   overflow: hidden;
 }
 
 .booking__progress-bar {
   height: 100%;
-  background-color: var(--color-primary, #1E88E5);
+  background-color: var(--patient-action, #1E88E5);
   border-radius: 999px;
   transition: width 0.3s ease;
 }
@@ -119,11 +127,11 @@
   margin: 2px 0 0;
   font-size: 13.5px;
   line-height: 1.45;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .booking__sub strong {
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
   font-weight: 600;
 }
 
@@ -131,11 +139,11 @@
 .booking__card,
 .bk-card {
   box-sizing: border-box;
-  background-color: var(--color-surface, #FFFFFF);
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
   padding: 20px 22px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.02);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -147,13 +155,14 @@
   gap: 14px;
 }
 
-/* Decorative intro card icon: neutral treatment */
+/* Decorative intro card icon: warm ivory treatment */
 .booking__icon {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background-color: #F3F4F6;
-  border: 1px solid #E5E7EB;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-navy, #0B1F33);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,13 +180,13 @@
 .booking__section-title {
   font-size: 16px;
   font-weight: 700;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
   margin: 0;
 }
 
 .booking__section-count {
   font-size: 12.5px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
   font-weight: 500;
 }
 
@@ -188,29 +197,29 @@
   gap: 14px;
   width: 100%;
   box-sizing: border-box;
-  background-color: var(--color-surface, #FFFFFF);
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
   padding: 15px 18px;
   cursor: pointer;
   text-align: left;
   font-size: 14.5px;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
   transition: all 0.15s ease;
   font-family: inherit;
 }
 
 .booking__item:hover {
-  background-color: #F8FAFC;
-  border-color: #D1D5DB;
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
 }
 
-/* Selected item: clear primary blue indicator */
+/* Selected item: white surface + primary blue action border */
 .booking__item--active {
-  border-color: var(--color-primary, #1E88E5);
-  background-color: var(--color-primary-subtle, #EFF6FF);
-  color: var(--color-primary-hover, #0E4C9A);
-  font-weight: 600;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1.5px solid var(--patient-action, #1E88E5);
+  box-shadow: 0 0 0 1px var(--patient-action, #1E88E5), 0 2px 8px rgba(30, 136, 229, 0.08);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .booking__item-body {
@@ -221,54 +230,58 @@
 .booking__item-name {
   font-weight: 600;
   font-size: 15px;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .booking__item > span:last-child {
-  color: #9CA3AF;
+  color: var(--patient-muted, #6D706F);
   font-size: 18px;
   font-weight: 400;
 }
 
 .booking__item:hover > span:last-child {
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
-/* Doctor qualification & specialty badges: neutral slate treatment */
+.booking__item--active > span:last-child {
+  color: var(--patient-action, #1E88E5);
+}
+
+/* Doctor qualification & specialty badges: warm ivory chip */
 .booking__badge,
 .bk-pill {
   display: inline-block;
   margin: 4px 0;
   padding: 2px 9px;
   border-radius: 999px;
-  background-color: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  color: #4B5563;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-text, #1F2328);
   font-size: 12px;
   font-weight: 500;
   line-height: 18px;
 }
 
-/* Consultation fee: normal high-contrast dark text */
+/* Consultation fee */
 .booking__fee {
   font-size: 13px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .booking__fee strong {
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
   font-weight: 600;
 }
 
-/* Doctor initial avatars: soft gray/slate treatment by default */
+/* Doctor initial avatars: soft warm neutral */
 .booking__avatar,
 .bk-avatar {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background-color: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  color: #4B5563;
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-navy, #0B1F33);
   font-weight: 700;
   font-size: 14px;
   display: flex;
@@ -278,11 +291,11 @@
   transition: all 0.15s ease;
 }
 
-/* Selected doctor avatar receives primary blue accent */
+/* Selected doctor avatar receives subtle blue ring */
 .booking__item--active .booking__avatar {
-  background-color: var(--color-primary-subtle, #EFF6FF);
-  border-color: var(--primary-border, #BFDBFE);
-  color: var(--color-primary, #1E88E5);
+  background-color: rgba(30, 136, 229, 0.08);
+  border-color: var(--patient-action, #1E88E5);
+  color: var(--patient-action, #1E88E5);
 }
 
 /* ---------- Search & Input Controls ---------- */
@@ -290,19 +303,19 @@
   width: 100%;
   box-sizing: border-box;
   padding: 11px 14px;
-  border: 1px solid var(--color-border, #E5E7EB);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius, 8px);
   font-size: 14px;
-  background-color: #FFFFFF;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-surface, #FFFFFF);
+  color: var(--patient-text, #1F2328);
   transition: all 0.15s ease;
   font-family: inherit;
 }
 
 .booking__search:focus {
   outline: none;
-  border-color: var(--color-primary, #1E88E5);
-  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+  border-color: var(--patient-action, #1E88E5);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
 }
 
 .booking__search::placeholder {
@@ -318,72 +331,72 @@
   scrollbar-width: thin;
 }
 
-/* Unselected date: clean neutral card */
+/* Unselected date: clean warm-white card */
 .booking__day {
   flex: 1 0 76px;
   min-width: 68px;
   padding: 10px 4px;
-  border: 1px solid var(--color-border, #E5E7EB);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius, 8px);
-  background-color: #FFFFFF;
+  background-color: var(--patient-surface, #FFFFFF);
   cursor: pointer;
   text-align: center;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
   transition: all 0.15s ease;
   font-family: inherit;
 }
 
 .booking__day:hover:not(.booking__day--active):not(:disabled) {
-  background-color: var(--color-primary-subtle, #EFF6FF);
-  border-color: var(--primary-border, #BFDBFE);
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .booking__day:hover:not(.booking__day--active):not(:disabled) small {
-  color: var(--color-text-secondary, #4B5563);
+  color: var(--patient-muted, #6D706F);
 }
 
 .booking__day:hover:not(.booking__day--active):not(:disabled) strong {
-  color: var(--color-text, #111827);
+  color: var(--patient-navy, #0B1F33);
 }
 
-/* Selected date: unmistakable primary blue active state */
+/* Selected date: Action Blue */
 .booking__day--active {
-  background-color: var(--color-primary, #1E88E5);
-  border-color: var(--color-primary, #1E88E5);
+  background-color: var(--patient-action, #1E88E5);
+  border-color: var(--patient-action, #1E88E5);
   color: #FFFFFF;
 }
 
 .booking__day--active small {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .booking__day--active strong {
   color: #FFFFFF;
 }
 
-/* Disabled / unavailable date: faded and low emphasis */
+/* Disabled date */
 .booking__day:disabled,
 .booking__day--disabled {
   background-color: #F9FAFB;
-  border-color: #E5E7EB;
-  color: var(--color-text-muted, #9CA3AF);
+  border-color: var(--patient-border-subtle, #EAE6DE);
+  color: #9CA3AF;
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 .booking__day:disabled small,
 .booking__day--disabled small,
 .booking__day:disabled strong,
 .booking__day--disabled strong {
-  color: var(--color-text-muted, #9CA3AF);
+  color: #9CA3AF;
 }
 
 .booking__day small {
   display: block;
   font-size: 11.5px;
   margin-bottom: 2px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .booking__day strong {
@@ -394,7 +407,7 @@
 .booking__group-title {
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
   margin: 14px 0 8px;
 }
 
@@ -408,39 +421,39 @@
 /* Unselected slot: clean neutral button */
 .booking__slot {
   padding: 11px 0;
-  border: 1px solid var(--color-border, #E5E7EB);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius, 8px);
-  background-color: #FFFFFF;
+  background-color: var(--patient-surface, #FFFFFF);
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
   text-align: center;
   transition: all 0.15s ease;
   font-family: inherit;
 }
 
 .booking__slot:hover:not(.booking__slot--active):not(:disabled) {
-  background-color: var(--color-primary-subtle, #EFF6FF);
-  border-color: var(--primary-border, #BFDBFE);
-  color: var(--color-text, #111827);
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
-/* Selected slot: unmistakable primary blue active state */
+/* Selected slot: Action Blue */
 .booking__slot--active {
-  background-color: var(--color-primary, #1E88E5);
-  border-color: var(--color-primary, #1E88E5);
+  background-color: var(--patient-action, #1E88E5);
+  border-color: var(--patient-action, #1E88E5);
   color: #FFFFFF;
 }
 
-/* Disabled / unavailable slot: faded and low emphasis */
+/* Disabled slot */
 .booking__slot:disabled,
 .booking__slot--disabled {
   background-color: #F9FAFB;
-  border-color: #E5E7EB;
-  color: var(--color-text-muted, #9CA3AF);
+  border-color: var(--patient-border-subtle, #EAE6DE);
+  color: #9CA3AF;
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.55;
 }
 
 .booking__summary {
@@ -450,8 +463,8 @@
   gap: 10px;
   font-size: 13.5px;
   padding: 8px 0;
-  border-bottom: 1px solid var(--color-border, #E5E7EB);
-  color: var(--color-text-secondary, #6B7280);
+  border-bottom: 1px solid var(--patient-border-subtle, #EAE6DE);
+  color: var(--patient-muted, #6D706F);
 }
 
 .booking__summary:last-of-type {
@@ -462,7 +475,7 @@
   font-size: 14px;
   font-weight: 600;
   text-align: right;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
 /* ---------- Step 4: Patient Info Form ---------- */
@@ -472,14 +485,14 @@
   align-items: center;
 }
 
-/* Header icon box: neutral slate */
+/* Header icon box: warm ivory */
 .bk-icon-box {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  background-color: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  color: #4B5563;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-navy, #0B1F33);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -490,7 +503,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 22px;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-meta {
@@ -499,11 +512,11 @@
   gap: 5px;
   margin-top: 3px;
   font-size: 12.5px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-meta svg {
-  color: #9CA3AF;
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-label {
@@ -511,7 +524,7 @@
   margin: 14px 0 6px;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
 /* Required indicator: semantic danger */
@@ -526,9 +539,9 @@
   gap: 10px;
   padding: 11px 14px;
   border-radius: var(--radius, 8px);
-  background-color: #F3F4F6;
-  border: 1px solid var(--color-border, #E5E7EB);
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-text, #1F2328);
 }
 
 .bk-readonly strong {
@@ -546,11 +559,11 @@
   gap: 5px;
   margin: 5px 0 0;
   font-size: 12px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-hint svg {
-  color: #9CA3AF;
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-choices {
@@ -565,42 +578,43 @@
   flex-direction: column;
   gap: 3px;
   padding: 14px 16px;
-  border: 1px solid var(--color-border, #E5E7EB);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
-  background-color: #FFFFFF;
+  background-color: var(--patient-surface, #FFFFFF);
   cursor: pointer;
   text-align: left;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
   font: inherit;
   transition: all 0.15s ease;
 }
 
 .bk-choice:hover {
-  background-color: #F8FAFC;
-  border-color: #D1D5DB;
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
 }
 
-/* Selected BHYT choice: primary blue accent indicator */
+/* Selected BHYT choice: white surface + primary blue border */
 .bk-choice--active {
-  background-color: var(--color-primary-subtle, #EFF6FF);
-  border-color: var(--color-primary, #1E88E5);
-  color: var(--color-primary-hover, #0E4C9A);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1.5px solid var(--patient-action, #1E88E5);
+  box-shadow: 0 0 0 1px var(--patient-action, #1E88E5);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-choice strong {
   margin-top: 4px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
 }
 
 .bk-choice--active strong {
-  color: var(--color-primary-hover, #0E4C9A);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-choice small {
   font-size: 12px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-choice-top {
@@ -610,18 +624,18 @@
 }
 
 .bk-choice-top svg {
-  color: #6B7280;
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-choice--active .bk-choice-top svg {
-  color: var(--color-primary, #1E88E5);
+  color: var(--patient-action, #1E88E5);
 }
 
 .bk-radio {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: #E5E7EB;
+  background-color: var(--patient-border, #DDD8CF);
   color: #FFFFFF;
   display: flex;
   align-items: center;
@@ -630,10 +644,10 @@
 }
 
 .bk-radio--on {
-  background-color: var(--color-primary, #1E88E5);
+  background-color: var(--patient-action, #1E88E5);
 }
 
-/* Form validation error: semantic danger */
+/* Form validation error */
 .bk-error {
   margin: 5px 0 0;
   font-size: 12.5px;
@@ -641,17 +655,17 @@
 }
 
 .bk-textarea-box {
-  background-color: #FFFFFF;
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
   padding: 14px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
+  box-shadow: 0 1px 2px rgba(11, 31, 51, 0.02);
   transition: all 0.15s ease;
 }
 
 .bk-textarea-box:focus-within {
-  border-color: var(--color-primary, #1E88E5);
-  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+  border-color: var(--patient-action, #1E88E5);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
 }
 
 .bk-textarea {
@@ -666,7 +680,7 @@
   line-height: 1.5;
   resize: vertical;
   background: transparent;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
 }
 
 .bk-textarea::placeholder {
@@ -679,36 +693,36 @@
   align-items: center;
   margin-top: 8px;
   font-size: 12px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-tip {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-tip svg {
-  color: #9CA3AF;
+  color: var(--patient-muted, #6D706F);
 }
 
-/* Medical privacy notice: calm neutral card */
+/* Medical privacy notice: warm ivory card */
 .bk-privacy {
   display: flex;
   gap: 10px;
   margin-top: 14px;
   padding: 12px 14px;
-  background-color: #F8FAFC;
-  border: 1px solid #E5E7EB;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
   font-size: 12.5px;
   line-height: 1.45;
 }
 
 .bk-privacy svg {
-  color: #6B7280;
+  color: var(--patient-muted, #6D706F);
   flex-shrink: 0;
   margin-top: 1px;
 }
@@ -721,10 +735,10 @@
   position: sticky;
   bottom: 0;
   padding: 14px 20px;
-  background-color: var(--color-surface, #FFFFFF);
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 -2px 10px rgba(11, 31, 51, 0.04);
 }
 
 /* ---------- Buttons & Actions ---------- */
@@ -755,56 +769,57 @@
   cursor: not-allowed;
 }
 
-/* Primary CTA: prominent blue action */
+/* Primary CTA: Action Blue */
 .booking__btn--primary,
 .bk-btn--primary {
-  background-color: var(--color-primary, #1E88E5);
-  border-color: var(--color-primary, #1E88E5);
+  background-color: var(--patient-action, #1E88E5);
+  border-color: var(--patient-action, #1E88E5);
   color: #FFFFFF;
 }
 
 .booking__btn--primary:hover:not(:disabled),
 .bk-btn--primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover, #0E4C9A);
-  border-color: var(--color-primary-hover, #0E4C9A);
+  background-color: var(--patient-action-hover, #1565C0);
+  border-color: var(--patient-action-hover, #1565C0);
 }
 
-/* Secondary outline actions (e.g. "Ngẫu nhiên", "Thử lại"): neutral treatment */
+/* Secondary outline actions: neutral warm treatment */
 .booking__btn--outline,
 .bk-btn--outline {
-  background-color: #FFFFFF;
-  border: 1px solid #D1D5DB;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-text, #1F2328);
 }
 
 .booking__btn--outline:hover:not(:disabled),
 .bk-btn--outline:hover:not(:disabled) {
-  background-color: #F8FAFC;
-  border-color: #9CA3AF;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-btn--white {
-  background-color: #FFFFFF;
-  border-color: var(--color-border, #D1D5DB);
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-surface, #FFFFFF);
+  border-color: var(--patient-border, #DDD8CF);
+  color: var(--patient-text, #1F2328);
 }
 
 .bk-btn--white:hover:not(:disabled) {
-  background-color: #F8FAFC;
-  border-color: #9CA3AF;
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
 }
 
-/* Secondary soft action (e.g. "Xem lịch hẹn của tôi"): calm neutral */
+/* Secondary soft action */
 .bk-btn--soft {
-  background-color: #F8FAFC;
-  border: 1px solid #D1D5DB;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-text, #1F2328);
 }
 
 .bk-btn--soft:hover:not(:disabled) {
-  background-color: #F1F5F9;
-  border-color: #9CA3AF;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-actions {
@@ -821,13 +836,13 @@
   align-items: flex-start;
   padding: 16px 20px;
   border-radius: var(--radius-card, 12px);
-  background-color: #FFFFFF;
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
 }
 
-/* Badge check icon: Clinical primary blue emblem */
+/* Check icon: Muted Teal accent */
 .bk-intro svg {
-  color: var(--color-primary, #1E88E5);
+  color: var(--patient-teal, #4F8C87);
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -836,13 +851,13 @@
   margin: 0;
   font-size: 17px;
   font-weight: 700;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-intro p {
   margin: 2px 0 0;
   font-size: 13px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-card-head {
@@ -858,12 +873,11 @@
   margin: 0;
   font-size: 15px;
   font-weight: 700;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
-/* Decorative section icons: neutral slate */
 .bk-card-title svg {
-  color: #6B7280;
+  color: var(--patient-teal, #4F8C87);
 }
 
 .bk-doctor {
@@ -872,8 +886,8 @@
   align-items: center;
   padding: 12px 14px;
   border-radius: 8px;
-  background-color: #F8FAFC;
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
 }
 
 .bk-doctor .bk-doctor-name {
@@ -882,7 +896,7 @@
 }
 
 .bk-link {
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
   font-size: 12.5px;
 }
 
@@ -892,9 +906,9 @@
   align-items: flex-start;
   gap: 16px;
   padding: 11px 0;
-  border-bottom: 1px solid var(--color-border, #E5E7EB);
+  border-bottom: 1px solid var(--patient-border-subtle, #EAE6DE);
   font-size: 13.5px;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
 }
 
 .bk-row:last-child {
@@ -904,7 +918,7 @@
 .bk-row > span:first-child {
   flex-shrink: 0;
   font-size: 13px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-row strong {
@@ -915,22 +929,23 @@
 
 .bk-row strong.bk-strong {
   font-weight: 700;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-row em {
   text-align: right;
   overflow-wrap: anywhere;
   font-style: normal;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
 }
 
-/* Time slot row highlight: primary blue accent for selected appointment time */
+/* Time slot row highlight: warm ivory row */
 .bk-row--highlight {
   margin: 4px 0;
   padding: 10px 12px;
   border-radius: 8px;
-  background-color: #F8FAFC;
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
 }
 
 .bk-row-label {
@@ -940,7 +955,7 @@
 }
 
 .bk-row-label svg {
-  color: #6B7280;
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-row-stack {
@@ -952,39 +967,38 @@
 
 .bk-row-stack small {
   font-size: 12px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-row--highlight .bk-accent {
   font-size: 15px;
   font-weight: 700;
-  color: var(--color-primary, #1E88E5);
+  color: var(--patient-action, #1E88E5);
 }
 
-/* Price inside review card: neutral strong text */
 .bk-row:not(.bk-row--highlight) .bk-accent,
 .bk-accent {
   font-size: 14.5px;
   font-weight: 600;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
-/* BHYT status indicator on confirmation: neutral badge */
+/* BHYT status indicator on confirmation: warm ivory badge */
 .bk-status {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 3px 10px;
   border-radius: 999px;
-  background-color: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  color: #4B5563;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-text, #1F2328);
   font-size: 12px;
   font-weight: 500;
 }
 
 .bk-status svg {
-  color: #6B7280;
+  color: var(--patient-muted, #6D706F);
 }
 
 /* Semantic success status */
@@ -1000,40 +1014,40 @@
   gap: 12px;
   padding: 14px 16px;
   border-radius: var(--radius-card, 12px);
-  background-color: #F8FAFC;
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
   font-size: 13px;
   line-height: 1.45;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-note > div > strong {
   display: block;
   font-size: 12px;
   letter-spacing: 0.3px;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
   margin-bottom: 2px;
 }
 
 .bk-note p {
   margin: 0;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-note-icon {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  color: #6B7280;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-muted, #6D706F);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-/* Semantic alert: danger red */
+/* Semantic alert */
 .bk-alert {
   margin-top: 14px;
   padding: 14px 16px;
@@ -1051,11 +1065,10 @@
 .booking__message {
   text-align: center;
   padding: 24px 12px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
   font-size: 13.5px;
 }
 
-/* Semantic error message */
 .booking__message--error {
   color: var(--danger-text, #9B2222);
   background-color: var(--danger-bg, #FDF2F2);
@@ -1072,11 +1085,11 @@
 .bk-result-header {
   position: relative;
   padding: 20px 24px;
-  background-color: var(--color-surface, #FFFFFF);
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
   text-align: center;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.03);
 }
 
 .bk-result-header h1 {
@@ -1084,7 +1097,7 @@
   font-size: 20px;
   line-height: 26px;
   font-weight: 700;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-result-header button {
@@ -1095,9 +1108,9 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid var(--color-border, #E5E7EB);
-  background-color: #F8FAFC;
-  color: var(--color-text-secondary, #6B7280);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  background-color: var(--patient-surface, #FFFFFF);
+  color: var(--patient-muted, #6D706F);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1106,9 +1119,9 @@
 }
 
 .bk-result-header button:hover {
-  background-color: #F1F5F9;
-  border-color: #D1D5DB;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-success {
@@ -1116,14 +1129,14 @@
   margin: 4px 0 14px;
 }
 
-/* Semantic success emblem: Green #2E9E59 */
+/* Semantic success emblem */
 .bk-success-icon {
   display: inline-flex;
   width: 52px;
   height: 52px;
   border-radius: 50%;
   background-color: var(--success, #2E9E59);
-  box-shadow: 0 0 0 10px var(--success-bg, #EDF8F2);
+  box-shadow: 0 0 0 10px rgba(46, 158, 89, 0.12);
   color: #FFFFFF;
   align-items: center;
   justify-content: center;
@@ -1134,7 +1147,7 @@
   font-size: 20px;
   line-height: 26px;
   font-weight: 700;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-navy, #0B1F33);
   margin: 0;
 }
 
@@ -1144,7 +1157,7 @@
   gap: 5px;
   margin: 6px 0 0;
   font-size: 13px;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-ticket {
@@ -1156,13 +1169,13 @@
   margin-top: 14px;
   padding: 24px 20px 20px;
   text-align: center;
-  background-color: var(--color-surface, #FFFFFF);
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius-card, 12px);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 2px 8px rgba(11, 31, 51, 0.04);
 }
 
-/* Ticket tag: neutral slate pill */
+/* Ticket tag: warm ivory pill */
 .bk-ticket-tag {
   position: absolute;
   top: -11px;
@@ -1170,9 +1183,9 @@
   transform: translateX(-50%);
   padding: 3px 12px;
   border-radius: 999px;
-  background-color: #F3F4F6;
-  border: 1px solid var(--color-border, #E5E7EB);
-  color: #4B5563;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-navy, #0B1F33);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -1183,8 +1196,8 @@
   padding: 14px;
   margin: 4px 0 8px;
   border-radius: 12px;
-  background-color: #F8FAFC;
-  border: 1px solid #E5E7EB;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1200,13 +1213,13 @@
   gap: 8px;
 }
 
-/* Electronic ticket appointment code: Primary Blue */
+/* Electronic ticket appointment code: Deep Navy / Monospace */
 .bk-code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 19px;
   font-weight: 700;
   letter-spacing: 1px;
-  color: var(--color-primary, #1E88E5);
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-code-row button {
@@ -1216,17 +1229,17 @@
   width: 30px;
   height: 30px;
   border-radius: 6px;
-  border: 1px solid var(--color-border, #E5E7EB);
-  background-color: #F8FAFC;
-  color: var(--color-text-secondary, #6B7280);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  background-color: var(--patient-surface, #FFFFFF);
+  color: var(--patient-muted, #6D706F);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .bk-code-row button:hover {
-  background-color: #F1F5F9;
-  border-color: #D1D5DB;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-save-bar {
@@ -1240,11 +1253,11 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
-  border: 1px solid var(--color-border, #E5E7EB);
+  padding: 7px 16px;
+  border: 1px solid var(--patient-border, #DDD8CF);
   border-radius: var(--radius, 8px);
-  background-color: #FFFFFF;
-  color: var(--color-text, #1F2937);
+  background-color: var(--patient-surface, #FFFFFF);
+  color: var(--patient-text, #1F2328);
   font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
@@ -1252,8 +1265,9 @@
 }
 
 .bk-save-bar button:hover {
-  background-color: #F8FAFC;
-  border-color: #D1D5DB;
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-place {
@@ -1263,18 +1277,18 @@
   margin-top: 10px;
   padding: 10px 14px;
   border-radius: 8px;
-  background-color: #F8FAFC;
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
   font-size: 13.5px;
-  color: var(--color-text, #1F2937);
+  color: var(--patient-text, #1F2328);
 }
 
 .bk-place svg {
-  color: #6B7280;
+  color: var(--patient-muted, #6D706F);
   flex-shrink: 0;
 }
 
-/* Reception guidance checkin notice: calm neutral card */
+/* Reception guidance checkin notice */
 .bk-checkin {
   display: flex;
   align-items: center;
@@ -1282,25 +1296,20 @@
   margin-top: 10px;
   padding: 12px 14px;
   border-radius: 8px;
-  background-color: #F8FAFC;
-  border: 1px solid var(--color-border, #E5E7EB);
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
   font-size: 13px;
   line-height: 1.45;
-  color: var(--color-text-secondary, #6B7280);
+  color: var(--patient-muted, #6D706F);
 }
 
 .bk-checkin svg {
   flex-shrink: 0;
-  color: #6B7280;
+  color: var(--patient-muted, #6D706F);
 }
 
 /* ---------- Responsive Adjustments ---------- */
 @media (max-width: 640px) {
-  .booking {
-    padding: 0 4px 24px;
-    gap: 12px;
-  }
-
   .booking__header {
     padding: 14px 16px;
   }
