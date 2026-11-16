@@ -8,6 +8,8 @@ import DoctorHomePage from "../pages/doctor/DoctorHomePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import AdminPlaceholderPage from "../pages/admin/AdminPlaceholderPage";
+import AdminSpecialtiesPage from "../pages/admin/AdminSpecialtiesPage";
+import AdminDoctorsPage from "../pages/admin/AdminDoctorsPage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import SelectSpecialtyPage from "../pages/patient/booking/SelectSpecialtyPage";
@@ -158,23 +160,11 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/specialties"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý chuyên khoa"
-                            taskCode="C6-02"
-                            description="Quản lý danh mục các chuyên khoa khám bệnh, tạo mới và cập nhật thông tin mô tả."
-                        />
-                    }
+                    element={<AdminSpecialtiesPage />}
                 />
                 <Route
                     path="/admin/doctors"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý bác sĩ"
-                            taskCode="C6-02"
-                            description="Quản lý hồ sơ bác sĩ, phân bổ chuyên khoa, thiết lập mức phí khám và cấp bậc chuyên môn."
-                        />
-                    }
+                    element={<AdminDoctorsPage />}
                 />
                 <Route
                     path="/admin/rooms"
