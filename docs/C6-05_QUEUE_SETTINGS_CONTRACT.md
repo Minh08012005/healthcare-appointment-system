@@ -13,8 +13,9 @@ Other roles receive `403`; missing or invalid tokens receive `401`.
 ## Request and response
 
 `PUT` requires all seven integer fields. Values must be between `1` and
-`2147483647`; incomplete or invalid input returns `400` without changing any
-settings.
+`2147483647`, and `checkin_som_nhat_phut` must be strictly greater than
+`checkin_toi_thieu_phut` (`checkin_som_nhat_phut > checkin_toi_thieu_phut`);
+incomplete or invalid input returns `400` without changing any settings.
 
 ```json
 {
@@ -47,6 +48,6 @@ error.
 1. Log in as `Quản trị viên` and open `/admin/queue-settings`.
 2. Confirm current values load; update a value and save.
 3. Reload the page and confirm the saved values remain.
-4. Try `0`, a negative value, a decimal, or a value above `2147483647`; the
-   update must be rejected.
-5. Call either endpoint with a non-admin token and confirm it returns `403`.
+5. Try `0`, a negative value, a decimal, a value above `2147483647`, or
+   `checkin_som_nhat_phut <= checkin_toi_thieu_phut`; the update must be rejected.
+6. Call either endpoint with a non-admin token and confirm it returns `403`.

@@ -46,6 +46,10 @@ const validateQueueSettings = (body) => {
     }
   }
 
+  if (errors.length === 0 && body.checkin_som_nhat_phut <= body.checkin_toi_thieu_phut) {
+    errors.push("checkin_som_nhat_phut phải lớn hơn checkin_toi_thieu_phut");
+  }
+
   if (errors.length > 0) return { message: errors.join("; ") };
 
   return {

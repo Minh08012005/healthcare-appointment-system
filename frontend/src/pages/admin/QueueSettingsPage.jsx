@@ -97,6 +97,14 @@ function QueueSettingsPage() {
       payload[name] = value;
     }
 
+    if (payload.checkin_som_nhat_phut <= payload.checkin_toi_thieu_phut) {
+      setNotice({
+        type: "error",
+        text: "Thời gian check-in sớm nhất phải lớn hơn thời gian check-in tối thiểu.",
+      });
+      return;
+    }
+
     setSaving(true);
     setNotice(null);
     try {
