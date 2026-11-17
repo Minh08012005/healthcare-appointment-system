@@ -39,6 +39,18 @@ function PatientLayout() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
+  // Close dropdown or mobile menu on Escape key
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === "Escape") {
+        setDropdownOpen(false);
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   return (
     <div className="pl-layout">
       {/* ── Header ────────────────────────────────────────────── */}
@@ -164,6 +176,7 @@ function PatientLayout() {
               className="pl-hamburger"
               aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
               aria-expanded={menuOpen}
+              aria-controls="pl-mobile-nav"
               onClick={() => setMenuOpen((v) => !v)}
             >
               <span className="pl-hamburger__bar" />
@@ -173,9 +186,22 @@ function PatientLayout() {
           </div>
         </div>
 
+        {/* Mobile backdrop */}
+        {menuOpen && (
+          <div
+            className="pl-mobile-backdrop"
+            onClick={() => setMenuOpen(false)}
+            aria-hidden="true"
+          />
+        )}
+
         {/* Mobile nav drawer */}
         {menuOpen && (
-          <nav className="pl-mobile-nav" aria-label="Mobile patient navigation">
+          <nav
+            id="pl-mobile-nav"
+            className="pl-mobile-nav"
+            aria-label="Mobile patient navigation"
+          >
             <NavLink
               to={BOOKING_PATHS.home}
               end

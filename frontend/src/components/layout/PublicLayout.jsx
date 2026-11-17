@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import { PUBLIC_PATHS } from "../../pages/public/publicPaths";
@@ -15,6 +15,14 @@ const mobileClass = ({ isActive }) => `pl-mobile-nav__link${isActive ? " pl-mobi
 function PublicLayout() {
   const { user, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    function onKeyDown(e) {
+      if (e.key === "Escape") setMenuOpen(false);
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   if (loading) {
     return (
@@ -73,6 +81,7 @@ function PublicLayout() {
               className="pl-hamburger"
               aria-label={menuOpen ? "Đóng menu" : "Mở menu"}
               aria-expanded={menuOpen}
+              aria-controls="pub-mobile-nav"
               onClick={() => setMenuOpen((v) => !v)}
             >
               <span className="pl-hamburger__bar" />
@@ -83,7 +92,19 @@ function PublicLayout() {
         </div>
 
         {menuOpen && (
-          <nav className="pl-mobile-nav" aria-label="Điều hướng công khai (di động)">
+          <div
+            className="pl-mobile-backdrop"
+            onClick={close}
+            aria-hidden="true"
+          />
+        )}
+
+        {menuOpen && (
+          <nav
+            id="pub-mobile-nav"
+            className="pl-mobile-nav"
+            aria-label="Điều hướng công khai (di động)"
+          >
             <NavLink to={PUBLIC_PATHS.news} className={mobileClass} onClick={close}>
               Tin tức
             </NavLink>

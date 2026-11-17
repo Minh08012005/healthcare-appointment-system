@@ -3,6 +3,7 @@ import BookingHeader from "./BookingHeader";
 import { BOOKING_PATHS } from "./bookingPaths";
 import { useBooking } from "../../../booking/useBooking";
 import { useFetch } from "../../../api/useFetch";
+import { PatientLoading, PatientError, PatientEmpty } from "../../../components/patient/PatientState";
 import "./booking.css";
 
 function SelectSpecialtyPage() {
@@ -38,19 +39,16 @@ function SelectSpecialtyPage() {
           {data && <span className="booking__section-count">{data.length} chuyên khoa</span>}
         </div>
 
-        {loading && <p className="booking__message">Đang tải danh sách chuyên khoa...</p>}
+        {loading && <PatientLoading text="Đang tải danh sách chuyên khoa..." />}
 
-        {error && (
-          <div className="booking__message booking__message--error">
-            <p>{error.message}</p>
-            <button type="button" className="booking__btn booking__btn--outline" onClick={reload}>
-              Thử lại
-            </button>
-          </div>
-        )}
+        {error && <PatientError error={error} onRetry={reload} />}
 
         {data && data.length === 0 && (
-          <p className="booking__message">Hiện chưa có chuyên khoa.</p>
+          <PatientEmpty
+            title="Hiện chưa có chuyên khoa"
+            description="Vui lòng quay lại sau hoặc liên hệ bệnh viện để được hỗ trợ."
+            icon="medical"
+          />
         )}
 
         {data &&

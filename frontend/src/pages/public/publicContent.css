@@ -4,7 +4,26 @@
 .pc-page--narrow { max-width: 760px; }
 
 .pc-head { margin-bottom: 28px; }
-.pc-kicker { display: inline-block; margin-bottom: 8px; color: var(--patient-teal); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+.pc-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--patient-teal);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.pc-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  background-color: var(--patient-teal);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
 .pc-head h1 { margin: 0 0 8px; color: var(--patient-navy); font-size: 30px; line-height: 1.25; }
 .pc-head p { margin: 0; color: var(--patient-muted); }
 

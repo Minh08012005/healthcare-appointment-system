@@ -1,0 +1,94 @@
+/* ==================================================================
+   Patient Portal — Shared States (Loading / Empty / Error)
+   ================================================================== */
+
+.patient-state {
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 44px 24px;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius-card, 12px);
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.02);
+}
+
+/* ── Loading State ── */
+.patient-state--loading {
+  gap: 12px;
+  padding: 36px 20px;
+}
+
+.patient-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid var(--patient-border-subtle, #EAE6DE);
+  border-top-color: var(--patient-navy, #0B1F33);
+  border-radius: 50%;
+  animation: patientSpin 0.75s linear infinite;
+}
+
+@keyframes patientSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.patient-state__text {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--patient-muted, #6D706F);
+}
+
+/* ── Empty State ── */
+.patient-state--empty {
+  padding: 48px 24px;
+}
+
+.patient-state__icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-teal, #4F8C87);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.patient-state__icon-box--error {
+  background-color: #FEF2F2;
+  border-color: #FECACA;
+  color: #DC2626;
+}
+
+.patient-state__title {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 700;
+  color: var(--patient-navy, #0B1F33);
+}
+
+.patient-state__desc {
+  margin: 0 0 18px 0;
+  font-size: 13.5px;
+  line-height: 20px;
+  color: var(--patient-muted, #6D706F);
+  max-width: 440px;
+}
+
+.patient-state__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}

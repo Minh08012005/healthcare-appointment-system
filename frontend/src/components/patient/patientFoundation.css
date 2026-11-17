@@ -1,0 +1,212 @@
+/* ==================================================================
+   Patient Portal — Shared UI Foundation (Phase 1)
+   Color Palette Benchmark:
+     Navy (#0B1F33), Warm Ivory (#F5F1E8), Warm-White (#FBFAF7),
+     Pure White (#FFFFFF), Muted Teal (#4F8C87), Action Blue (#1E88E5)
+   ================================================================== */
+
+/* ── 1. Shared Patient Containers ─────────────────────────────────── */
+.patient-container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 56px;
+}
+
+.patient-container--wide {
+  max-width: 1200px;
+}
+
+.patient-container--narrow {
+  max-width: 760px;
+}
+
+@media (max-width: 900px) {
+  .patient-container {
+    padding: 24px 20px 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .patient-container {
+    padding: 18px 16px 32px;
+  }
+}
+
+/* ── 2. Shared Typography & Page Intro ───────────────────────────── */
+.patient-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--patient-teal, #4F8C87);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.patient-kicker__bar {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  background-color: var(--patient-teal, #4F8C87);
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.patient-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.patient-page-header--row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.patient-page-title {
+  margin: 0;
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  color: var(--patient-navy, #0B1F33);
+  letter-spacing: -0.3px;
+}
+
+@media (max-width: 640px) {
+  .patient-page-title {
+    font-size: 22px;
+    line-height: 28px;
+  }
+}
+
+.patient-page-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--patient-muted, #6D706F);
+}
+
+.patient-section-title {
+  margin: 0 0 12px 0;
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 700;
+  color: var(--patient-navy, #0B1F33);
+}
+
+.patient-body {
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--patient-text, #1F2328);
+}
+
+.patient-muted {
+  color: var(--patient-muted, #6D706F);
+}
+
+/* ── 3. Shared Buttons ────────────────────────────────────────────── */
+.patient-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: var(--radius, 8px);
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 160ms ease;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.patient-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.patient-btn--sm {
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+
+.patient-btn--primary {
+  background-color: var(--patient-action, #1E88E5);
+  border-color: var(--patient-action, #1E88E5);
+  color: #FFFFFF;
+}
+
+.patient-btn--primary:hover:not(:disabled) {
+  background-color: var(--patient-action-hover, #1565C0);
+  border-color: var(--patient-action-hover, #1565C0);
+}
+
+.patient-btn--secondary,
+.patient-btn--ghost {
+  background-color: var(--patient-surface, #FFFFFF);
+  border-color: var(--patient-border, #DDD8CF);
+  color: var(--patient-navy, #0B1F33);
+}
+
+.patient-btn--secondary:hover:not(:disabled),
+.patient-btn--ghost:hover:not(:disabled) {
+  background-color: var(--patient-bg, #FBFAF7);
+  border-color: #BDB7AB;
+}
+
+.patient-btn--danger {
+  background-color: var(--patient-surface, #FFFFFF);
+  border-color: #FECACA;
+  color: #DC2626;
+}
+
+.patient-btn--danger:hover:not(:disabled) {
+  background-color: #FEF2F2;
+  border-color: #F87171;
+}
+
+/* ── 4. Shared Cards ──────────────────────────────────────────────── */
+.patient-card {
+  box-sizing: border-box;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius-card, 12px);
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.02);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.patient-card--interactive:hover {
+  border-color: #BDB7AB;
+  box-shadow: 0 4px 12px rgba(11, 31, 51, 0.05);
+}
+
+/* ── 5. Focus & Form Utilities ────────────────────────────────────── */
+.patient-focus:focus-visible,
+.patient-btn:focus-visible,
+a.patient-card:focus-visible {
+  outline: 2px solid var(--patient-action, #1E88E5);
+  outline-offset: 2px;
+}
+
+.patient-divider {
+  height: 1px;
+  background-color: var(--patient-border, #DDD8CF);
+  margin: 16px 0;
+  border: none;
+}

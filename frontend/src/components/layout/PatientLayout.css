@@ -4,6 +4,8 @@
    Luminous Warm-White Canvas Balance (#FBFAF7)
    ================================================================== */
 
+@import "../patient/patientFoundation.css";
+
 .pl-layout {
   /* ── Patient-specific Design Tokens (Non-leaking) ───────────── */
   --patient-navy: #0B1F33;
@@ -287,20 +289,29 @@
   display: none;
   flex-direction: column;
   justify-content: center;
-  gap: 5px;
-  width: 36px;
-  height: 36px;
+  align-items: center;
+  gap: 4.5px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
   border: 1px solid var(--patient-border);
-  border-radius: 6px;
+  border-radius: 8px;
   background-color: var(--patient-surface);
   cursor: pointer;
-  padding: 0 8px;
+  padding: 0 10px;
   box-sizing: border-box;
   transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
+.pl-hamburger:focus-visible {
+  outline: 2px solid var(--patient-action);
+  outline-offset: 2px;
+}
+
 .pl-hamburger:hover {
   background-color: var(--patient-border-subtle);
+  border-color: #BDB7AB;
 }
 
 .pl-hamburger:active {
@@ -311,19 +322,42 @@
   display: block;
   width: 100%;
   height: 2px;
-  background-color: var(--patient-text);
+  background-color: var(--patient-navy);
   border-radius: 2px;
   transition: transform 180ms ease, opacity 180ms ease;
 }
 
+/* ── Mobile Backdrop ─────────────────────────────────────────────── */
+.pl-mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  top: 60px;
+  background-color: rgba(11, 31, 51, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 90;
+  animation: plBackdropFadeIn 180ms ease forwards;
+}
+
+@keyframes plBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* ── Mobile Nav ──────────────────────────────────────────────────── */
 .pl-mobile-nav {
+  position: relative;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   padding: 8px 16px 16px;
   border-top: 1px solid var(--patient-border);
   background-color: var(--patient-surface);
   animation: plMobileNavIn 200ms ease-out forwards;
+  box-shadow: 0 10px 25px rgba(11, 31, 51, 0.12);
 }
 
 @keyframes plMobileNavIn {
@@ -521,14 +555,21 @@
 
   .pl-hamburger {
     display: flex;
-    width: 32px;
-    height: 32px;
-    padding: 0 6px;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 0 10px;
     gap: 4px;
+    border-radius: 8px;
   }
 
   .pl-hamburger__bar {
-    height: 1.5px;
+    height: 2px;
+  }
+
+  .pl-mobile-backdrop {
+    top: 50px;
   }
 
   .pl-footer__inner {
@@ -543,7 +584,8 @@
 }
 
 @media (min-width: 769px) {
-  .pl-mobile-nav {
+  .pl-mobile-nav,
+  .pl-mobile-backdrop {
     display: none;
   }
 }
