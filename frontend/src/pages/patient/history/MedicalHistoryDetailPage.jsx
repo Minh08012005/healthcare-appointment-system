@@ -60,23 +60,45 @@ function LabFile({ file }) {
         </button>
       )}
       {opened && (
-        <>
+        <div className="mh-file__view-box">
           <div className="mh-file__bar">
-            <a href={opened.url} target="_blank" rel="noopener noreferrer">
-              Mở trong tab mới
-            </a>
-            <button type="button" onClick={() => setOpened(null)}>
-              Đóng file
-            </button>
+            <span className="mh-file__meta">Đã mở file tài liệu xét nghiệm</span>
+            <div className="mh-file__actions">
+              <a
+                className="mh-file__action-btn"
+                href={opened.url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <BookingIcon name="externalLink" size={13} />
+                <span>Mở trong tab mới</span>
+              </a>
+              <button
+                type="button"
+                className="mh-file__action-btn mh-file__action-btn--close"
+                onClick={() => setOpened(null)}
+              >
+                <BookingIcon name="x" size={13} />
+                <span>Đóng file</span>
+              </button>
+            </div>
           </div>
-          {isImage && <img className="mh-file__preview" src={opened.url} alt="File kết quả xét nghiệm" />}
+          {isImage && (
+            <img className="mh-file__preview" src={opened.url} alt="File kết quả xét nghiệm" />
+          )}
           {isPdf && (
-            <iframe className="mh-file__preview mh-file__pdf" src={opened.url} title="File kết quả xét nghiệm" />
+            <iframe
+              className="mh-file__preview mh-file__pdf"
+              src={opened.url}
+              title="File kết quả xét nghiệm"
+            />
           )}
           {!isImage && !isPdf && (
-            <p className="mh-block__empty">Không xem trước được định dạng này, hãy mở trong tab mới.</p>
+            <p className="mh-block__empty">
+              Không xem trước được định dạng này, hãy mở trong tab mới.
+            </p>
           )}
-        </>
+        </div>
       )}
       {error && (
         <div className="ap-notice ap-notice--error" role="alert">
@@ -101,19 +123,25 @@ function MedicalHistoryDetailPage() {
 
   return (
     <div className="ap-page ap-detail">
-      <header className="ap-header ap-detail-header">
-        <div className="ap-detail-header__left">
-          <button type="button" className="ap-back" onClick={goList} aria-label="Quay lại lịch sử khám">
-            ←
-          </button>
-          <div className="ap-detail-header__title">
-            <h1>Chi tiết lần khám</h1>
-            <p className="ap-header__sub">Kết quả khám và xét nghiệm của bạn</p>
+      <header className="ap-page-header ap-detail-page-header">
+        <div className="ap-page-header__main">
+          <div className="ap-detail-back-row">
+            <button
+              type="button"
+              className="ap-back-btn"
+              onClick={goList}
+              aria-label="Quay lại lịch sử khám bệnh"
+            >
+              <BookingIcon name="arrowLeft" size={15} />
+              <span>Lịch sử khám bệnh</span>
+            </button>
           </div>
+          <span className="ap-kicker">HỒ SƠ BỆNH ÁN ĐIỆN TỬ</span>
+          <h1 className="ap-page-title">Chi tiết lần khám</h1>
+          <p className="ap-page-desc">
+            Kết quả chẩn đoán, lời dặn của bác sĩ, đơn thuốc và các chỉ định cận lâm sàng.
+          </p>
         </div>
-        <button type="button" className="ap-btn ap-btn--ghost ap-btn--sm" onClick={goList}>
-          Lịch sử khám
-        </button>
       </header>
 
       <main className="ap-main">
@@ -141,13 +169,13 @@ function MedicalHistoryDetailPage() {
             <section className="ap-card ap-info-card">
               <div className="ap-card-title">
                 <BookingIcon name="calendar" size={18} />
-                <strong>Thông tin lần khám</strong>
+                <strong>Thông tin lượt khám</strong>
               </div>
               <div className="ap-doctor">
                 <span className="ap-avatar">{getInitials(data.doctor?.ho_ten)}</span>
                 <div>
                   <strong>BS. {data.doctor?.ho_ten || "—"}</strong>
-                  <span>{data.doctor?.cap_bac || "Chưa cập nhật"}</span>
+                  <span>{data.doctor?.cap_bac || "Bác sĩ phụ trách"}</span>
                 </div>
               </div>
               <div className="ap-detail-rows">
@@ -156,7 +184,7 @@ function MedicalHistoryDetailPage() {
                   <strong className="ap-detail-row__val">{formatDate(data.ho_so?.ngay_kham)}</strong>
                 </div>
                 <div className="ap-detail-row">
-                  <span className="ap-detail-row__label">Bác sĩ</span>
+                  <span className="ap-detail-row__label">Bác sĩ phụ trách</span>
                   <strong className="ap-detail-row__val">{data.doctor?.ho_ten || "Chưa cập nhật"}</strong>
                 </div>
                 <div className="ap-detail-row">
@@ -168,23 +196,34 @@ function MedicalHistoryDetailPage() {
               </div>
             </section>
 
-            {/* 2. Kết quả khám */}
-            <section className="ap-card ap-info-card">
+            {/* 2. Tóm tắt y khoa & Đơn thuốc */}
+            <section className="ap-card ap-info-card mh-summary-card">
               <div className="ap-card-title">
                 <BookingIcon name="medical" size={18} />
-                <strong>Kết quả khám</strong>
+                <strong>Tóm tắt chẩn đoán y khoa</strong>
               </div>
-              <ResultBlock label="TRIỆU CHỨNG" value={kq?.trieu_chung} />
-              <ResultBlock label="CHẨN ĐOÁN" value={kq?.chan_doan} />
-              <ResultBlock label="LỜI DẶN CỦA BÁC SĨ" value={kq?.loi_dan} />
-              <ResultBlock label="ĐƠN THUỐC" value={kq?.don_thuoc} />
+              <ResultBlock label="TRIỆU CHỨNG LÂM SÀNG" value={kq?.trieu_chung} />
+              <ResultBlock label="CHẨN ĐOÁN CỦA BÁC SĨ" value={kq?.chan_doan} />
+              <ResultBlock label="LỜI DẶN ĐIỀU TRỊ" value={kq?.loi_dan} />
+
+              <div className="mh-rx-card">
+                <div className="mh-rx-header">
+                  <span className="mh-rx-badge">Rx</span>
+                  <strong>ĐƠN THUỐC ĐIỀU TRỊ</strong>
+                </div>
+                {kq?.don_thuoc ? (
+                  <p className="mh-rx-text">{kq.don_thuoc}</p>
+                ) : (
+                  <p className="mh-block__empty">Không có đơn thuốc cho lần khám này.</p>
+                )}
+              </div>
             </section>
 
             {/* 3. Kết quả xét nghiệm */}
             <section className="ap-card ap-info-card">
               <div className="ap-card-title">
                 <BookingIcon name="clock" size={18} />
-                <strong>Kết quả xét nghiệm</strong>
+                <strong>Chỉ định & kết quả cận lâm sàng</strong>
               </div>
               {labs.length === 0 ? (
                 <div className="mh-empty">
@@ -201,7 +240,9 @@ function MedicalHistoryDetailPage() {
                           <span className={`mh-pill mh-pill--${st.tone}`}>{st.label}</span>
                         </div>
                         {lab.trang_thai === "DA_XONG" && (
-                          <small className="mh-lab__time">Hoàn thành lúc {formatLabTime(lab.thoi_gian_hoan_thanh)}</small>
+                          <small className="mh-lab__time">
+                            Hoàn thành lúc {formatLabTime(lab.thoi_gian_hoan_thanh)}
+                          </small>
                         )}
                         {lab.trang_thai === "DA_XONG" ? (
                           <>
@@ -215,7 +256,7 @@ function MedicalHistoryDetailPage() {
                             )}
                           </>
                         ) : (
-                          <p className="mh-block__empty">Chưa có kết quả.</p>
+                          <p className="mh-block__empty">Chưa có kết quả xét nghiệm.</p>
                         )}
                       </li>
                     );

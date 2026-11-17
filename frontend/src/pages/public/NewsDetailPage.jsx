@@ -4,6 +4,7 @@ import { publicContentApi } from "../../api/publicContent";
 import { PUBLIC_PATHS } from "./publicPaths";
 import { formatPostDate } from "./publicHelpers";
 import { PublicError, PublicLoading } from "./PublicState";
+import BookingIcon from "../patient/booking/BookingIcons";
 import "./publicContent.css";
 
 // UC-035: chi tiết một tin. Tin không tồn tại / đã ẩn: Backend trả 404 -> hiển thị "không tìm thấy".
@@ -15,11 +16,14 @@ function NewsDetailPage() {
 
   return (
     <div className="pc-page pc-page--narrow">
-      <Link className="pc-back" to={PUBLIC_PATHS.news}>
-        ← Tất cả tin tức
-      </Link>
+      <div className="pc-detail-nav">
+        <Link className="pc-back-btn" to={PUBLIC_PATHS.news}>
+          <BookingIcon name="arrowLeft" size={15} />
+          <span>Tất cả tin tức</span>
+        </Link>
+      </div>
 
-      {loading && <PublicLoading text="Đang tải tin tức..." />}
+      {loading && <PublicLoading text="Đang tải nội dung tin tức..." />}
 
       {!loading && notFound && (
         <div className="pc-state" role="alert">
@@ -35,9 +39,30 @@ function NewsDetailPage() {
 
       {!loading && !error && data && (
         <article className="pc-article">
-          <span className="pc-news-card__date">{formatPostDate(data.ngay_dang)}</span>
-          <h1>{data.tieu_de}</h1>
+          <header className="pc-article__header">
+            <div className="pc-article__meta">
+              <span className="pc-news-card__tag">Tin tức y tế</span>
+              <span className="pc-article__date">
+                <BookingIcon name="clock" size={13} />
+                <span>Ngày đăng: {formatPostDate(data.ngay_dang)}</span>
+              </span>
+            </div>
+            <h1 className="pc-article__title">{data.tieu_de}</h1>
+            <div className="pc-article__divider" />
+          </header>
+
           <div className="pc-article__body">{data.noi_dung}</div>
+
+          <footer className="pc-article__footer">
+            <div className="pc-article__hospital-tag">
+              <strong>Bệnh viện Đa khoa Quốc tế MEDICARE</strong>
+              <p>Mọi thắc mắc và nhu cầu tư vấn xin vui lòng liên hệ quầy tiếp đón hoặc tổng đài hỗ trợ.</p>
+            </div>
+            <Link className="pc-btn pc-btn--outline" to={PUBLIC_PATHS.news}>
+              <BookingIcon name="arrowLeft" size={14} />
+              <span>Quay lại trang tin tức</span>
+            </Link>
+          </footer>
         </article>
       )}
     </div>

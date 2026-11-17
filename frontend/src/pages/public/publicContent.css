@@ -167,10 +167,128 @@
 }
 
 /* ── Chi tiết tin ── */
-.pc-back { display: inline-block; margin-bottom: 20px; color: var(--patient-muted); font-size: 14px; text-decoration: none; }
-.pc-back:hover { color: var(--patient-navy); }
-.pc-article h1 { margin: 4px 0 20px; color: var(--patient-navy); font-size: 28px; line-height: 1.3; overflow-wrap: anywhere; }
-.pc-article__body { color: var(--patient-text); font-size: 16px; line-height: 1.75; white-space: pre-line; overflow-wrap: anywhere; }
+.pc-detail-nav {
+  margin-bottom: 20px;
+}
+
+.pc-back-btn,
+.pc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--patient-muted, #6D706F);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 150ms ease, transform 150ms ease;
+}
+
+.pc-back-btn:hover,
+.pc-back:hover {
+  color: var(--patient-navy, #0B1F33);
+  transform: translateX(-2px);
+}
+
+.pc-article {
+  background: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius-card, 12px);
+  padding: 32px 36px 40px;
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.02);
+}
+
+.pc-article__header {
+  margin-bottom: 24px;
+}
+
+.pc-article__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.pc-article__date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--patient-muted, #6D706F);
+  font-size: 13px;
+}
+
+.pc-article__title,
+.pc-article h1 {
+  margin: 0 0 16px;
+  color: var(--patient-navy, #0B1F33);
+  font-size: 26px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  overflow-wrap: anywhere;
+}
+
+.pc-article__divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--patient-border-subtle, #EAE6DE);
+  margin-top: 18px;
+}
+
+.pc-article__body {
+  color: var(--patient-text, #1F2328);
+  font-size: 15.5px;
+  line-height: 1.8;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.pc-article__footer {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--patient-border-subtle, #EAE6DE);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pc-article__hospital-tag {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--patient-muted, #6D706F);
+}
+
+.pc-article__hospital-tag strong {
+  color: var(--patient-navy, #0B1F33);
+}
+
+.pc-article__hospital-tag p {
+  margin: 0;
+  font-size: 12.5px;
+}
+
+@media (max-width: 768px) {
+  .pc-article {
+    padding: 22px 20px 28px;
+  }
+  .pc-article__title,
+  .pc-article h1 {
+    font-size: 22px;
+    line-height: 30px;
+  }
+  .pc-article__body {
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+  .pc-article__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
 
 /* ── Quy trình khám ── */
 .pc-steps { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0; list-style: none; }

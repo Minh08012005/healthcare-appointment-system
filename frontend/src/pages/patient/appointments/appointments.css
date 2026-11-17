@@ -817,6 +817,63 @@
 }
 
 /* ---------- BN15: Chi tiết lịch hẹn ---------- */
+.ap-detail-back-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ap-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--patient-muted, #6D706F);
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.ap-back-btn:hover {
+  color: var(--patient-navy, #0B1F33);
+  transform: translateX(-2px);
+}
+
+.ap-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  align-items: start;
+}
+
+.ap-detail-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ap-detail-side-col {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .ap-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .ap-detail-side-col {
+    position: static;
+    order: -1; /* Trên mobile/tablet nhỏ, đưa mã QR lên đầu để check-in tiện lợi */
+  }
+}
+
 .ap-detail-header {
   display: flex;
   align-items: center;

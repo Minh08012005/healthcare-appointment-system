@@ -97,30 +97,37 @@ function AppointmentDetailPage() {
 
   return (
     <div className="ap-page ap-detail">
-      <header className="ap-header ap-detail-header">
-        <div className="ap-detail-header__left">
-          <button type="button" className="ap-back" onClick={goList} aria-label="Quay lại danh sách">
-            ←
-          </button>
-          <div className="ap-detail-header__title">
-            <h1>Chi tiết lịch hẹn</h1>
-            <p className="ap-header__sub">Thông tin khám và mã QR check-in tiếp đón</p>
+      <header className="ap-page-header ap-detail-page-header">
+        <div className="ap-page-header__main">
+          <div className="ap-detail-back-row">
+            <button
+              type="button"
+              className="ap-back-btn"
+              onClick={goList}
+              aria-label="Quay lại danh sách lịch hẹn"
+            >
+              <BookingIcon name="arrowLeft" size={15} />
+              <span>Danh sách lịch hẹn</span>
+            </button>
           </div>
+          <span className="ap-kicker">LỊCH HẸN KHÁM BỆNH</span>
+          <h1 className="ap-page-title">Chi tiết lịch hẹn</h1>
+          <p className="ap-page-desc">
+            Thông tin chi tiết lượt khám và mã QR check-in tại quầy tiếp đón MEDICARE.
+          </p>
         </div>
-        <button
-          type="button"
-          className="ap-btn ap-btn--ghost ap-btn--sm"
-          onClick={goList}
-        >
-          Danh sách lịch hẹn
-        </button>
       </header>
 
       <main className="ap-main">
         {loading && <LoadingState text="Đang tải chi tiết lịch hẹn..." />}
 
         {!loading && error && (
-          <ErrorState error={error} onRetry={reload} onBack={goList} backLabel="Về danh sách lịch hẹn" />
+          <ErrorState
+            error={error}
+            onRetry={reload}
+            onBack={goList}
+            backLabel="Về danh sách lịch hẹn"
+          />
         )}
 
         {!loading && !error && appointment && (
@@ -131,164 +138,202 @@ function AppointmentDetailPage() {
               </div>
             )}
 
-            <section className="ap-card ap-qr-card">
-              <div className="ap-qr-card__top">
-                <span className={`ap-badge ap-badge--${statusKey}`}>{getStatusLabel(appointment)}</span>
-                <button type="button" className="ap-code" onClick={handleCopy} aria-label="Sao chép mã lịch hẹn">
-                  Mã: <strong>{appointment.ma_dat_lich}</strong>
-                  <BookingIcon name={copied ? "check" : "copy"} size={13} />
-                </button>
-              </div>
-
-              {appointment.qr_code ? (
-                <>
-                  <div className="bk-qr-box">
-                    <QRCodeCanvas
-                      ref={qrRef}
-                      value={appointment.qr_code}
-                      size={170}
-                      level="M"
-                      fgColor="#000000"
-                      bgColor="#ffffff"
-                      marginSize={4}
-                    />
+            <div className="ap-detail-grid">
+              {/* Cột chính: Thông tin khám bệnh */}
+              <div className="ap-detail-main-col">
+                <section className="ap-card ap-info-card">
+                  <div className="ap-card-title">
+                    <BookingIcon name="medical" size={18} />
+                    <strong>Thông tin khám bệnh</strong>
                   </div>
-                  <p className="ap-qr-hint">
-                    <BookingIcon name="qr" size={14} />
-                    Xuất trình mã này cho nhân viên tiếp đón khi đến khám
-                  </p>
-                  <div className="ap-qr-actions">
-                    <button type="button" className="ap-btn ap-btn--ghost ap-btn--sm" onClick={handleSaveQr}>
-                      <BookingIcon name="download" size={14} />
-                      Lưu ảnh QR
+
+                  <div className="ap-doctor">
+                    <span className="ap-avatar">{getInitials(appointment.bac_si_ten)}</span>
+                    <div>
+                      <strong>BS. {appointment.bac_si_ten || "—"}</strong>
+                      <span>
+                        {[
+                          appointment.cap_bac,
+                          appointment.ten_chuyen_khoa &&
+                            `Chuyên khoa: ${appointment.ten_chuyen_khoa}`,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ") || "Chưa cập nhật"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="ap-detail-rows">
+                    <div className="ap-detail-row">
+                      <span className="ap-detail-row__label">Chuyên khoa</span>
+                      <strong className="ap-detail-row__val">
+                        {appointment.ten_chuyen_khoa || "Chưa cập nhật"}
+                      </strong>
+                    </div>
+                    <div className="ap-detail-row">
+                      <span className="ap-detail-row__label">Phòng khám</span>
+                      <strong className="ap-detail-row__val ap-blue">
+                        {appointment.ten_phong || "Chưa cập nhật"}
+                      </strong>
+                    </div>
+                    <div className="ap-detail-row">
+                      <span className="ap-detail-row__label">Thời gian khám</span>
+                      <div className="ap-detail-row__time">
+                        <strong className="ap-detail-row__val">
+                          {formatTime(appointment.gio_kham)}
+                        </strong>
+                        <span className="ap-detail-row__date">
+                          {formatDate(appointment.ngay_kham)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="ap-detail-row">
+                      <span className="ap-detail-row__label">Phí khám</span>
+                      <strong className="ap-detail-row__val ap-detail-row__val--fee">
+                        {formatFee(appointment.phi_kham)}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {appointment.trieu_chung && (
+                    <div className="ap-symptom">
+                      <small>TRIỆU CHỨNG BAN ĐẦU</small>
+                      <p>{appointment.trieu_chung}</p>
+                    </div>
+                  )}
+                </section>
+
+                <div className="ap-help">
+                  <span className="ap-help__icon">
+                    <BookingIcon name="info" size={20} />
+                  </span>
+                  <div>
+                    <strong>Lưu ý tiếp đón tại bệnh viện</strong>
+                    <p>
+                      {statusKey === "checkedIn"
+                        ? "Bạn đã hoàn tất tiếp đón. Vui lòng theo dõi thông báo số thứ tự tại khu vực chờ của phòng khám."
+                        : "Vui lòng đến trước giờ hẹn tối thiểu 10 phút, nếu không mã QR tiếp đón sẽ hết hiệu lực phục vụ."}
+                    </p>
+                  </div>
+                </div>
+
+                {statusKey === "cancelled" ? (
+                  <div className="ap-cancel-banner">
+                    <BookingIcon name="info" size={15} />
+                    <span>Lịch hẹn này đã được hủy.</span>
+                  </div>
+                ) : (
+                  <div className="ap-cancel-zone">
+                    <p className="ap-cancel-hint">
+                      <BookingIcon name="info" size={13} />
+                      <span>
+                        {appointment.co_the_huy
+                          ? "Chỉ được phép hủy lịch hẹn trước giờ khám ít nhất 2 tiếng."
+                          : statusKey === "checkedIn"
+                          ? "Lịch hẹn đã check-in không thể hủy."
+                          : "Đã quá thời hạn hủy (cần hủy trước giờ khám ít nhất 2 tiếng)."}
+                      </span>
+                    </p>
+                    <button
+                      type="button"
+                      className="ap-btn ap-btn--danger-outline"
+                      onClick={openModal}
+                      disabled={!appointment.co_the_huy}
+                    >
+                      <BookingIcon name="x" size={16} />
+                      Hủy lịch hẹn
                     </button>
-                    <button type="button" className="ap-btn ap-btn--ghost ap-btn--sm" onClick={handleCopy}>
-                      <BookingIcon name={copied ? "check" : "copy"} size={14} />
-                      {copied ? "Đã sao chép mã" : "Sao chép mã"}
+                  </div>
+                )}
+              </div>
+
+              {/* Cột phụ: Thẻ QR Check-in */}
+              <div className="ap-detail-side-col">
+                <section className="ap-card ap-qr-card">
+                  <div className="ap-qr-card__top">
+                    <span className={`ap-badge ap-badge--${statusKey}`}>
+                      {getStatusLabel(appointment)}
+                    </span>
+                    <button
+                      type="button"
+                      className="ap-code"
+                      onClick={handleCopy}
+                      aria-label="Sao chép mã lịch hẹn"
+                      title="Nhấn để sao chép"
+                    >
+                      Mã: <strong>{appointment.ma_dat_lich}</strong>
+                      <BookingIcon name={copied ? "check" : "copy"} size={13} />
                     </button>
                   </div>
-                </>
-              ) : statusKey === "checkedIn" ? (
-                <div className="ap-qr-checked-in">
-                  <span className="ap-qr-checked-in__icon">
-                    <BookingIcon name="checkCircle" size={26} />
-                  </span>
-                  <strong>Đã hoàn tất check-in</strong>
-                  <p>Bạn đã hoàn tất thủ tục check-in. Vui lòng chờ đến lượt khám.</p>
-                </div>
-              ) : statusKey === "completed" ? (
-                <div className="ap-qr-checked-in">
-                  <span className="ap-qr-checked-in__icon">
-                    <BookingIcon name="checkCircle" size={26} />
-                  </span>
-                  <strong>Lịch khám đã hoàn thành</strong>
-                  <p>Lượt khám của lịch hẹn này đã hoàn tất.</p>
-                </div>
-              ) : (
-                <div className="ap-qr-invalid">
-                  <span className="ap-qr-invalid__icon">
-                    <BookingIcon name="x" size={26} />
-                  </span>
-                  <strong>Mã QR không còn hợp lệ</strong>
-                  <p>
-                    {statusKey === "cancelled"
-                      ? "Lịch hẹn này đã được hủy. Mã QR đã bị vô hiệu hóa."
-                      : "Lịch hẹn đã quá hạn check-in (còn dưới 10 phút hoặc đã qua giờ hẹn)."}
-                  </p>
-                </div>
-              )}
-            </section>
 
-            <section className="ap-card ap-info-card">
-              <div className="ap-card-title">
-                <BookingIcon name="medical" size={18} />
-                <strong>Thông tin khám bệnh</strong>
-              </div>
-
-              <div className="ap-doctor">
-                <span className="ap-avatar">{getInitials(appointment.bac_si_ten)}</span>
-                <div>
-                  <strong>BS. {appointment.bac_si_ten || "—"}</strong>
-                  <span>
-                    {[appointment.cap_bac, appointment.ten_chuyen_khoa && `Chuyên khoa: ${appointment.ten_chuyen_khoa}`]
-                      .filter(Boolean)
-                      .join(" · ") || "Chưa cập nhật"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="ap-detail-rows">
-                <div className="ap-detail-row">
-                  <span className="ap-detail-row__label">Khoa</span>
-                  <strong className="ap-detail-row__val">{appointment.ten_chuyen_khoa || "Chưa cập nhật"}</strong>
-                </div>
-                <div className="ap-detail-row">
-                  <span className="ap-detail-row__label">Phòng khám</span>
-                  <strong className="ap-detail-row__val ap-blue">{appointment.ten_phong || "Chưa cập nhật"}</strong>
-                </div>
-                <div className="ap-detail-row">
-                  <span className="ap-detail-row__label">Thời gian</span>
-                  <div className="ap-detail-row__time">
-                    <strong className="ap-detail-row__val">{formatTime(appointment.gio_kham)}</strong>
-                    <span className="ap-detail-row__date">{formatDate(appointment.ngay_kham)}</span>
-                  </div>
-                </div>
-                <div className="ap-detail-row">
-                  <span className="ap-detail-row__label">Phí khám</span>
-                  <strong className="ap-detail-row__val ap-detail-row__val--fee">{formatFee(appointment.phi_kham)}</strong>
-                </div>
-              </div>
-
-              {appointment.trieu_chung && (
-                <div className="ap-symptom">
-                  <small>TRIỆU CHỨNG BAN ĐẦU</small>
-                  <p>{appointment.trieu_chung}</p>
-                </div>
-              )}
-            </section>
-
-            <div className="ap-help">
-              <span className="ap-help__icon">
-                <BookingIcon name="info" size={20} />
-              </span>
-              <div>
-                <strong>Lưu ý tiếp đón tại bệnh viện</strong>
-                <p>
-                  {statusKey === "checkedIn"
-                    ? "Bạn đã hoàn tất tiếp đón. Vui lòng theo dõi thông báo số thứ tự tại khu vực chờ của phòng khám."
-                    : "Vui lòng đến trước giờ hẹn tối thiểu 10 phút, nếu không mã QR tiếp đón sẽ hết hiệu lực phục vụ."}
-                </p>
+                  {appointment.qr_code ? (
+                    <>
+                      <div className="bk-qr-box">
+                        <QRCodeCanvas
+                          ref={qrRef}
+                          value={appointment.qr_code}
+                          size={170}
+                          level="M"
+                          fgColor="#000000"
+                          bgColor="#ffffff"
+                          marginSize={4}
+                        />
+                      </div>
+                      <p className="ap-qr-hint">
+                        <BookingIcon name="qr" size={14} />
+                        Xuất trình mã này cho nhân viên tiếp đón khi đến khám
+                      </p>
+                      <div className="ap-qr-actions">
+                        <button
+                          type="button"
+                          className="ap-btn ap-btn--ghost ap-btn--sm"
+                          onClick={handleSaveQr}
+                        >
+                          <BookingIcon name="download" size={14} />
+                          Lưu ảnh QR
+                        </button>
+                        <button
+                          type="button"
+                          className="ap-btn ap-btn--ghost ap-btn--sm"
+                          onClick={handleCopy}
+                        >
+                          <BookingIcon name={copied ? "check" : "copy"} size={14} />
+                          {copied ? "Đã sao chép mã" : "Sao chép mã"}
+                        </button>
+                      </div>
+                    </>
+                  ) : statusKey === "checkedIn" ? (
+                    <div className="ap-qr-checked-in">
+                      <span className="ap-qr-checked-in__icon">
+                        <BookingIcon name="checkCircle" size={26} />
+                      </span>
+                      <strong>Đã hoàn tất check-in</strong>
+                      <p>Bạn đã hoàn tất thủ tục check-in. Vui lòng chờ đến lượt khám.</p>
+                    </div>
+                  ) : statusKey === "completed" ? (
+                    <div className="ap-qr-checked-in">
+                      <span className="ap-qr-checked-in__icon">
+                        <BookingIcon name="checkCircle" size={26} />
+                      </span>
+                      <strong>Lịch khám đã hoàn thành</strong>
+                      <p>Lượt khám của lịch hẹn này đã hoàn tất.</p>
+                    </div>
+                  ) : (
+                    <div className="ap-qr-invalid">
+                      <span className="ap-qr-invalid__icon">
+                        <BookingIcon name="x" size={26} />
+                      </span>
+                      <strong>Mã QR không còn hợp lệ</strong>
+                      <p>
+                        {statusKey === "cancelled"
+                          ? "Lịch hẹn này đã được hủy. Mã QR đã bị vô hiệu hóa."
+                          : "Lịch hẹn đã quá hạn check-in (còn dưới 10 phút hoặc đã qua giờ hẹn)."}
+                      </p>
+                    </div>
+                  )}
+                </section>
               </div>
             </div>
-
-            {statusKey === "cancelled" ? (
-              <div className="ap-cancel-banner">
-                <BookingIcon name="info" size={15} />
-                <span>Lịch hẹn này đã được hủy.</span>
-              </div>
-            ) : (
-              <div className="ap-cancel-zone">
-                <p className="ap-cancel-hint">
-                  <BookingIcon name="info" size={13} />
-                  <span>
-                    {appointment.co_the_huy
-                      ? "Chỉ được phép hủy lịch hẹn trước giờ khám 2 tiếng."
-                      : statusKey === "checkedIn"
-                      ? "Lịch hẹn đã check-in không thể hủy."
-                      : "Đã quá thời hạn hủy (cần hủy trước giờ khám ít nhất 2 tiếng)."}
-                  </span>
-                </p>
-                <button
-                  type="button"
-                  className="ap-btn ap-btn--danger-outline"
-                  onClick={openModal}
-                  disabled={!appointment.co_the_huy}
-                >
-                  <BookingIcon name="x" size={16} />
-                  Hủy lịch hẹn
-                </button>
-              </div>
-            )}
           </>
         )}
       </main>

@@ -188,30 +188,132 @@
   color: #7a6422;
 }
 
+/* ---------- Tóm tắt y khoa & Rx Box ---------- */
+.mh-summary-card {
+  gap: 18px;
+}
+
+.mh-rx-card {
+  margin-top: 6px;
+  padding: 18px 20px;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius, 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mh-rx-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mh-rx-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 15px;
+  width: 26px;
+  height: 26px;
+  background-color: var(--patient-navy, #0B1F33);
+  color: #FFFFFF;
+  border-radius: 4px;
+}
+
+.mh-rx-header strong {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--patient-navy, #0B1F33);
+}
+
+.mh-rx-text {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--patient-text, #1F2328);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding-left: 2px;
+}
+
 /* ---------- File kết quả ---------- */
 .mh-file {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   align-items: flex-start;
+  width: 100%;
+}
+
+.mh-file__view-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 14px;
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: 8px;
 }
 
 .mh-file__bar {
   display: flex;
-  gap: 16px;
-  font-size: 13.5px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--patient-border-subtle, #EAE6DE);
 }
 
-.mh-file__bar a,
-.mh-file__bar button {
-  background: none;
-  border: none;
-  padding: 0;
-  font: inherit;
+.mh-file__meta {
+  font-size: 12.5px;
+  color: var(--patient-muted, #6D706F);
+  font-weight: 500;
+}
+
+.mh-file__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mh-file__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
-  color: var(--patient-action, #1e88e5);
+  text-decoration: none;
   cursor: pointer;
-  text-decoration: underline;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-navy, #0B1F33);
+  transition: all 0.15s ease;
+}
+
+.mh-file__action-btn:hover {
+  background-color: #FFFFFF;
+  border-color: var(--patient-action, #1E88E5);
+  color: var(--patient-action, #1E88E5);
+}
+
+.mh-file__action-btn--close {
+  color: var(--patient-muted, #6D706F);
+}
+
+.mh-file__action-btn--close:hover {
+  border-color: #F87171;
+  color: #DC2626;
+  background-color: #FEF2F2;
 }
 
 .mh-file__preview {
