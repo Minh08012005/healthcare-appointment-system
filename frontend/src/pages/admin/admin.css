@@ -586,4 +586,43 @@
   }
 }
 
+/* Tabs Navigation for Admin Content (C6-09) */
+.admin-tabs {
+  display: flex;
+  gap: 8px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-card, 12px);
+  padding: 6px;
+  width: fit-content;
+}
+
+.admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius, 8px);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.admin-tab:hover:not(.admin-tab--active) {
+  color: var(--text-primary, #1f2937);
+  background: var(--neutral-bg, #f3f4f6);
+}
+
+.admin-tab--active {
+  color: var(--primary-dark, #0e4c9a);
+  background: var(--primary-light, #eff6ff);
+  font-weight: 600;
+}
+
+
 

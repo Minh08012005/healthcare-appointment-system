@@ -32,6 +32,8 @@ import PublicLayout from "../components/layout/PublicLayout";
 import NewsListPage from "../pages/public/NewsListPage";
 import NewsDetailPage from "../pages/public/NewsDetailPage";
 import ProcedurePage from "../pages/public/ProcedurePage";
+import QueueSettingsPage from "../pages/admin/QueueSettingsPage";
+import AdminContentPage from "../pages/admin/AdminContentPage";
 
 function AppRoutes() {
     return (
@@ -204,13 +206,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/queue-settings"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Cấu hình hệ thống"
-                            taskCode="C6-05"
-                            description="Cấu hình quy tắc điều phối hàng đợi khám bệnh, tỉ lệ online/offline và mốc check-in."
-                        />
-                    }
+                    element={<QueueSettingsPage />}
                 />
                 <Route
                     path="/admin/overview"
@@ -224,13 +220,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/content"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý nội dung"
-                            taskCode="C6-09"
-                            description="Quản lý tin tức bệnh viện và quy trình hướng dẫn khám bệnh cho bệnh nhân."
-                        />
-                    }
+                    element={<AdminContentPage />}
                 />
             </Route>
 
