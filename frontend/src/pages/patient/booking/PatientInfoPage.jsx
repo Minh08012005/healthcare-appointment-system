@@ -58,15 +58,20 @@ function PatientInfoPage() {
           </div>
         </div>
 
-        <label className="bk-label">Phòng khám</label>
-        <div className="bk-readonly">
-          <BookingIcon name="building" size={18} />
-          <strong>{slot.ten_phong ?? "Chưa có phòng"}</strong>
-          <BookingIcon name="lock" size={16} className="bk-muted" />
+        <label className="bk-label">Địa điểm khám</label>
+        <div className="bk-room-chip">
+          <span className="bk-room-chip__icon">
+            <BookingIcon name="building" size={18} />
+          </span>
+          <div className="bk-room-chip__content">
+            <span className="bk-room-chip__label">Phòng khám chuyên khoa</span>
+            <strong>{slot.ten_phong ?? "Chưa chỉ định phòng"}</strong>
+          </div>
+          <span className="bk-room-chip__tag">Cố định theo ca</span>
         </div>
         <p className="bk-hint">
           <BookingIcon name="info" size={12} />
-          Hệ thống tự gán theo khung giờ
+          Phòng khám được hệ thống tự động gán theo lịch làm việc của bác sĩ.
         </p>
 
         <label className="bk-label">

@@ -49,9 +49,6 @@ function BookingSuccessPage() {
     <div className="booking">
       <header className="bk-result-header">
         <h1>Kết quả đặt lịch</h1>
-        <button type="button" aria-label="Đóng" onClick={() => goTo(BOOKING_PATHS.home)}>
-          <BookingIcon name="x" size={20} />
-        </button>
       </header>
 
       <main className="booking__main">
@@ -62,12 +59,12 @@ function BookingSuccessPage() {
           <h2>Đặt lịch thành công</h2>
           <p>
             <BookingIcon name="qr" size={13} />
-            Hãy mang mã QR này khi đến viện
+            Hãy xuất trình mã QR phiếu hẹn khi đến tiếp đón tại bệnh viện
           </p>
         </div>
 
         <section className="bk-card bk-ticket">
-          <span className="bk-ticket-tag">THẺ KHÁM ĐIỆN TỬ</span>
+          <span className="bk-ticket-tag">PHIẾU TIẾP ĐÓN ĐIỆN TỬ</span>
           <div className="bk-qr-box">
             {appointment.qr_code ? (
               <QRCodeCanvas
@@ -83,10 +80,15 @@ function BookingSuccessPage() {
               <p className="bk-muted">Chưa có mã QR.</p>
             )}
           </div>
-          <small className="bk-muted">Mã lịch hẹn</small>
+          <small className="bk-muted">Mã phiếu hẹn</small>
           <div className="bk-code-row">
             <strong className="bk-code">{appointment.ma_dat_lich}</strong>
-            <button type="button" onClick={handleCopy} aria-label="Sao chép mã lịch hẹn">
+            <button
+              type="button"
+              onClick={handleCopy}
+              aria-label="Sao chép mã lịch hẹn"
+              title="Sao chép mã lịch hẹn"
+            >
               <BookingIcon name={copied ? "check" : "copy"} size={15} />
             </button>
           </div>
@@ -94,7 +96,7 @@ function BookingSuccessPage() {
             <div className="bk-save-bar">
               <button type="button" onClick={handleSaveQr}>
                 <BookingIcon name="download" size={13} />
-                Lưu mã QR
+                Lưu mã QR phiếu hẹn
               </button>
             </div>
           )}
@@ -133,7 +135,7 @@ function BookingSuccessPage() {
         <div className="bk-actions">
           <button
             type="button"
-            className="bk-btn bk-btn--soft"
+            className="bk-btn bk-btn--primary"
             onClick={() => goTo(BOOKING_PATHS.appointments)}
           >
             <BookingIcon name="calendar" size={16} />
@@ -141,7 +143,7 @@ function BookingSuccessPage() {
           </button>
           <button
             type="button"
-            className="bk-btn bk-btn--primary"
+            className="bk-btn bk-btn--outline"
             onClick={() => goTo(BOOKING_PATHS.home)}
           >
             <BookingIcon name="home" size={16} />

@@ -290,14 +290,120 @@
   }
 }
 
-/* ── Quy trình khám ── */
-.pc-steps { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0; list-style: none; }
-.pc-step { display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px; background: var(--patient-surface); border: 1px solid var(--patient-border); border-radius: 12px; }
-.pc-step__num { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: #fff; font-weight: 700; background: var(--patient-navy); border-radius: 50%; }
-.pc-step__body { min-width: 0; }
-.pc-step__body h2 { margin: 4px 0 6px; color: var(--patient-navy); font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
-.pc-step__body p { margin: 0; color: var(--patient-muted); line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
-.pc-cta { margin-top: 28px; }
+/* ── Quy trình khám dạng Stepper / Timeline ── */
+.pc-steps {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-step {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding-bottom: 28px;
+}
+
+/* Đường nối dọc giữa các bước */
+.pc-step::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 40px;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--patient-border, #DDD8CF);
+}
+
+.pc-step:last-child::before {
+  display: none;
+}
+
+.pc-step__num {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 16px;
+  background-color: var(--patient-navy, #0B1F33);
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 0 0 1px var(--patient-border, #DDD8CF), 0 2px 6px rgba(11, 31, 51, 0.08);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.pc-step__body {
+  flex: 1;
+  min-width: 0;
+  padding: 16px 20px 20px;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius-card, 12px);
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.02);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pc-step__body:hover {
+  border-color: #BDB7AB;
+  box-shadow: 0 4px 12px rgba(11, 31, 51, 0.04);
+}
+
+.pc-step__body h2 {
+  margin: 0 0 8px;
+  color: var(--patient-navy, #0B1F33);
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.pc-step__body p {
+  margin: 0;
+  color: var(--patient-muted, #6D706F);
+  font-size: 14px;
+  line-height: 1.65;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.pc-cta {
+  margin-top: 16px;
+  display: flex;
+}
+
+@media (max-width: 640px) {
+  .pc-step {
+    gap: 14px;
+    padding-bottom: 22px;
+  }
+  .pc-step::before {
+    left: 17px;
+    top: 36px;
+  }
+  .pc-step__num {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+  .pc-step__body {
+    padding: 14px 16px 16px;
+  }
+  .pc-step__body h2 {
+    font-size: 15.5px;
+  }
+  .pc-step__body p {
+    font-size: 13.5px;
+  }
+}
 
 /* ── Trạng thái ── */
 .pc-state { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 48px 16px; text-align: center; color: var(--patient-muted); background: var(--patient-surface); border: 1px dashed var(--patient-border); border-radius: 12px; }

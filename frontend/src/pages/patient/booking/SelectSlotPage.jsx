@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import BookingHeader from "./BookingHeader";
+import BookingIcon from "./BookingIcons";
 import { BOOKING_PATHS } from "./bookingPaths";
 import { formatDate, formatFee, formatMonthRange, getInitials } from "./bookingFormat";
 import { useBooking } from "../../../booking/useBooking";
 import { useFetch } from "../../../api/useFetch";
+import { PatientLoading, PatientError } from "../../../components/patient/PatientState";
 import "./booking.css";
 
 const SHORT_WEEKDAYS = ["CN", "Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"];
@@ -45,7 +47,7 @@ function SelectSlotPage() {
 
   const renderGroup = (title, list) =>
     list.length > 0 && (
-      <div>
+      <div className="booking__slot-group">
         <h3 className="booking__group-title">{title}</h3>
         <div className="booking__slots">
           {list.map((s) => (
@@ -58,7 +60,8 @@ function SelectSlotPage() {
               }`}
               onClick={() => selectSlot(s)}
             >
-              {s.gio_bat_dau}
+              <span className="booking__slot-time">{s.gio_bat_dau}</span>
+              <span className="booking__slot-badge">Còn {s.slot_con_lai}</span>
             </button>
           ))}
         </div>
@@ -77,11 +80,21 @@ function SelectSlotPage() {
       <main className="booking__main">
         <div className="booking__card booking__card--row">
           <span className="booking__avatar">{getInitials(doctor.ho_ten)}</span>
-          <div>
-            <small>Bác sĩ chỉ định</small>
-            <div className="booking__item-name">BS. {doctor.ho_ten}</div>
+          <div className="booking__doctor-selected">
+            <small>Bác sĩ khám</small>
+            <div className="booking__item-name">
+              {doctor.cap_bac ? `${doctor.cap_bac} ` : "BS. "}
+              {doctor.ho_ten}
+            </div>
             <span className="booking__badge">{doctor.ten_chuyen_khoa}</span>
-            <div className="booking__fee">Phòng khám: {slot?.ten_phong ?? "—"}</div>
+            <div className="booking__fee">
+              <BookingIcon name="building" size={13} />
+              <span>
+                {slot?.ten_phong
+                  ? `Phòng khám: ${slot.ten_phong}`
+                  : "Phòng khám sẽ hiển thị theo khung giờ đã chọn"}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -109,36 +122,35 @@ function SelectSlotPage() {
           )}
         </div>
 
-        {!date && <p className="booking__message">Vui lòng chọn ngày khám.</p>}
-        {loading && <p className="booking__message">Đang tải khung giờ...</p>}
+        {!date && <p className="booking__message">Vui lòng chọn ngày khám ở trên.</p>}
+        {loading && <PatientLoading text="Đang tải khung giờ khám..." />}
 
-        {error && (
-          <div className="booking__message booking__message--error">
-            <p>{error.message}</p>
-            <button type="button" className="booking__btn booking__btn--outline" onClick={reload}>
-              Thử lại
-            </button>
-          </div>
-        )}
+        {error && <PatientError error={error} onRetry={reload} />}
 
         {/* KHONG_CO_LICH hoặc DA_DAY: hiển thị message do Backend trả về */}
         {data && data.trang_thai !== "CON_SLOT" && (
-          <p className="booking__message">{data.message}</p>
+          <div className="booking__empty-slots">
+            <BookingIcon name="clock" size={24} />
+            <p>{data.message}</p>
+          </div>
         )}
 
         {renderGroup("Buổi sáng", morning)}
         {renderGroup("Buổi chiều", afternoon)}
 
-        <div className="booking__card">
+        <div className="booking__card booking__action-summary">
           {slot && date ? (
-            <div className="booking__summary">
-              <span>Thời gian đã chọn:</span>
+            <div className="booking__summary-highlight">
+              <span className="booking__summary-label">
+                <BookingIcon name="calendar" size={15} />
+                Thời gian đã chọn:
+              </span>
               <strong>
                 {slot.gio_bat_dau} – {slot.gio_ket_thuc} • {formatDate(date)}
               </strong>
             </div>
           ) : (
-            <p className="booking__sub">Chưa chọn khung giờ.</p>
+            <p className="booking__sub">Vui lòng bấm chọn một khung giờ còn trống ở trên.</p>
           )}
           <div className="booking__summary">
             <span>Phí khám ban đầu</span>
@@ -150,7 +162,8 @@ function SelectSlotPage() {
             disabled={!slot}
             onClick={() => navigate(BOOKING_PATHS.patientInfo)}
           >
-            Tiếp tục →
+            <span>Tiếp tục điền thông tin</span>
+            <BookingIcon name="arrowRight" size={16} />
           </button>
         </div>
       </main>

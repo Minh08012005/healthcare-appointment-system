@@ -220,7 +220,7 @@ function ConfirmBookingPage() {
             ) : (
               <>
                 <BookingIcon name="checkCircle" size={16} />
-                Xác nhận đặt lịch
+                <span>Xác nhận đặt lịch khám</span>
               </>
             )}
           </button>
@@ -230,7 +230,7 @@ function ConfirmBookingPage() {
             disabled={submitting}
             onClick={() => navigate(BOOKING_PATHS.patientInfo)}
           >
-            Quay lại
+            <span>Quay lại chỉnh sửa thông tin</span>
           </button>
         </div>
       </main>

@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import BookingHeader from "./BookingHeader";
+import BookingIcon from "./BookingIcons";
 import { BOOKING_PATHS } from "./bookingPaths";
 import { useBooking } from "../../../booking/useBooking";
 import { useFetch } from "../../../api/useFetch";
@@ -27,7 +28,9 @@ function SelectSpecialtyPage() {
 
       <main className="booking__main">
         <div className="booking__card booking__card--row">
-          <span className="booking__icon">🏥</span>
+          <span className="booking__icon">
+            <BookingIcon name="medical" size={22} />
+          </span>
           <div>
             <strong>Khám theo chuyên khoa</strong>
             <p className="booking__sub">Đặt lịch trực tiếp với bác sĩ chuyên khoa đầu ngành</p>
@@ -62,7 +65,9 @@ function SelectSpecialtyPage() {
               onClick={() => handleSelect(item)}
             >
               <span className="booking__item-body">{item.ten_chuyen_khoa}</span>
-              <span>›</span>
+              <span className="booking__item-arrow" aria-hidden="true">
+                <BookingIcon name="arrowRight" size={16} />
+              </span>
             </button>
           ))}
       </main>

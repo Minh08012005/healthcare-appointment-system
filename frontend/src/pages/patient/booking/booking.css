@@ -565,24 +565,234 @@
   margin-left: 2px;
 }
 
-.bk-readonly {
+/* ---------- Room chip in Step 4 ---------- */
+.bk-room-chip {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 14px;
+  gap: 12px;
+  padding: 12px 16px;
   border-radius: var(--radius, 8px);
   background-color: var(--patient-bg, #FBFAF7);
   border: 1px solid var(--patient-border, #DDD8CF);
-  color: var(--patient-text, #1F2328);
 }
 
-.bk-readonly strong {
+.bk-room-chip__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-teal, #4F8C87);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bk-room-chip__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   flex: 1;
   min-width: 0;
-  font-size: 14px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.bk-room-chip__label {
+  font-size: 11.5px;
+  color: var(--patient-muted, #6D706F);
+}
+
+.bk-room-chip__content strong {
+  font-size: 14.5px;
+  color: var(--patient-navy, #0B1F33);
+  font-weight: 700;
+}
+
+.bk-room-chip__tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  color: var(--patient-muted, #6D706F);
   white-space: nowrap;
+}
+
+/* ---------- Doctor allocation card in Step 2 ---------- */
+.booking__card--allocate {
+  background-color: var(--patient-ivory, #F5F1E8);
+  border-color: #DDD8CF;
+}
+
+.booking__card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--patient-navy, #0B1F33);
+}
+
+.booking__card-title svg {
+  color: var(--patient-teal, #4F8C87);
+}
+
+.booking__search-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.booking__search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--patient-muted, #6D706F);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.booking__search {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px 11px 38px;
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius, 8px);
+  font-size: 14px;
+  background-color: var(--patient-surface, #FFFFFF);
+  color: var(--patient-text, #1F2328);
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.booking__item-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--patient-muted, #6D706F);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.booking__item:hover .booking__item-arrow {
+  color: var(--patient-action, #1E88E5);
+  transform: translateX(2px);
+}
+
+.booking__doctor-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.booking__doctor-selected {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.booking__doctor-selected small {
+  font-size: 11.5px;
+  color: var(--patient-muted, #6D706F);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.booking__doctor-selected .booking__fee {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.booking__doctor-selected .booking__fee svg {
+  color: var(--patient-muted, #6D706F);
+}
+
+/* ---------- Time Slot styling enhancements ---------- */
+.booking__slot-group {
+  margin-bottom: 14px;
+}
+
+.booking__slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 10px 8px;
+  min-height: 52px;
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius, 8px);
+  background-color: var(--patient-surface, #FFFFFF);
+  cursor: pointer;
+  color: var(--patient-text, #1F2328);
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.booking__slot-time {
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.booking__slot-badge {
+  font-size: 11px;
+  color: var(--patient-muted, #6D706F);
+  font-weight: 500;
+}
+
+.booking__slot--active .booking__slot-badge {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.booking__empty-slots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 16px;
+  background-color: var(--patient-bg, #FBFAF7);
+  border: 1px dashed var(--patient-border, #DDD8CF);
+  border-radius: var(--radius-card, 12px);
+  text-align: center;
+  color: var(--patient-muted, #6D706F);
+}
+
+.booking__empty-slots p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.booking__summary-highlight {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: 8px;
+}
+
+.booking__summary-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--patient-muted, #6D706F);
+}
+
+.booking__summary-label svg {
+  color: var(--patient-teal, #4F8C87);
+}
+
+.booking__summary-highlight strong {
+  font-size: 14px;
+  color: var(--patient-navy, #0B1F33);
 }
 
 .bk-hint {
