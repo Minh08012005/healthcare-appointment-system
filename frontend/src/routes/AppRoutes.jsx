@@ -30,6 +30,12 @@ import LabOrderListPage from "../pages/lab/LabOrderListPage";
 import LabOrderDetailPage from "../pages/lab/LabOrderDetailPage";
 import MedicalHistoryListPage from "../pages/patient/history/MedicalHistoryListPage";
 import MedicalHistoryDetailPage from "../pages/patient/history/MedicalHistoryDetailPage";
+import PublicLayout from "../components/layout/PublicLayout";
+import NewsListPage from "../pages/public/NewsListPage";
+import NewsDetailPage from "../pages/public/NewsDetailPage";
+import ProcedurePage from "../pages/public/ProcedurePage";
+import QueueSettingsPage from "../pages/admin/QueueSettingsPage";
+import AdminContentPage from "../pages/admin/AdminContentPage";
 
 function AppRoutes() {
     return (
@@ -38,6 +44,13 @@ function AppRoutes() {
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+
+            {/* Công khai: KHÔNG cần đăng nhập (C6-10, UC-035/036) */}
+            <Route element={<PublicLayout />}>
+                <Route path="/news" element={<NewsListPage />} />
+                <Route path="/news/:id" element={<NewsDetailPage />} />
+                <Route path="/procedure" element={<ProcedurePage />} />
+            </Route>
 
             {/* Bệnh nhân: phải đăng nhập với vai trò Bệnh nhân */}
             <Route
@@ -203,13 +216,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/queue-settings"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Cấu hình hệ thống"
-                            taskCode="C6-05"
-                            description="Cấu hình quy tắc điều phối hàng đợi khám bệnh, tỉ lệ online/offline và mốc check-in."
-                        />
-                    }
+                    element={<QueueSettingsPage />}
                 />
                 <Route
                     path="/admin/overview"
@@ -223,13 +230,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/content"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý nội dung"
-                            taskCode="C6-09"
-                            description="Quản lý tin tức bệnh viện và quy trình hướng dẫn khám bệnh cho bệnh nhân."
-                        />
-                    }
+                    element={<AdminContentPage />}
                 />
             </Route>
 

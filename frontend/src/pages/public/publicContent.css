@@ -1,0 +1,56 @@
+/* C6-10 — Trang công khai: Tin tức, Chi tiết tin, Quy trình khám.
+   Dùng token của .pl-layout (navy / warm neutral); màu xanh chỉ dành cho CTA. */
+.pc-page { box-sizing: border-box; width: 100%; max-width: 960px; margin: 0 auto; padding: 40px 32px 56px; }
+.pc-page--narrow { max-width: 760px; }
+
+.pc-head { margin-bottom: 28px; }
+.pc-kicker { display: inline-block; margin-bottom: 8px; color: var(--patient-teal); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+.pc-head h1 { margin: 0 0 8px; color: var(--patient-navy); font-size: 30px; line-height: 1.25; }
+.pc-head p { margin: 0; color: var(--patient-muted); }
+
+/* ── Danh sách tin ── */
+.pc-news-list { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.pc-news-card { display: block; padding: 18px 20px; color: inherit; text-decoration: none; background: var(--patient-surface); border: 1px solid var(--patient-border); border-radius: 12px; transition: border-color 180ms ease, box-shadow 180ms ease; }
+.pc-news-card:hover { border-color: var(--patient-navy); box-shadow: 0 2px 10px rgba(11, 31, 51, 0.08); }
+.pc-news-card:focus-visible { outline: 2px solid var(--patient-action); outline-offset: 2px; }
+.pc-news-card__date { display: block; margin-bottom: 6px; color: var(--patient-muted); font-size: 13px; }
+.pc-news-card__title { margin: 0 0 10px; color: var(--patient-navy); font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
+.pc-news-card__cta { color: var(--patient-action); font-size: 14px; font-weight: 600; }
+
+/* ── Chi tiết tin ── */
+.pc-back { display: inline-block; margin-bottom: 20px; color: var(--patient-muted); font-size: 14px; text-decoration: none; }
+.pc-back:hover { color: var(--patient-navy); }
+.pc-article h1 { margin: 4px 0 20px; color: var(--patient-navy); font-size: 28px; line-height: 1.3; overflow-wrap: anywhere; }
+.pc-article__body { color: var(--patient-text); font-size: 16px; line-height: 1.75; white-space: pre-line; overflow-wrap: anywhere; }
+
+/* ── Quy trình khám ── */
+.pc-steps { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.pc-step { display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px; background: var(--patient-surface); border: 1px solid var(--patient-border); border-radius: 12px; }
+.pc-step__num { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; color: #fff; font-weight: 700; background: var(--patient-navy); border-radius: 50%; }
+.pc-step__body { min-width: 0; }
+.pc-step__body h2 { margin: 4px 0 6px; color: var(--patient-navy); font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
+.pc-step__body p { margin: 0; color: var(--patient-muted); line-height: 1.65; white-space: pre-line; overflow-wrap: anywhere; }
+.pc-cta { margin-top: 28px; }
+
+/* ── Trạng thái ── */
+.pc-state { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 48px 16px; text-align: center; color: var(--patient-muted); background: var(--patient-surface); border: 1px dashed var(--patient-border); border-radius: 12px; }
+.pc-state h2 { margin: 0; color: var(--patient-navy); font-size: 18px; }
+.pc-state p { margin: 0; }
+.pc-state--error h2 { color: #b3261e; }
+.pc-spinner { width: 28px; height: 28px; border: 3px solid var(--patient-border-subtle); border-top-color: var(--patient-navy); border-radius: 50%; animation: pc-spin 0.8s linear infinite; }
+@keyframes pc-spin { to { transform: rotate(360deg); } }
+
+/* ── Nút ── */
+.pc-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 20px; font: inherit; font-weight: 600; text-decoration: none; border: 1px solid transparent; border-radius: 8px; cursor: pointer; }
+.pc-btn--primary { color: #fff; background: var(--patient-action); }
+.pc-btn--primary:hover { background: var(--patient-action-hover); }
+.pc-btn--outline { color: var(--patient-navy); background: var(--patient-surface); border-color: var(--patient-border); }
+.pc-btn--outline:hover { border-color: var(--patient-navy); }
+
+.pc-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 768px) {
+  .pc-page { padding: 24px 16px 40px; }
+  .pc-head h1 { font-size: 24px; }
+  .pc-article h1 { font-size: 23px; }
+}
