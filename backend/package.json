@@ -25,6 +25,7 @@
     "api:test-c5-01": "node scripts/test-c5-01.js",
     "api:test-c5-03": "node scripts/test-c5-03.js",
     "api:test-c5-05": "node scripts/test-c5-05.js",
+    "api:test-c6-11": "node scripts/test-c6-11.js",
     "api:test-c6-10": "node scripts/test-c6-10.js"
   },
   "keywords": [],

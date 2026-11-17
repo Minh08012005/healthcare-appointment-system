@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import { BOOKING_PATHS } from "../../pages/patient/booking/bookingPaths";
+import { HISTORY_PATHS } from "../../pages/patient/history/historyPaths";
 import { PUBLIC_PATHS } from "../../pages/public/publicPaths";
 import "./PatientLayout.css";
 
@@ -74,6 +75,12 @@ function PatientLayout() {
               className={({ isActive }) => `pl-nav__link${isActive ? " pl-nav__link--active" : ""}`}
             >
               Lịch hẹn
+            </NavLink>
+            <NavLink
+              to={HISTORY_PATHS.list}
+              className={({ isActive }) => `pl-nav__link${isActive ? " pl-nav__link--active" : ""}`}
+            >
+              Lịch sử khám
             </NavLink>
             <NavLink
               to={PUBLIC_PATHS.news}
@@ -192,6 +199,13 @@ function PatientLayout() {
               Lịch hẹn
             </NavLink>
             <NavLink
+              to={HISTORY_PATHS.list}
+              className={({ isActive }) => `pl-mobile-nav__link${isActive ? " pl-mobile-nav__link--active" : ""}`}
+              onClick={() => setMenuOpen(false)}
+            >
+              Lịch sử khám
+            </NavLink>
+            <NavLink
               to={PUBLIC_PATHS.news}
               className={({ isActive }) => `pl-mobile-nav__link${isActive ? " pl-mobile-nav__link--active" : ""}`}
               onClick={() => setMenuOpen(false)}
@@ -250,6 +264,9 @@ function PatientLayout() {
             </NavLink>
             <NavLink to={BOOKING_PATHS.appointments} className="pl-footer__link">
               Lịch hẹn của tôi
+            </NavLink>
+            <NavLink to={HISTORY_PATHS.list} className="pl-footer__link">
+              Lịch sử khám
             </NavLink>
             <NavLink to={PUBLIC_PATHS.news} className="pl-footer__link">
               Tin tức

@@ -1,0 +1,178 @@
+/* ==================================================================
+   C6-11 — Lịch sử khám bệnh (Patient)
+   Tái sử dụng bộ class ap-* của Patient Appointments (khung trang, card, badge, state).
+   File này chỉ thêm phần riêng của Lịch sử khám (tiền tố mh-). Không đổi style C5.
+   ================================================================== */
+
+.mh-count {
+  font-size: 13.5px;
+  color: var(--patient-muted, #6d706f);
+  padding: 0 4px;
+}
+
+.mh-count strong {
+  color: var(--patient-navy, #0b1f33);
+}
+
+.mh-cta {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--patient-action, #1e88e5);
+}
+
+/* ---------- Kết quả khám ---------- */
+.mh-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 0;
+  border-top: 1px solid var(--patient-border, #ddd8cf);
+}
+
+.mh-block:first-of-type {
+  border-top: none;
+  padding-top: 4px;
+}
+
+.mh-block small {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--patient-muted, #6d706f);
+}
+
+.mh-block__text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--patient-text, #1f2328);
+  white-space: pre-wrap; /* giữ xuống dòng của đơn thuốc / lời dặn */
+  overflow-wrap: anywhere;
+}
+
+.mh-block__empty {
+  margin: 0;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--patient-muted, #6d706f);
+}
+
+/* ---------- Xét nghiệm ---------- */
+.mh-empty {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--patient-bg, #fbfaf7);
+  border: 1px dashed var(--patient-border, #ddd8cf);
+}
+
+.mh-empty p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--patient-muted, #6d706f);
+}
+
+.mh-labs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mh-lab {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--patient-border, #ddd8cf);
+  border-radius: 10px;
+  background: var(--patient-surface, #ffffff);
+}
+
+.mh-lab__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mh-lab__top strong {
+  font-size: 15px;
+  color: var(--patient-navy, #0b1f33);
+  overflow-wrap: anywhere;
+}
+
+.mh-lab__time {
+  font-size: 12.5px;
+  color: var(--patient-muted, #6d706f);
+}
+
+.mh-pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mh-pill--done {
+  background: #e5f3ee;
+  color: #17624a;
+}
+
+.mh-pill--doing {
+  background: #e8eefa;
+  color: #1f4f9a;
+}
+
+.mh-pill--wait {
+  background: #f4efe4;
+  color: #7a6422;
+}
+
+/* ---------- File kết quả ---------- */
+.mh-file {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.mh-file__bar {
+  display: flex;
+  gap: 16px;
+  font-size: 13.5px;
+}
+
+.mh-file__bar a,
+.mh-file__bar button {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--patient-action, #1e88e5);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.mh-file__preview {
+  max-width: 100%;
+  border: 1px solid var(--patient-border, #ddd8cf);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.mh-file__pdf {
+  width: 100%;
+  height: 480px;
+}
+
+@media (max-width: 768px) {
+  .mh-file__pdf {
+    height: 360px;
+  }
+}
