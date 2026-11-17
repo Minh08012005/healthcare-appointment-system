@@ -146,6 +146,23 @@ function AppRoutes() {
                     path="/receptionist/queue"
                     element={<ReceptionQueuePage />}
                 />
+                {/* Fallback & aliases đóng navigation gap (C6-12) */}
+                <Route
+                    path="/receptionist/checkin/online"
+                    element={<Navigate to="/receptionist/check-in-online" replace />}
+                />
+                <Route
+                    path="/receptionist/checkin"
+                    element={<Navigate to="/receptionist/check-in-online" replace />}
+                />
+                <Route
+                    path="/receptionist/check-in"
+                    element={<Navigate to="/receptionist/check-in-online" replace />}
+                />
+                <Route
+                    path="/receptionist/offline"
+                    element={<Navigate to="/receptionist/walk-in" replace />}
+                />
             </Route>
 
             {/* Nhân viên phòng xét nghiệm: phải đăng nhập với vai trò Xét nghiệm */}

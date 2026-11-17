@@ -3,9 +3,9 @@ export const sidebarMenus = {
     roleLabel: "LỄ TÂN",
     items: [
       { path: "/receptionist", label: "Trang chủ", title: "Trang chủ lễ tân" },
-      { path: "/receptionist/check-in-online", label: "Check-in online" },
-      { path: "/receptionist/walk-in", label: "Tiếp đón offline" },
-      { path: "/receptionist/queue", label: "Hàng đợi" },
+      { path: "/receptionist/check-in-online", label: "Check-in online", title: "Tiếp đón & Check-in online" },
+      { path: "/receptionist/walk-in", label: "Tiếp đón offline", title: "Tiếp đón & Đăng ký offline" },
+      { path: "/receptionist/queue", label: "Hàng đợi", title: "Hàng đợi tiếp đón & điều phối" },
     ],
   },
   doctor: {
