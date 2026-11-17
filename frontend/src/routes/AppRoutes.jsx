@@ -14,6 +14,7 @@ import AdminAccountsPage from "../pages/admin/AdminAccountsPage";
 import AdminSpecialtiesPage from "../pages/admin/AdminSpecialtiesPage";
 import AdminDoctorsPage from "../pages/admin/AdminDoctorsPage";
 import AdminRoomsPage from "../pages/admin/AdminRoomsPage";
+import AdminTimeSlotsPage from "../pages/admin/AdminTimeSlotsPage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import SelectSpecialtyPage from "../pages/patient/booking/SelectSpecialtyPage";
@@ -221,13 +222,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/time-slots"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Cấu hình khung giờ & Slot"
-                            taskCode="C6-06"
-                            description="Cấu hình khung giờ hoạt động và thiết lập phân bổ số lượng slot đặt khám."
-                        />
-                    }
+                    element={<AdminTimeSlotsPage />}
                 />
                 <Route
                     path="/admin/queue-settings"
