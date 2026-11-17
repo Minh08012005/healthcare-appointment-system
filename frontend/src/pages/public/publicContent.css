@@ -1,15 +1,24 @@
 /* C6-10 — Trang công khai: Tin tức, Chi tiết tin, Quy trình khám.
    Dùng token của .pl-layout (navy / warm neutral); màu xanh chỉ dành cho CTA. */
-.pc-page { box-sizing: border-box; width: 100%; max-width: 960px; margin: 0 auto; padding: 40px 32px 56px; }
+.pc-page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 36px 24px 56px;
+}
 .pc-page--narrow { max-width: 760px; }
 
-.pc-head { margin-bottom: 28px; }
+.pc-head {
+  margin-bottom: 28px;
+}
+
 .pc-kicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
-  color: var(--patient-teal);
+  margin-bottom: 6px;
+  color: var(--patient-teal, #4F8C87);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -20,21 +29,142 @@
   display: inline-block;
   width: 14px;
   height: 2px;
-  background-color: var(--patient-teal);
+  background-color: var(--patient-teal, #4F8C87);
   border-radius: 1px;
   flex-shrink: 0;
 }
-.pc-head h1 { margin: 0 0 8px; color: var(--patient-navy); font-size: 30px; line-height: 1.25; }
-.pc-head p { margin: 0; color: var(--patient-muted); }
 
-/* ── Danh sách tin ── */
-.pc-news-list { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
-.pc-news-card { display: block; padding: 18px 20px; color: inherit; text-decoration: none; background: var(--patient-surface); border: 1px solid var(--patient-border); border-radius: 12px; transition: border-color 180ms ease, box-shadow 180ms ease; }
-.pc-news-card:hover { border-color: var(--patient-navy); box-shadow: 0 2px 10px rgba(11, 31, 51, 0.08); }
-.pc-news-card:focus-visible { outline: 2px solid var(--patient-action); outline-offset: 2px; }
-.pc-news-card__date { display: block; margin-bottom: 6px; color: var(--patient-muted); font-size: 13px; }
-.pc-news-card__title { margin: 0 0 10px; color: var(--patient-navy); font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
-.pc-news-card__cta { color: var(--patient-action); font-size: 14px; font-weight: 600; }
+.pc-page-title,
+.pc-head h1 {
+  margin: 0 0 6px;
+  color: var(--patient-navy, #0B1F33);
+  font-size: 26px;
+  line-height: 34px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.pc-page-desc,
+.pc-head p {
+  margin: 0;
+  color: var(--patient-muted, #6D706F);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+/* ── Danh sách tin (Grid 2 cột trên desktop, 1 cột trên mobile) ── */
+.pc-news-grid,
+.pc-news-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-news-item {
+  display: flex;
+}
+
+.pc-news-card {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  padding: 22px 24px;
+  color: inherit;
+  text-decoration: none;
+  background: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius-card, 12px);
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.02);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.pc-news-card:hover {
+  border-color: #BDB7AB;
+  box-shadow: 0 4px 12px rgba(11, 31, 51, 0.05);
+  transform: translateY(-1px);
+}
+
+.pc-news-card:focus-visible {
+  outline: 2px solid var(--patient-action, #1E88E5);
+  outline-offset: 2px;
+}
+
+.pc-news-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.pc-news-card__tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: var(--patient-ivory, #F5F1E8);
+  color: var(--patient-teal, #4F8C87);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pc-news-card__date {
+  color: var(--patient-muted, #6D706F);
+  font-size: 12.5px;
+}
+
+.pc-news-card__title {
+  margin: 0 0 16px;
+  color: var(--patient-navy, #0B1F33);
+  font-size: 16.5px;
+  line-height: 1.45;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  flex: 1;
+}
+
+.pc-news-card__footer {
+  padding-top: 12px;
+  border-top: 1px solid var(--patient-border-subtle, #EAE6DE);
+}
+
+.pc-news-card__cta {
+  color: var(--patient-action, #1E88E5);
+  font-size: 13.5px;
+  font-weight: 600;
+  transition: color 150ms ease;
+}
+
+.pc-news-card:hover .pc-news-card__cta {
+  color: var(--patient-action-hover, #1565C0);
+}
+
+@media (max-width: 768px) {
+  .pc-page {
+    padding: 20px 16px 40px;
+  }
+  .pc-head h1,
+  .pc-page-title {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .pc-news-grid,
+  .pc-news-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .pc-news-card {
+    padding: 18px 20px;
+  }
+}
 
 /* ── Chi tiết tin ── */
 .pc-back { display: inline-block; margin-bottom: 20px; color: var(--patient-muted); font-size: 14px; text-decoration: none; }

@@ -4,13 +4,67 @@
    File này chỉ thêm phần riêng của Lịch sử khám (tiền tố mh-). Không đổi style C5.
    ================================================================== */
 
+.mh-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background-color: var(--patient-surface, #FFFFFF);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  border-radius: var(--radius-card, 12px);
+  box-shadow: 0 1px 3px rgba(11, 31, 51, 0.02);
+  flex-wrap: wrap;
+}
+
 .mh-count {
   font-size: 13.5px;
   color: var(--patient-muted, #6d706f);
-  padding: 0 4px;
 }
 
 .mh-count strong {
+  color: var(--patient-navy, #0b1f33);
+  font-weight: 700;
+}
+
+.mh-sort-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--patient-muted, #6d706f);
+  background-color: var(--patient-ivory, #F5F1E8);
+  border: 1px solid var(--patient-border, #DDD8CF);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.mh-card-item:hover .mh-cta {
+  color: var(--patient-action-hover, #1565C0);
+}
+
+.mh-tag-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background-color: #E8F5E9;
+  color: #2E7D32;
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid #C8E6C9;
+}
+
+.mh-lab-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--patient-text, #1F2328);
+}
+
+.mh-lab-counter strong {
   color: var(--patient-navy, #0b1f33);
 }
 
@@ -18,6 +72,7 @@
   margin-left: auto;
   font-weight: 600;
   color: var(--patient-action, #1e88e5);
+  transition: color 0.15s ease;
 }
 
 /* ---------- Kết quả khám ---------- */

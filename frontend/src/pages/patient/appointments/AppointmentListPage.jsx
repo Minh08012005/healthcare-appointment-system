@@ -5,7 +5,7 @@ import { BOOKING_PATHS } from "../booking/bookingPaths";
 import { getInitials, removeDiacritics } from "../booking/bookingFormat";
 import { appointmentApi } from "../../../api/appointments";
 import { useFetch } from "../../../api/useFetch";
-import { ErrorState, LoadingState } from "./StateMessage";
+import { EmptyState, ErrorState, LoadingState } from "./StateMessage";
 import { formatDateTime, getStatusKey, getStatusLabel } from "./appointmentHelpers";
 import "../booking/booking.css";
 import "./appointments.css";
@@ -43,88 +43,110 @@ function AppointmentListPage() {
 
   return (
     <div className="ap-page">
-      <header className="ap-header">
-        <h1>Lịch hẹn của tôi</h1>
+      <header className="ap-page-header">
+        <div className="ap-page-header__main">
+          <span className="ap-kicker">LỊCH KHÁM</span>
+          <h1 className="ap-page-title">Lịch hẹn của tôi</h1>
+          <p className="ap-page-desc">
+            Theo dõi, quản lý và kiểm tra thông tin check-in các lượt khám tại MEDICARE.
+          </p>
+        </div>
         <button
           type="button"
-          className="ap-btn ap-btn--primary ap-btn--sm"
+          className="ap-btn ap-btn--primary"
           onClick={() => navigate(BOOKING_PATHS.specialty)}
         >
-          <BookingIcon name="calendar" size={14} />
-          Đặt lịch mới
+          <BookingIcon name="calendar" size={16} />
+          <span>Đặt lịch mới</span>
         </button>
       </header>
 
       <main className="ap-main">
-        {loading && <LoadingState text="Đang tải lịch hẹn..." />}
+        {loading && <LoadingState text="Đang tải lịch hẹn của bạn..." />}
 
         {!loading && error && (
-          <ErrorState error={error} onRetry={reload} onBack={() => navigate(BOOKING_PATHS.home)} backLabel="Về trang chủ" />
+          <ErrorState
+            error={error}
+            onRetry={reload}
+            onBack={() => navigate(BOOKING_PATHS.home)}
+            backLabel="Về trang chủ"
+          />
         )}
 
         {!loading && !error && (
           <>
             <div className="ap-filter-card">
               <div className="ap-title-row">
-                <h2>Lịch khám của bạn</h2>
-                <span className="ap-count">{total}</span>
-              </div>
-
-              <input
-                className="ap-search"
-                type="search"
-                placeholder="Tìm theo mã lịch hẹn hoặc tên bác sĩ..."
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                aria-label="Tìm lịch hẹn"
-              />
-
-              <div className="ap-tabs" role="tablist">
-                {TABS.map((t) => (
-                  <button
-                    key={t.key}
-                    type="button"
-                    role="tab"
-                    aria-selected={tab === t.key}
-                    className={`ap-tab${tab === t.key ? " ap-tab--active" : ""}`}
-                    onClick={() => setTab(t.key)}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="ap-result-row">
-                <span>
-                  Hiển thị <strong>{visible.length}</strong> kết quả
-                </span>
-                <button type="button" className="ap-sort" onClick={() => setNewestFirst((v) => !v)}>
+                <div className="ap-filter-title-group">
+                  <h2 className="ap-filter-heading">Bộ lọc & tìm kiếm</h2>
+                  <span className="ap-count">{total} tổng số</span>
+                </div>
+                <button
+                  type="button"
+                  className="ap-sort"
+                  onClick={() => setNewestFirst((v) => !v)}
+                  title="Thay đổi thứ tự hiển thị"
+                >
                   <BookingIcon name="clock" size={13} />
-                  {newestFirst ? "Gần đây nhất" : "Cũ nhất"}
+                  <span>{newestFirst ? "Gần đây nhất" : "Cũ nhất trước"}</span>
                 </button>
+              </div>
+
+              <div className="ap-search-wrap">
+                <span className="ap-search-icon">
+                  <BookingIcon name="search" size={16} />
+                </span>
+                <input
+                  className="ap-search"
+                  type="search"
+                  placeholder="Tìm theo mã lịch hẹn (VD: AP...) hoặc tên bác sĩ..."
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  aria-label="Tìm lịch hẹn"
+                />
+              </div>
+
+              <div className="ap-tabs-row">
+                <div className="ap-tabs" role="tablist" aria-label="Lọc theo trạng thái">
+                  {TABS.map((t) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={tab === t.key}
+                      className={`ap-tab${tab === t.key ? " ap-tab--active" : ""}`}
+                      onClick={() => setTab(t.key)}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="ap-result-count">
+                  Hiển thị <strong>{visible.length}</strong> / {total} lượt khám
+                </div>
               </div>
             </div>
 
             {total === 0 ? (
-              <div className="ap-state">
-                <span className="ap-state__icon">
-                  <BookingIcon name="calendar" size={28} />
-                </span>
-                <h3>Bạn chưa có lịch hẹn nào</h3>
-                <p>Đặt lịch khám để xem và quản lý lịch hẹn tại đây.</p>
-                <button
-                  type="button"
-                  className="ap-btn ap-btn--primary"
-                  onClick={() => navigate(BOOKING_PATHS.specialty)}
-                >
-                  Đặt lịch khám
-                </button>
-              </div>
+              <EmptyState
+                icon="calendar"
+                title="Bạn chưa có lịch hẹn nào"
+                description="Đặt lịch khám trực tuyến để chủ động chọn bác sĩ, chuyên khoa và khung giờ phù hợp."
+                actionText="Đặt lịch khám ngay"
+                onAction={() => navigate(BOOKING_PATHS.specialty)}
+              />
             ) : visible.length === 0 ? (
-              <div className="ap-state">
-                <h3>Không tìm thấy lịch hẹn phù hợp</h3>
-                <p>Thử đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
-              </div>
+              <EmptyState
+                icon="search"
+                title="Không tìm thấy lịch hẹn phù hợp"
+                description="Không có lịch hẹn nào khớp với bộ lọc hoặc từ khóa tìm kiếm hiện tại."
+                actionText="Xóa bộ lọc tìm kiếm"
+                onAction={() => {
+                  setTab("all");
+                  setKeyword("");
+                }}
+              />
             ) : (
               <ul className="ap-list">
                 {visible.map((a) => (
@@ -139,24 +161,30 @@ function AppointmentListPage() {
                           <BookingIcon name="calendar" size={16} />
                           {formatDateTime(a)}
                         </strong>
-                        <span className={`ap-badge ap-badge--${getStatusKey(a)}`}>{getStatusLabel(a)}</span>
+                        <span className={`ap-badge ap-badge--${getStatusKey(a)}`}>
+                          {getStatusLabel(a)}
+                        </span>
                       </div>
+
                       <div className="ap-item__doctor">
                         <span className="ap-avatar">{getInitials(a.bac_si_ten)}</span>
                         <div className="ap-item__info">
-                          <strong>BS. {a.bac_si_ten || "—"}</strong>
-                          <span>{a.ten_chuyen_khoa || "Chưa cập nhật chuyên khoa"}</span>
+                          <span className="ap-item__specialty">
+                            {a.ten_chuyen_khoa || "Chuyên khoa khám"}
+                          </span>
+                          <strong className="ap-item__name">BS. {a.bac_si_ten || "—"}</strong>
                         </div>
-                        <span className="ap-chevron">
+                        <span className="ap-chevron" aria-hidden="true">
                           <BookingIcon name="arrowRight" size={16} />
                         </span>
                       </div>
+
                       <div className="ap-item__meta">
-                        <span>
+                        <span className="ap-item__location">
                           <BookingIcon name="building" size={13} />
-                          {a.ten_phong || "Phòng chưa cập nhật"}
+                          {a.ten_phong || "Phòng khám chưa cập nhật"}
                         </span>
-                        <span>{a.ma_dat_lich}</span>
+                        <span className="ap-item__code">Mã: {a.ma_dat_lich}</span>
                       </div>
                     </button>
                   </li>
@@ -168,10 +196,11 @@ function AppointmentListPage() {
               <span className="ap-help__icon">
                 <BookingIcon name="info" size={20} />
               </span>
-              <div>
+              <div className="ap-help__content">
                 <strong>Lưu ý khi đến khám tại bệnh viện</strong>
                 <p>
-                  Vui lòng có mặt trước giờ hẹn ít nhất 15 phút tại quầy tiếp đón và xuất trình mã QR lịch hẹn để hoàn tất thủ tục check-in.
+                  Vui lòng có mặt trước giờ hẹn ít nhất 15 phút tại quầy tiếp đón và xuất trình mã QR
+                  trong chi tiết lịch hẹn để hoàn tất thủ tục check-in nhanh chóng.
                 </p>
               </div>
             </div>
