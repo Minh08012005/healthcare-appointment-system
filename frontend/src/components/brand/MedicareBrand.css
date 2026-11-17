@@ -1,0 +1,99 @@
+/* ==================================================================
+   Unified MEDICARE Brand Component
+   Palette: Muted Teal (#4F8C87) Cross + Deep Navy (#0B1F33) Wordmark
+   ================================================================== */
+
+.medicare-brand-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: opacity 180ms ease;
+}
+
+.medicare-brand-link:hover {
+  opacity: 0.9;
+}
+
+.medicare-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.medicare-brand__cross {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4F8C87; /* Muted Teal */
+  flex-shrink: 0;
+}
+
+.medicare-brand__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.medicare-brand__wordmark {
+  font-family: inherit;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #0B1F33; /* Deep Navy */
+  line-height: 1;
+}
+
+.medicare-brand__sub {
+  font-size: 12px;
+  line-height: 16px;
+  color: #6D706F;
+  margin-top: 3px;
+  font-weight: 400;
+}
+
+/* ── Size Variants ────────────────────────────────────────────────── */
+.medicare-brand--compact {
+  gap: 8px;
+}
+
+.medicare-brand--compact .medicare-brand__cross .medicare-brand__svg {
+  width: 18px;
+  height: 18px;
+}
+
+.medicare-brand--compact .medicare-brand__wordmark {
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.medicare-brand--compact .medicare-brand__sub {
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.medicare-brand--default {
+  gap: 12px;
+}
+
+.medicare-brand--default .medicare-brand__cross .medicare-brand__svg {
+  width: 26px;
+  height: 26px;
+}
+
+.medicare-brand--default .medicare-brand__wordmark {
+  font-size: 22px;
+  letter-spacing: 0.8px;
+}
+
+.medicare-brand--large {
+  gap: 14px;
+}
+
+.medicare-brand--large .medicare-brand__cross .medicare-brand__svg {
+  width: 32px;
+  height: 32px;
+}
+
+.medicare-brand--large .medicare-brand__wordmark {
+  font-size: 26px;
+  letter-spacing: 1px;
+}

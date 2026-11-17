@@ -5,6 +5,7 @@ import Topbar from "./Topbar";
 import PatientLayout from "./PatientLayout";
 import { sidebarMenus } from "./sidebarMenus";
 import { useAuth } from "../../auth/useAuth";
+import { getPostLogoutPath } from "../../auth/authPaths";
 import "./MainLayout.css";
 
 function MainLayout({ role, userName, userTitle }) {
@@ -32,8 +33,10 @@ function MainLayout({ role, userName, userTitle }) {
   const displayTitle = userTitle ?? user?.role ?? "";
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    const targetRole = user?.role || role;
+    const res = await logout(targetRole);
+    const destination = res?.redirectPath || getPostLogoutPath(targetRole);
+    navigate(destination, { replace: true });
   };
 
   // Patient role: dùng horizontal navigation riêng, không dùng sidebar

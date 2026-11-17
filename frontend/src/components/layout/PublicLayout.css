@@ -1,13 +1,83 @@
 /* C6-10 — Phần riêng của khung công khai; phần còn lại dùng lại PatientLayout.css */
-.pub-loading { align-items: center; justify-content: center; color: var(--patient-muted); }
+.pub-loading {
+  align-items: center;
+  justify-content: center;
+  color: var(--patient-muted);
+}
 
-.pub-actions { display: flex; align-items: center; gap: 8px; }
-.pub-btn { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid transparent; border-radius: 6px; white-space: nowrap; }
-.pub-btn--ghost { color: var(--patient-text); border-color: var(--patient-border); background: var(--patient-surface); }
-.pub-btn--ghost:hover { border-color: var(--patient-navy); }
-.pub-btn--primary { color: #fff; background: var(--patient-action); }
-.pub-btn--primary:hover { background: var(--patient-action-hover); }
+.pub-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pub-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 18px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.pub-btn--ghost {
+  color: var(--patient-text);
+  border-color: var(--patient-border);
+  background: var(--patient-surface);
+}
+
+.pub-btn--ghost:hover {
+  border-color: var(--patient-navy);
+}
+
+.pub-btn--primary {
+  color: #fff;
+  background: var(--patient-action);
+}
+
+.pub-btn--primary:hover {
+  background: var(--patient-action-hover);
+}
+
+/* ── Public Layout Desktop Scale (~8–12% Polish) ──────────────────── */
+@media (min-width: 769px) {
+  .pl-layout--public .pl-header {
+    height: 64px;
+  }
+
+  .pl-layout--public .pl-header__inner {
+    height: 64px;
+  }
+
+  .pl-layout--public .pl-brand {
+    gap: 10px;
+  }
+
+  .pl-layout--public .pl-brand__cross svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pl-layout--public .pl-brand__wordmark {
+    font-size: 19px;
+    letter-spacing: 0.7px;
+  }
+
+  .pl-layout--public .pl-nav__link {
+    height: 38px;
+    padding: 0 16px;
+    font-size: 14.5px;
+    font-weight: 500;
+  }
+}
 
 @media (max-width: 768px) {
-  .pub-actions { display: none; }
+  .pub-actions {
+    display: none;
+  }
 }

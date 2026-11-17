@@ -80,8 +80,8 @@ function ConfirmBookingPage() {
   };
 
   const handleRelogin = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    const res = await logout("Bệnh nhân");
+    navigate(res?.redirectPath || "/login", { replace: true });
   };
 
   return (

@@ -24,8 +24,8 @@ function PatientLayout() {
   const initials = getInitials(displayName);
 
   const handleLogout = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    const res = await logout("Bệnh nhân");
+    navigate(res?.redirectPath || "/login", { replace: true });
   };
 
   // Close dropdown on outside click

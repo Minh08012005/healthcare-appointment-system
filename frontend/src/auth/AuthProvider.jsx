@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { authApi } from "../api/auth";
 import { getToken, setToken, clearToken } from "./tokenStorage";
+import { getPostLogoutPath } from "./authPaths";
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -25,8 +26,23 @@ function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = async (username, password) => {
+  const login = async (username, password, allowedRoles = null) => {
     const res = await authApi.login({ username, password });
+    const tempUser = res.data?.user;
+
+    // Portal Boundary Validation: kiểm tra role TRƯỚC KHI lưu token và TRƯỚC KHI set user
+    if (
+      allowedRoles &&
+      Array.isArray(allowedRoles) &&
+      allowedRoles.length > 0 &&
+      tempUser &&
+      !allowedRoles.includes(tempUser.role)
+    ) {
+      clearToken();
+      setUser(null);
+      return { mismatch: true, role: tempUser.role, user: tempUser };
+    }
+
     setToken(res.data.token);
     try {
       const me = await authApi.me(); // lấy đủ thông tin (ho_ten...)
@@ -34,11 +50,13 @@ function AuthProvider({ children }) {
       return me.data.user;
     } catch (err) {
       clearToken();
+      setUser(null);
       throw err;
     }
   };
 
-  const logout = async () => {
+  const logout = async (fallbackRole) => {
+    const roleBeforeLogout = user?.role || fallbackRole;
     try {
       await authApi.logout();
     } catch {
@@ -46,6 +64,10 @@ function AuthProvider({ children }) {
     }
     clearToken();
     setUser(null);
+    return {
+      redirectPath: getPostLogoutPath(roleBeforeLogout),
+      role: roleBeforeLogout,
+    };
   };
 
   return (

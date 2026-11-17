@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
+import PublicEntryRedirect from "./PublicEntryRedirect";
 import LoginPage from "../pages/common/LoginPage";
+import StaffLoginPage from "../pages/common/StaffLoginPage";
 import RegisterPage from "../pages/common/RegisterPage";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import PatientHomePage from "../pages/patient/PatientHomePage";
@@ -41,8 +43,9 @@ function AppRoutes() {
     return (
         <Routes>
             {/* Trang chung */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<PublicEntryRedirect />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/staff/login" element={<StaffLoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
             {/* Công khai: KHÔNG cần đăng nhập (C6-10, UC-035/036) */}

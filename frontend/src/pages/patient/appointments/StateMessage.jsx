@@ -13,8 +13,8 @@ export function ErrorState({ error, onRetry, onBack, backLabel = "Quay lại" })
   const expired = error?.status === 401;
 
   const relogin = async () => {
-    await logout();
-    navigate("/login", { replace: true });
+    const res = await logout("Bệnh nhân");
+    navigate(res?.redirectPath || "/login", { replace: true });
   };
 
   return (

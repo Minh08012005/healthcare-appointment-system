@@ -37,7 +37,7 @@ function PublicLayout() {
   const close = () => setMenuOpen(false);
 
   return (
-    <div className="pl-layout">
+    <div className="pl-layout pl-layout--public">
       <header className="pl-header">
         <div className="pl-header__inner">
           <NavLink to={PUBLIC_PATHS.news} className="pl-brand" aria-label="MEDICARE – Tin tức">
