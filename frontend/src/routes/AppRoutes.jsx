@@ -29,6 +29,7 @@ import ExaminationPage from "../pages/doctor/examination/ExaminationPage";
 import LabOrderListPage from "../pages/lab/LabOrderListPage";
 import LabOrderDetailPage from "../pages/lab/LabOrderDetailPage";
 import QueueSettingsPage from "../pages/admin/QueueSettingsPage";
+import AdminContentPage from "../pages/admin/AdminContentPage";
 
 function AppRoutes() {
     return (
@@ -208,13 +209,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/content"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý nội dung"
-                            taskCode="C6-09"
-                            description="Quản lý tin tức bệnh viện và quy trình hướng dẫn khám bệnh cho bệnh nhân."
-                        />
-                    }
+                    element={<AdminContentPage />}
                 />
             </Route>
 
