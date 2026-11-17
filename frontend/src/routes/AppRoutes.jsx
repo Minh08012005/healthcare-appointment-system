@@ -28,6 +28,7 @@ import CallPatientPage from "../pages/doctor/call/CallPatientPage";
 import ExaminationPage from "../pages/doctor/examination/ExaminationPage";
 import LabOrderListPage from "../pages/lab/LabOrderListPage";
 import LabOrderDetailPage from "../pages/lab/LabOrderDetailPage";
+import QueueSettingsPage from "../pages/admin/QueueSettingsPage";
 
 function AppRoutes() {
     return (
@@ -193,13 +194,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/queue-settings"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Cấu hình hệ thống"
-                            taskCode="C6-05"
-                            description="Cấu hình quy tắc điều phối hàng đợi khám bệnh, tỉ lệ online/offline và mốc check-in."
-                        />
-                    }
+                    element={<QueueSettingsPage />}
                 />
                 <Route
                     path="/admin/overview"
