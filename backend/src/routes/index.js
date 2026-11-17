@@ -2,7 +2,7 @@ const express = require("express");
 const healthRoutes = require("./health.routes");
 const integrationRoutes = require("./integration.routes");
 const authRoutes = require("./auth.routes");
-const masterRoutes = require(https://github.com/Minh08012005/healthcare-appointment-system/pull/102/conflict?name=backend%252Fpackage.json&ancestor_oid=dba1b671db048af7687cca2d9f17b34b87698144&base_oid=cb24a171d394147c770381ee57ca29c1384efda2&head_oid=4bdf1ec14a32547f3337859f63b9036eb73d8b41"./master.routes");
+const masterRoutes = require("./master.routes");
 const slotRoutes = require("./slot.routes");
 const appointmentManageRoutes = require("./appointmentManage.routes");
 const appointmentRoutes = require("./appointment.routes");

@@ -81,6 +81,8 @@ function PatientLayout() {
               className={({ isActive }) => `pl-nav__link${isActive ? " pl-nav__link--active" : ""}`}
             >
               Lịch sử khám
+            </NavLink>
+            <NavLink
               to={PUBLIC_PATHS.news}
               className={({ isActive }) => `pl-nav__link${isActive ? " pl-nav__link--active" : ""}`}
             >
@@ -202,6 +204,8 @@ function PatientLayout() {
               onClick={() => setMenuOpen(false)}
             >
               Lịch sử khám
+            </NavLink>
+            <NavLink
               to={PUBLIC_PATHS.news}
               className={({ isActive }) => `pl-mobile-nav__link${isActive ? " pl-mobile-nav__link--active" : ""}`}
               onClick={() => setMenuOpen(false)}
@@ -263,6 +267,7 @@ function PatientLayout() {
             </NavLink>
             <NavLink to={HISTORY_PATHS.list} className="pl-footer__link">
               Lịch sử khám
+            </NavLink>
             <NavLink to={PUBLIC_PATHS.news} className="pl-footer__link">
               Tin tức
             </NavLink>
