@@ -8,6 +8,9 @@ import DoctorHomePage from "../pages/doctor/DoctorHomePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import AdminPlaceholderPage from "../pages/admin/AdminPlaceholderPage";
+import AdminAccountsPage from "../pages/admin/AdminAccountsPage";
+import AdminSpecialtiesPage from "../pages/admin/AdminSpecialtiesPage";
+import AdminDoctorsPage from "../pages/admin/AdminDoctorsPage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import SelectSpecialtyPage from "../pages/patient/booking/SelectSpecialtyPage";
@@ -25,6 +28,7 @@ import CallPatientPage from "../pages/doctor/call/CallPatientPage";
 import ExaminationPage from "../pages/doctor/examination/ExaminationPage";
 import LabOrderListPage from "../pages/lab/LabOrderListPage";
 import LabOrderDetailPage from "../pages/lab/LabOrderDetailPage";
+import QueueSettingsPage from "../pages/admin/QueueSettingsPage";
 
 function AppRoutes() {
     return (
@@ -148,33 +152,15 @@ function AppRoutes() {
                 <Route path="/admin" element={<AdminHomePage />} />
                 <Route
                     path="/admin/accounts"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý tài khoản nhân viên"
-                            taskCode="C6-03"
-                            description="Quản lý danh sách, tạo mới, chỉnh sửa thông tin và khóa tài khoản nhân viên y tế."
-                        />
-                    }
+                    element={<AdminAccountsPage />}
                 />
                 <Route
                     path="/admin/specialties"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý chuyên khoa"
-                            taskCode="C6-02"
-                            description="Quản lý danh mục các chuyên khoa khám bệnh, tạo mới và cập nhật thông tin mô tả."
-                        />
-                    }
+                    element={<AdminSpecialtiesPage />}
                 />
                 <Route
                     path="/admin/doctors"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý bác sĩ"
-                            taskCode="C6-02"
-                            description="Quản lý hồ sơ bác sĩ, phân bổ chuyên khoa, thiết lập mức phí khám và cấp bậc chuyên môn."
-                        />
-                    }
+                    element={<AdminDoctorsPage />}
                 />
                 <Route
                     path="/admin/rooms"
@@ -208,13 +194,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/queue-settings"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Cấu hình hệ thống"
-                            taskCode="C6-05"
-                            description="Cấu hình quy tắc điều phối hàng đợi khám bệnh, tỉ lệ online/offline và mốc check-in."
-                        />
-                    }
+                    element={<QueueSettingsPage />}
                 />
                 <Route
                     path="/admin/overview"

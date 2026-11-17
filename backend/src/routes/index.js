@@ -14,6 +14,10 @@ const labOrderRoutes = require("./labOrder.routes");
 const labRoomRoutes = require("./labRoom.routes"); 
 const notificationRoutes = require("./notification.routes");
 const adminContentRoutes = require("./adminContent.routes");
+const adminSpecialtyRoutes = require("./adminSpecialty.routes");
+const adminDoctorRoutes = require("./adminDoctor.routes");
+const adminAccountRoutes = require("./adminAccount.routes");
+const queueSettingsRoutes = require("./queueSettings.routes");
 
 const router = express.Router();
 router.use("/health", healthRoutes);
@@ -31,5 +35,9 @@ router.use("/lab-orders", labOrderRoutes);
 router.use("/lab", labRoomRoutes); 
 router.use("/notifications", notificationRoutes);
 router.use("/admin/content", adminContentRoutes);
+router.use("/admin/specialties", adminSpecialtyRoutes);
+router.use("/admin/doctors", adminDoctorRoutes);
+router.use("/admin/accounts", adminAccountRoutes);
+router.use("/admin", queueSettingsRoutes);
 
 module.exports = router;

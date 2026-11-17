@@ -206,9 +206,384 @@
   text-decoration: none;
   transition: background-color 0.15s ease;
   width: fit-content;
+  border: none;
+  cursor: pointer;
 }
 
 .admin-btn:hover {
   background-color: var(--primary-dark, #0e4c9a);
 }
+
+.admin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-btn--secondary {
+  background-color: var(--neutral-bg, #f3f4f6);
+  color: var(--text-primary, #1f2937);
+  border: 1px solid var(--border, #e5e7eb);
+}
+
+.admin-btn--secondary:hover {
+  background-color: var(--border, #e5e7eb);
+}
+
+.admin-btn--danger {
+  background-color: var(--danger, #d64545);
+  color: #ffffff;
+}
+
+.admin-btn--danger:hover {
+  background-color: #b91c1c;
+}
+
+/* ------------------------------------------------------------------
+   Specialties & Doctors Management Common Styles
+   ------------------------------------------------------------------ */
+
+.admin-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.admin-header__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-card, 12px);
+  padding: 14px 18px;
+}
+
+.admin-toolbar__filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-select,
+.admin-input {
+  height: 38px;
+  padding: 0 12px;
+  font-size: 13.5px;
+  color: var(--text-primary, #1f2937);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius, 8px);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.admin-select:focus,
+.admin-input:focus,
+.admin-textarea:focus {
+  border-color: var(--primary, #1e88e5);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.15);
+}
+
+.admin-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-table-wrap {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-card, 12px);
+  overflow-x: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13.5px;
+}
+
+.admin-table th {
+  background: var(--neutral-bg, #f3f4f6);
+  padding: 12px 16px;
+  font-weight: 600;
+  color: var(--text-secondary, #6b7280);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  color: var(--text-primary, #1f2937);
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #fafbfc;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-btn-sm {
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.admin-btn-sm--outline {
+  background: transparent;
+  border-color: var(--border, #e5e7eb);
+  color: var(--text-primary, #1f2937);
+}
+
+.admin-btn-sm--outline:hover {
+  border-color: var(--primary, #1e88e5);
+  color: var(--primary, #1e88e5);
+  background: var(--primary-light, #eff6ff);
+}
+
+.admin-btn-sm--danger {
+  background: transparent;
+  border-color: var(--danger-border, #f8b4b4);
+  color: var(--danger, #d64545);
+}
+
+.admin-btn-sm--danger:hover {
+  background: var(--danger-bg, #fdf2f2);
+}
+
+.admin-btn-sm--success {
+  background: transparent;
+  border-color: var(--success-border, #a3e0ba);
+  color: var(--success-text, #1e6b3c);
+}
+
+.admin-btn-sm--success:hover {
+  background: var(--success-bg, #edf8f2);
+}
+
+/* Modal Dialogs */
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.admin-modal {
+  background: var(--surface, #ffffff);
+  border-radius: var(--radius-card, 12px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: adminModalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes adminModalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.admin-modal__header {
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-modal__title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+  margin: 0;
+}
+
+.admin-modal__close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--text-secondary, #6b7280);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm, 4px);
+}
+
+.admin-modal__close:hover {
+  color: var(--text-primary, #1f2937);
+  background: var(--neutral-bg, #f3f4f6);
+}
+
+.admin-modal__body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-modal__footer {
+  padding: 14px 24px;
+  border-top: 1px solid var(--border, #e5e7eb);
+  background: var(--neutral-bg, #f3f4f6);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Forms */
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary, #1f2937);
+}
+
+.admin-label--required::after {
+  content: " *";
+  color: var(--danger, #d64545);
+}
+
+.admin-textarea {
+  padding: 10px 12px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: var(--text-primary, #1f2937);
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius, 8px);
+  outline: none;
+  min-height: 85px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.admin-form-hint {
+  font-size: 12px;
+  color: var(--text-muted, #9ca3af);
+}
+
+/* Reference warnings & breakdown */
+.admin-ref-box {
+  background: var(--danger-bg, #fdf2f2);
+  border: 1px solid var(--danger-border, #f8b4b4);
+  border-radius: var(--radius, 8px);
+  padding: 14px 16px;
+  color: var(--danger-text, #9b2222);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.admin-ref-box ul {
+  margin: 6px 0 0 20px;
+  padding: 0;
+}
+
+/* Flash alerts */
+.admin-flash {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-radius: var(--radius, 8px);
+  font-size: 13.5px;
+  font-weight: 500;
+}
+
+.admin-flash--success {
+  background-color: var(--success-bg, #edf8f2);
+  color: var(--success-text, #1e6b3c);
+  border: 1px solid var(--success-border, #a3e0ba);
+}
+
+.admin-flash--error {
+  background-color: var(--danger-bg, #fdf2f2);
+  color: var(--danger-text, #9b2222);
+  border: 1px solid var(--danger-border, #f8b4b4);
+}
+
+/* State boxes (loading, empty, error) */
+.admin-state-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-card, 12px);
+  text-align: center;
+  gap: 12px;
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+}
+
+.admin-spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--primary-border, #bfdbfe);
+  border-top-color: var(--primary, #1e88e5);
+  border-radius: 50%;
+  animation: adminSpin 0.7s linear infinite;
+}
+
+@keyframes adminSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 
