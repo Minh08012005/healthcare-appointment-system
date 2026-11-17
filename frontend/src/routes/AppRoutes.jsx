@@ -13,6 +13,7 @@ import AdminPlaceholderPage from "../pages/admin/AdminPlaceholderPage";
 import AdminAccountsPage from "../pages/admin/AdminAccountsPage";
 import AdminSpecialtiesPage from "../pages/admin/AdminSpecialtiesPage";
 import AdminDoctorsPage from "../pages/admin/AdminDoctorsPage";
+import AdminRoomsPage from "../pages/admin/AdminRoomsPage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import SelectSpecialtyPage from "../pages/patient/booking/SelectSpecialtyPage";
@@ -206,13 +207,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/rooms"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý phòng"
-                            taskCode="C6-04"
-                            description="Quản lý danh mục phòng khám bệnh và các phòng xét nghiệm, chẩn đoán hình ảnh."
-                        />
-                    }
+                    element={<AdminRoomsPage />}
                 />
                 <Route
                     path="/admin/schedules"
