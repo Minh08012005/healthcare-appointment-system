@@ -24,7 +24,8 @@
     "api:test-close-exam": "node scripts/test-c4-08.js",
     "api:test-c5-01": "node scripts/test-c5-01.js",
     "api:test-c5-03": "node scripts/test-c5-03.js",
-    "api:test-c5-05": "node scripts/test-c5-05.js"
+    "api:test-c5-05": "node scripts/test-c5-05.js",
+    "api:test-c6-11": "node scripts/test-c6-11.js"
   },
   "keywords": [],
   "author": "",

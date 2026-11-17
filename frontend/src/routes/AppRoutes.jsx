@@ -28,6 +28,8 @@ import CallPatientPage from "../pages/doctor/call/CallPatientPage";
 import ExaminationPage from "../pages/doctor/examination/ExaminationPage";
 import LabOrderListPage from "../pages/lab/LabOrderListPage";
 import LabOrderDetailPage from "../pages/lab/LabOrderDetailPage";
+import MedicalHistoryListPage from "../pages/patient/history/MedicalHistoryListPage";
+import MedicalHistoryDetailPage from "../pages/patient/history/MedicalHistoryDetailPage";
 
 function AppRoutes() {
     return (
@@ -77,6 +79,14 @@ function AppRoutes() {
                 <Route
                     path="/patient/appointments/:id"
                     element={<AppointmentDetailPage />}
+                />
+                <Route
+                    path="/patient/history"
+                    element={<MedicalHistoryListPage />}
+                />
+                <Route
+                    path="/patient/history/:id"
+                    element={<MedicalHistoryDetailPage />}
                 />
             </Route>
 
