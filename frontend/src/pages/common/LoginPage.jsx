@@ -109,6 +109,11 @@ function LoginPage() {
           Chưa có tài khoản?<Link to="/register">Đăng ký tài khoản</Link>
         </p>
 
+        <p className="auth__switch">
+          Xem thêm:<Link to="/news">Tin tức</Link>
+          <Link to="/procedure">Quy trình khám bệnh</Link>
+        </p>
+
         {error && (
           <div className="auth__alert auth__alert--error" role="alert">
             <strong>Đăng nhập không thành công</strong>

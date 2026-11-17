@@ -17,6 +17,7 @@ const adminContentRoutes = require("./adminContent.routes");
 const adminSpecialtyRoutes = require("./adminSpecialty.routes");
 const adminDoctorRoutes = require("./adminDoctor.routes");
 const adminAccountRoutes = require("./adminAccount.routes");
+const publicContentRoutes = require("./publicContent.routes");
 const queueSettingsRoutes = require("./queueSettings.routes");
 
 const router = express.Router();
@@ -38,6 +39,7 @@ router.use("/admin/content", adminContentRoutes);
 router.use("/admin/specialties", adminSpecialtyRoutes);
 router.use("/admin/doctors", adminDoctorRoutes);
 router.use("/admin/accounts", adminAccountRoutes);
+router.use("/public", publicContentRoutes);
 router.use("/admin", queueSettingsRoutes);
 
 module.exports = router;

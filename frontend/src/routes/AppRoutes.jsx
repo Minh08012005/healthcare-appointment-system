@@ -28,6 +28,10 @@ import CallPatientPage from "../pages/doctor/call/CallPatientPage";
 import ExaminationPage from "../pages/doctor/examination/ExaminationPage";
 import LabOrderListPage from "../pages/lab/LabOrderListPage";
 import LabOrderDetailPage from "../pages/lab/LabOrderDetailPage";
+import PublicLayout from "../components/layout/PublicLayout";
+import NewsListPage from "../pages/public/NewsListPage";
+import NewsDetailPage from "../pages/public/NewsDetailPage";
+import ProcedurePage from "../pages/public/ProcedurePage";
 import QueueSettingsPage from "../pages/admin/QueueSettingsPage";
 import AdminContentPage from "../pages/admin/AdminContentPage";
 
@@ -38,6 +42,13 @@ function AppRoutes() {
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+
+            {/* Công khai: KHÔNG cần đăng nhập (C6-10, UC-035/036) */}
+            <Route element={<PublicLayout />}>
+                <Route path="/news" element={<NewsListPage />} />
+                <Route path="/news/:id" element={<NewsDetailPage />} />
+                <Route path="/procedure" element={<ProcedurePage />} />
+            </Route>
 
             {/* Bệnh nhân: phải đăng nhập với vai trò Bệnh nhân */}
             <Route

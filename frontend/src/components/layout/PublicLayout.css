@@ -1,0 +1,13 @@
+/* C6-10 — Phần riêng của khung công khai; phần còn lại dùng lại PatientLayout.css */
+.pub-loading { align-items: center; justify-content: center; color: var(--patient-muted); }
+
+.pub-actions { display: flex; align-items: center; gap: 8px; }
+.pub-btn { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; font-size: 14px; font-weight: 600; text-decoration: none; border: 1px solid transparent; border-radius: 6px; white-space: nowrap; }
+.pub-btn--ghost { color: var(--patient-text); border-color: var(--patient-border); background: var(--patient-surface); }
+.pub-btn--ghost:hover { border-color: var(--patient-navy); }
+.pub-btn--primary { color: #fff; background: var(--patient-action); }
+.pub-btn--primary:hover { background: var(--patient-action-hover); }
+
+@media (max-width: 768px) {
+  .pub-actions { display: none; }
+}
