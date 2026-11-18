@@ -30,7 +30,8 @@
     "api:test-c6-12": "node scripts/test-c6-12.js",
     "api:test-c6-10": "node scripts/test-c6-10.js",
     "api:test-c6-04": "node scripts/test-c6-04.js",
-    "api:test-c6-06": "node scripts/test-c6-06.js"
+    "api:test-c6-06": "node scripts/test-c6-06.js",
+    "api:test-c6-07": "node scripts/test-c6-07.js"
   },
   "keywords": [],
   "author": "",
