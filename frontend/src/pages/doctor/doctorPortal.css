@@ -1,0 +1,265 @@
+.dp-page {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  color: var(--color-text, #1f2937);
+}
+
+.dp-header,
+.dp-panel__heading,
+.dp-patient,
+.dp-shift,
+.dp-week-controls,
+.dp-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.dp-header {
+  flex-wrap: wrap;
+}
+
+.dp-header h1,
+.dp-panel h2,
+.dp-resume h2 {
+  margin: 0;
+}
+
+.dp-header h1 {
+  font-size: 24px;
+}
+
+.dp-eyebrow {
+  margin: 0 0 4px;
+  color: var(--color-primary, #1e88e5);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.dp-subtitle,
+.dp-panel__heading p,
+.dp-resume p,
+.dp-day__empty,
+.dp-state {
+  margin: 5px 0 0;
+  color: var(--color-text-secondary, #64748b);
+  font-size: 14px;
+}
+
+.dp-panel,
+.dp-resume,
+.dp-alert {
+  padding: 18px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--radius-card, 8px);
+  background: var(--color-surface, #fff);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.dp-resume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.dp-panel__heading {
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.dp-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.dp-filter,
+.dp-button {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border, #dbe2ea);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--color-text, #334155);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.dp-filter--active {
+  border-color: var(--color-primary, #1e88e5);
+  background: #eff6ff;
+  color: #0e4c9a;
+  font-weight: 600;
+}
+
+.dp-button--primary {
+  border-color: var(--color-primary, #1e88e5);
+  background: var(--color-primary, #1e88e5);
+  color: #fff;
+  font-weight: 600;
+}
+
+.dp-button--secondary:hover,
+.dp-filter:hover {
+  background: #f8fafc;
+}
+
+.dp-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.dp-alert {
+  flex-wrap: wrap;
+}
+
+.dp-alert p {
+  margin: 5px 0 0;
+}
+
+.dp-alert--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.dp-alert--warning {
+  justify-content: flex-start;
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.dp-patient-list,
+.dp-schedule,
+.dp-shifts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dp-patient,
+.dp-shift {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 7px;
+}
+
+.dp-patient__number {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 7px;
+  background: #eff6ff;
+  color: #0e4c9a;
+  font-weight: 700;
+}
+
+.dp-patient__info,
+.dp-shift__details {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dp-patient__info span,
+.dp-shift__details span {
+  color: var(--color-text-secondary, #64748b);
+  font-size: 13px;
+}
+
+.dp-status {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dp-status--cho_kham {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.dp-status--dang_kham {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.dp-status--da_xong {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.dp-status--cancelled {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.dp-empty {
+  text-align: center;
+  padding: 36px 18px;
+}
+
+.dp-day__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.dp-day__heading h2 {
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+.dp-day__heading span {
+  color: var(--color-text-secondary, #64748b);
+  font-size: 13px;
+}
+
+.dp-day__empty {
+  padding: 8px 0;
+}
+
+.dp-shift__time {
+  min-width: 125px;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .dp-resume,
+  .dp-patient,
+  .dp-shift {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .dp-patient__info,
+  .dp-shift__details {
+    flex-basis: calc(100% - 60px);
+  }
+
+  .dp-shift__time {
+    min-width: 100%;
+  }
+}
