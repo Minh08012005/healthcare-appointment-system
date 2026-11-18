@@ -7,6 +7,7 @@ import RegisterPage from "../pages/common/RegisterPage";
 import NotFoundPage from "../pages/common/NotFoundPage";
 import PatientHomePage from "../pages/patient/PatientHomePage";
 import DoctorHomePage from "../pages/doctor/DoctorHomePage";
+import DoctorSchedulePage from "../pages/doctor/DoctorSchedulePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
 import AdminAccountsPage from "../pages/admin/AdminAccountsPage";
@@ -118,6 +119,7 @@ function AppRoutes() {
                 }
             >
                 <Route path="/doctor" element={<DoctorHomePage />} />
+                <Route path="/doctor/schedule" element={<DoctorSchedulePage />} />
                 <Route path="/doctor/call" element={<CallPatientPage />} />
                 <Route
                     path="/doctor/examination/:hoSoId"

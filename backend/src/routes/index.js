@@ -23,6 +23,7 @@ const timeSlotConfigRoutes = require("./timeSlotConfig.routes");
 const patientMedicalRecordRoutes = require("./patientMedicalRecord.routes");
 const publicContentRoutes = require("./publicContent.routes");
 const queueSettingsRoutes = require("./queueSettings.routes");
+const doctorPortalRoutes = require("./doctorPortal.routes");
 
 const router = express.Router();
 router.use("/health", healthRoutes);
@@ -35,6 +36,7 @@ router.use("/appointments", appointmentRoutes);
 router.use("/checkin", checkinRoutes);
 router.use("/reception", receptionRoutes);
 router.use("/queue", callNextRoutes);
+router.use("/doctor", doctorPortalRoutes);
 router.use("/examinations", examinationRoutes); 
 router.use("/lab-orders", labOrderRoutes);
 router.use("/lab", labRoomRoutes); 
