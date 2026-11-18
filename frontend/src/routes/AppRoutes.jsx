@@ -9,11 +9,12 @@ import PatientHomePage from "../pages/patient/PatientHomePage";
 import DoctorHomePage from "../pages/doctor/DoctorHomePage";
 import ReceptionistHomePage from "../pages/receptionist/ReceptionistHomePage";
 import AdminHomePage from "../pages/admin/AdminHomePage";
-import AdminPlaceholderPage from "../pages/admin/AdminPlaceholderPage";
 import AdminAccountsPage from "../pages/admin/AdminAccountsPage";
 import AdminSpecialtiesPage from "../pages/admin/AdminSpecialtiesPage";
 import AdminDoctorsPage from "../pages/admin/AdminDoctorsPage";
 import AdminRoomsPage from "../pages/admin/AdminRoomsPage";
+import AdminSchedulesPage from "../pages/admin/AdminSchedulesPage";
+import AdminOverviewPage from "../pages/admin/AdminOverviewPage";
 import AdminTimeSlotsPage from "../pages/admin/AdminTimeSlotsPage";
 import MainLayout from "../components/layout/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
@@ -212,13 +213,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/schedules"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Quản lý lịch trực"
-                            taskCode="C6-07"
-                            description="Phân công ca khám và lịch làm việc của bác sĩ theo ngày, ca và phòng khám."
-                        />
-                    }
+                    element={<AdminSchedulesPage />}
                 />
                 <Route
                     path="/admin/time-slots"
@@ -230,13 +225,7 @@ function AppRoutes() {
                 />
                 <Route
                     path="/admin/overview"
-                    element={
-                        <AdminPlaceholderPage
-                            title="Tổng quan lịch khám"
-                            taskCode="C6-07"
-                            description="Xem bức tranh tổng thể lịch khám của tất cả bác sĩ theo ngày hoặc tuần."
-                        />
-                    }
+                    element={<AdminOverviewPage />}
                 />
                 <Route
                     path="/admin/content"
