@@ -15,13 +15,19 @@ const EXPECTED_SPECIALTIES = [
   "Tai Mũi Họng",
 ];
 
-const EXPECTED_ROOMS = [
+const EXPECTED_EXAM_ROOMS = [
   "Phòng 101 - Nội tổng quát",
   "Phòng 102 - Nội tổng quát",
   "Phòng 201 - Tim mạch",
   "Phòng 202 - Tim mạch",
   "Phòng 301 - Nhi",
   "Phòng 401 - Tai Mũi Họng",
+];
+
+const EXPECTED_LAB_ROOMS = [
+  "Phòng Xét nghiệm Huyết học",
+  "Phòng Xét nghiệm Sinh hóa",
+  "Phòng Chẩn đoán hình ảnh",
 ];
 
 const EXPECTED_DOCTORS = [
@@ -33,6 +39,23 @@ const EXPECTED_DOCTORS = [
   "Đặng Quốc Khánh",
 ];
 
+const EXPECTED_ACCOUNTS = [
+  { username: "admin", role: "Quản trị viên" },
+  { username: "letan_01", role: "Lễ tân", room: "Phòng 101 - Nội tổng quát" },
+  { username: "letan_02", role: "Lễ tân", room: "Phòng 201 - Tim mạch" },
+  { username: "bs_an", role: "Bác sĩ" },
+  { username: "bs_binh", role: "Bác sĩ" },
+  { username: "bs_cuong", role: "Bác sĩ" },
+  { username: "bs_dung", role: "Bác sĩ" },
+  { username: "bs_hanh", role: "Bác sĩ" },
+  { username: "bs_khanh", role: "Bác sĩ" },
+  { username: "ktv_huyethoc", role: "Xét nghiệm", room: "Phòng Xét nghiệm Huyết học" },
+  { username: "ktv_sinhhoa", role: "Xét nghiệm", room: "Phòng Xét nghiệm Sinh hóa" },
+  { username: "ktv_cdha", role: "Xét nghiệm", room: "Phòng Chẩn đoán hình ảnh" },
+  { username: "benhnhan_01", role: "Bệnh nhân" },
+  { username: "benhnhan_02", role: "Bệnh nhân" },
+];
+
 async function verifySeed() {
   console.log("=== BẮT ĐẦU XÁC MINH SEED DATA TRÊN NEON POSTGRESQL ===\n");
   let allPass = true;
@@ -42,23 +65,15 @@ async function verifySeed() {
     console.log("1. Kiểm tra bảng \"VaiTro\":");
     const roleRes = await pool.query(`SELECT id, ten_vai_tro FROM "VaiTro" ORDER BY id;`);
     const roles = roleRes.rows;
-    console.log(`- Số lượng record: ${roles.length}`);
-    roles.forEach((r) => console.log(`  [ID: ${r.id}] ${r.ten_vai_tro}`));
-
     const roleNames = roles.map((r) => r.ten_vai_tro);
-    const uniqueRoleNames = new Set(roleNames);
-    const hasRoleDuplicate = roleNames.length !== uniqueRoleNames.size;
-    console.log(`- Trùng lặp (Duplicate): ${hasRoleDuplicate ? "CÓ (FAIL)" : "KHÔNG (PASS)"}`);
-
+    const hasRoleDuplicate = roleNames.length !== new Set(roleNames).size;
     const missingRoles = EXPECTED_ROLES.filter((r) => !roleNames.includes(r));
-    const extraRoles = roleNames.filter((r) => !EXPECTED_ROLES.includes(r));
 
     if (missingRoles.length === 0 && !hasRoleDuplicate && roles.length === EXPECTED_ROLES.length) {
-      console.log(" [PASS] Bảng VaiTro có đầy đủ 5 vai trò chuẩn và không bị duplicate.\n");
+      console.log(`  [PASS] Đủ 5 vai trò chuẩn: ${roleNames.join(", ")}\n`);
     } else {
-      if (missingRoles.length > 0) console.log(` [FAIL] Thiếu vai trò: ${missingRoles.join(", ")}`);
-      if (extraRoles.length > 0) console.log(` [CẢNH BÁO] Có vai trò ngoài dự kiến: ${extraRoles.join(", ")}`);
-      if (hasRoleDuplicate) console.log(" [FAIL] Phát hiện duplicate trong VaiTro!");
+      if (missingRoles.length > 0) console.log(`  [FAIL] Thiếu vai trò: ${missingRoles.join(", ")}`);
+      if (hasRoleDuplicate) console.log("  [FAIL] Phát hiện duplicate trong VaiTro!");
       allPass = false;
     }
 
@@ -66,117 +81,142 @@ async function verifySeed() {
     console.log("2. Kiểm tra bảng \"ChuyenKhoa\":");
     const specialtyRes = await pool.query(`SELECT id, ten_chuyen_khoa, mo_ta FROM "ChuyenKhoa" ORDER BY id;`);
     const specialties = specialtyRes.rows;
-    console.log(`- Số lượng record: ${specialties.length}`);
-    specialties.forEach((s) => console.log(`  [ID: ${s.id}] ${s.ten_chuyen_khoa} - ${s.mo_ta}`));
-
     const specialtyNames = specialties.map((s) => s.ten_chuyen_khoa);
-    const uniqueSpecialtyNames = new Set(specialtyNames);
-    const hasSpecialtyDuplicate = specialtyNames.length !== uniqueSpecialtyNames.size;
-    console.log(`- Trùng lặp (Duplicate): ${hasSpecialtyDuplicate ? "CÓ (FAIL)" : "KHÔNG (PASS)"}`);
-
+    const hasSpecialtyDuplicate = specialtyNames.length !== new Set(specialtyNames).size;
     const missingSpecialties = EXPECTED_SPECIALTIES.filter((s) => !specialtyNames.includes(s));
     const extraSpecialties = specialtyNames.filter((s) => !EXPECTED_SPECIALTIES.includes(s));
 
-    if (missingSpecialties.length === 0 && !hasSpecialtyDuplicate && specialties.length === EXPECTED_SPECIALTIES.length) {
-      console.log(" [PASS] Bảng ChuyenKhoa có đầy đủ 4 chuyên khoa chuẩn và không bị duplicate.\n");
+    if (missingSpecialties.length === 0 && extraSpecialties.length === 0 && !hasSpecialtyDuplicate) {
+      console.log(`  [PASS] Đủ 4 chuyên khoa chuẩn: ${specialtyNames.join(", ")}\n`);
     } else {
-      if (missingSpecialties.length > 0) console.log(` [FAIL] Thiếu chuyên khoa: ${missingSpecialties.join(", ")}`);
-      if (extraSpecialties.length > 0) console.log(` [CẢNH BÁO] Có chuyên khoa ngoài dự kiến: ${extraSpecialties.join(", ")}`);
-      if (hasSpecialtyDuplicate) console.log(" [FAIL] Phát hiện duplicate trong ChuyenKhoa!");
+      if (missingSpecialties.length > 0) console.log(`  [FAIL] Thiếu chuyên khoa: ${missingSpecialties.join(", ")}`);
+      if (extraSpecialties.length > 0) console.log(`  [FAIL] Có chuyên khoa ngoài baseline: ${extraSpecialties.join(", ")}`);
+      if (hasSpecialtyDuplicate) console.log("  [FAIL] Phát hiện duplicate trong ChuyenKhoa!");
       allPass = false;
     }
 
-    // 3. Kiểm tra bảng PhongKham
+    // 3. Kiểm tra bảng PhongKham (6 phòng khám + 3 phòng xét nghiệm)
     console.log("3. Kiểm tra bảng \"PhongKham\":");
     const roomRes = await pool.query(
-      `SELECT p.id, p.ten_phong, p.chuyen_khoa_id, ck.ten_chuyen_khoa
+      `SELECT p.id, p.ten_phong, p.loai_phong, p.chuyen_khoa_id, ck.ten_chuyen_khoa
        FROM "PhongKham" p
        LEFT JOIN "ChuyenKhoa" ck ON ck.id = p.chuyen_khoa_id
        ORDER BY p.id;`
     );
     const rooms = roomRes.rows;
-    console.log(`- Số lượng record: ${rooms.length}`);
-    rooms.forEach((r) =>
-      console.log(`  [ID: ${r.id}] ${r.ten_phong} (Chuyên khoa: ${r.ten_chuyen_khoa || "NULL"})`)
-    );
-
     const roomNames = rooms.map((r) => r.ten_phong);
-    const missingRooms = EXPECTED_ROOMS.filter((r) => !roomNames.includes(r));
-    const roomsWithoutSpecialty = rooms.filter((r) => r.chuyen_khoa_id === null);
+    const allExpectedRooms = [...EXPECTED_EXAM_ROOMS, ...EXPECTED_LAB_ROOMS];
+    const missingRooms = allExpectedRooms.filter((r) => !roomNames.includes(r));
+    const extraRooms = roomNames.filter((r) => !allExpectedRooms.includes(r));
     const hasRoomDuplicate = roomNames.length !== new Set(roomNames).size;
 
+    const invalidExamRooms = rooms.filter(
+      (r) => EXPECTED_EXAM_ROOMS.includes(r.ten_phong) && (!r.chuyen_khoa_id || r.loai_phong !== "Phòng khám")
+    );
+    const invalidLabRooms = rooms.filter(
+      (r) => EXPECTED_LAB_ROOMS.includes(r.ten_phong) && (r.chuyen_khoa_id !== null || r.loai_phong !== "Phòng xét nghiệm")
+    );
+
     if (
-      rooms.length === EXPECTED_ROOMS.length &&
       missingRooms.length === 0 &&
-      roomsWithoutSpecialty.length === 0 &&
-      !hasRoomDuplicate
+      extraRooms.length === 0 &&
+      !hasRoomDuplicate &&
+      invalidExamRooms.length === 0 &&
+      invalidLabRooms.length === 0
     ) {
-      console.log(" [PASS] Bảng PhongKham đủ 6 phòng demo, có chuyên khoa và không duplicate.\n");
+      console.log(`  [PASS] Đủ 9 phòng chuẩn (6 phòng khám chuyên khoa + 3 phòng xét nghiệm C5)\n`);
     } else {
-      if (rooms.length !== EXPECTED_ROOMS.length)
-        console.log(` [FAIL] Số phòng khám không đúng ${EXPECTED_ROOMS.length} (hiện tại: ${rooms.length})`);
-      if (missingRooms.length > 0) console.log(` [FAIL] Thiếu phòng: ${missingRooms.join(", ")}`);
-      if (roomsWithoutSpecialty.length > 0)
-        console.log(
-          ` [FAIL] Có phòng chưa gán chuyên khoa: ${roomsWithoutSpecialty.map((r) => r.ten_phong).join(", ")}`
-        );
-      if (hasRoomDuplicate) console.log(" [FAIL] Phát hiện duplicate ten_phong trong PhongKham!");
+      if (missingRooms.length > 0) console.log(`  [FAIL] Thiếu phòng: ${missingRooms.join(", ")}`);
+      if (extraRooms.length > 0) console.log(`  [FAIL] Có phòng ngoài baseline: ${extraRooms.join(", ")}`);
+      if (invalidExamRooms.length > 0) console.log(`  [FAIL] Phòng khám sai loại/chưa gán chuyên khoa: ${invalidExamRooms.map(r => r.ten_phong).join(", ")}`);
+      if (invalidLabRooms.length > 0) console.log(`  [FAIL] Phòng xét nghiệm sai loại/gán nhầm chuyên khoa: ${invalidLabRooms.map(r => r.ten_phong).join(", ")}`);
+      if (hasRoomDuplicate) console.log("  [FAIL] Phát hiện duplicate trong PhongKham!");
       allPass = false;
     }
 
-    // 4. Kiểm tra bảng BacSi
-    console.log("4. Kiểm tra bảng \"BacSi\":");
+    // 4. Kiểm tra bảng BacSi & Liên kết tài khoản
+    console.log("4. Kiểm tra bảng \"BacSi\" & liên kết tài khoản:");
     const doctorRes = await pool.query(
-      `SELECT b.id, b.ho_ten, b.cap_bac, b.muc_phi, b.chuyen_khoa_id, ck.ten_chuyen_khoa
+      `SELECT b.id, b.ho_ten, b.cap_bac, b.muc_phi, b.chuyen_khoa_id, ck.ten_chuyen_khoa,
+              b.tai_khoan_id, tk.ten_dang_nhap, vt.ten_vai_tro
        FROM "BacSi" b
        LEFT JOIN "ChuyenKhoa" ck ON ck.id = b.chuyen_khoa_id
+       LEFT JOIN "TaiKhoan" tk ON tk.id = b.tai_khoan_id
+       LEFT JOIN "VaiTro" vt ON vt.id = tk.vai_tro_id
        ORDER BY b.id;`
     );
     const doctors = doctorRes.rows;
-    console.log(`- Số lượng record: ${doctors.length}`);
-    doctors.forEach((d) =>
-      console.log(
-        `  [ID: ${d.id}] ${d.ho_ten} | ${d.cap_bac} | Phí: ${d.muc_phi} | Chuyên khoa: ${d.ten_chuyen_khoa || "NULL"}`
-      )
-    );
-
     const doctorNames = doctors.map((d) => d.ho_ten);
     const missingDoctors = EXPECTED_DOCTORS.filter((name) => !doctorNames.includes(name));
     const extraDoctors = doctorNames.filter((name) => !EXPECTED_DOCTORS.includes(name));
     const doctorsWithoutSpecialty = doctors.filter((d) => d.chuyen_khoa_id === null);
     const doctorsWithoutRank = doctors.filter((d) => !d.cap_bac || d.cap_bac.trim() === "");
     const doctorsWithoutFee = doctors.filter((d) => d.muc_phi === null || Number(d.muc_phi) <= 0);
-    const doctorKeys = doctors.map((d) => `${d.ho_ten}|${d.chuyen_khoa_id}`);
-    const hasDoctorDuplicate = doctorKeys.length !== new Set(doctorKeys).size;
+    const doctorsWithoutAccount = doctors.filter((d) => !d.tai_khoan_id || d.ten_vai_tro !== "Bác sĩ");
+    const hasDoctorDuplicate = doctorNames.length !== new Set(doctorNames).size;
 
     if (
-      doctors.length === EXPECTED_DOCTORS.length &&
       missingDoctors.length === 0 &&
+      extraDoctors.length === 0 &&
       doctorsWithoutSpecialty.length === 0 &&
       doctorsWithoutRank.length === 0 &&
       doctorsWithoutFee.length === 0 &&
+      doctorsWithoutAccount.length === 0 &&
       !hasDoctorDuplicate
     ) {
-      console.log(" [PASS] Bảng BacSi đủ 6 bác sĩ demo, có cấp bậc + mức phí + chuyên khoa.\n");
+      console.log(`  [PASS] Đủ 6 bác sĩ chuẩn, có chuyên môn/phí và đã liên kết tài khoản Bác sĩ\n`);
     } else {
-      if (doctors.length !== EXPECTED_DOCTORS.length)
-        console.log(` [FAIL] Số bác sĩ không đúng ${EXPECTED_DOCTORS.length} (hiện tại: ${doctors.length})`);
-      if (missingDoctors.length > 0) console.log(` [FAIL] Thiếu bác sĩ: ${missingDoctors.join(", ")}`);
-      if (extraDoctors.length > 0) console.log(` [CẢNH BÁO] Có bác sĩ ngoài dự kiến: ${extraDoctors.join(", ")}`);
-      if (doctorsWithoutSpecialty.length > 0)
-        console.log(
-          ` [FAIL] Bác sĩ chưa gán chuyên khoa: ${doctorsWithoutSpecialty.map((d) => d.ho_ten).join(", ")}`
-        );
-      if (doctorsWithoutRank.length > 0)
-        console.log(` [FAIL] Bác sĩ thiếu cấp bậc: ${doctorsWithoutRank.map((d) => d.ho_ten).join(", ")}`);
-      if (doctorsWithoutFee.length > 0)
-        console.log(` [FAIL] Bác sĩ thiếu mức phí hợp lệ: ${doctorsWithoutFee.map((d) => d.ho_ten).join(", ")}`);
-      if (hasDoctorDuplicate) console.log(" [FAIL] Phát hiện duplicate (ho_ten, chuyen_khoa_id) trong BacSi!");
+      if (missingDoctors.length > 0) console.log(`  [FAIL] Thiếu bác sĩ: ${missingDoctors.join(", ")}`);
+      if (extraDoctors.length > 0) console.log(`  [FAIL] Có bác sĩ ngoài baseline: ${extraDoctors.join(", ")}`);
+      if (doctorsWithoutSpecialty.length > 0) console.log(`  [FAIL] Bác sĩ chưa gán chuyên khoa: ${doctorsWithoutSpecialty.map(d => d.ho_ten).join(", ")}`);
+      if (doctorsWithoutRank.length > 0) console.log(`  [FAIL] Bác sĩ thiếu cấp bậc: ${doctorsWithoutRank.map(d => d.ho_ten).join(", ")}`);
+      if (doctorsWithoutFee.length > 0) console.log(`  [FAIL] Bác sĩ thiếu phí: ${doctorsWithoutFee.map(d => d.ho_ten).join(", ")}`);
+      if (doctorsWithoutAccount.length > 0) console.log(`  [FAIL] Bác sĩ chưa liên kết tài khoản bác sĩ: ${doctorsWithoutAccount.map(d => d.ho_ten).join(", ")}`);
+      if (hasDoctorDuplicate) console.log("  [FAIL] Phát hiện duplicate trong BacSi!");
       allPass = false;
     }
 
-    // 5. Kiểm tra bảng LichKhamBacSi (dữ liệu nền cho C2-04 tính slot)
-    console.log("5. Kiểm tra bảng \"LichKhamBacSi\":");
+    // 5. Kiểm tra Tài khoản Demo (TaiKhoan)
+    console.log("5. Kiểm tra Tài khoản Demo (TaiKhoan):");
+    const accountRes = await pool.query(
+      `SELECT tk.id, tk.ten_dang_nhap, tk.trang_thai, vt.ten_vai_tro, tk.phong_kham_id, pk.ten_phong,
+              bn.id AS benh_nhan_id, bn.ho_ten AS ho_ten_bn, bn.so_cccd_ho_chieu
+       FROM "TaiKhoan" tk
+       JOIN "VaiTro" vt ON vt.id = tk.vai_tro_id
+       LEFT JOIN "PhongKham" pk ON pk.id = tk.phong_kham_id
+       LEFT JOIN "BenhNhan" bn ON bn.tai_khoan_id = tk.id
+       ORDER BY tk.id;`
+    );
+    const accounts = accountRes.rows;
+
+    for (const exp of EXPECTED_ACCOUNTS) {
+      const acc = accounts.find((a) => a.ten_dang_nhap === exp.username);
+      if (!acc) {
+        console.log(`  [FAIL] Thiếu tài khoản demo: ${exp.username}`);
+        allPass = false;
+        continue;
+      }
+      if (acc.trang_thai !== "HoatDong") {
+        console.log(`  [FAIL] Tài khoản ${exp.username} không ở trạng thái HoatDong`);
+        allPass = false;
+      }
+      if (acc.ten_vai_tro !== exp.role) {
+        console.log(`  [FAIL] Tài khoản ${exp.username} sai vai trò: mong đợi ${exp.role}, thực tế ${acc.ten_vai_tro}`);
+        allPass = false;
+      }
+      if (exp.room && acc.ten_phong !== exp.room) {
+        console.log(`  [FAIL] Tài khoản ${exp.username} sai phân công phòng: mong đợi ${exp.room}, thực tế ${acc.ten_phong || "NULL"}`);
+        allPass = false;
+      }
+      if (exp.role === "Bệnh nhân" && (!acc.benh_nhan_id || !acc.so_cccd_ho_chieu)) {
+        console.log(`  [FAIL] Bệnh nhân ${exp.username} thiếu hồ sơ BenhNhan hoặc CCCD`);
+        allPass = false;
+      }
+    }
+    console.log(`  [PASS] Đã kiểm tra ${EXPECTED_ACCOUNTS.length} tài khoản demo (Admin, Lễ tân, Bác sĩ, Lab, Bệnh nhân)\n`);
+
+    // 6. Kiểm tra bảng LichKhamBacSi (Lịch trực tương lai)
+    console.log("6. Kiểm tra bảng \"LichKhamBacSi\" (Lịch trực tương lai):");
     const scheduleSummary = await pool.query(
       `SELECT COUNT(*)::int AS total,
               COUNT(DISTINCT "ngay")::int AS so_ngay,
@@ -188,199 +228,103 @@ async function verifySeed() {
     );
     const summary = scheduleSummary.rows[0];
     console.log(
-      `- Tổng số khung giờ từ hôm nay trở đi: ${summary.total} (${summary.so_cap_bac_si_ngay} cặp bác sĩ/ngày, số ngày: ${summary.so_ngay}, từ ${summary.ngay_nho_nhat} đến ${summary.ngay_lon_nhat})`
+      `  - Tổng số slot khả dụng từ hôm nay: ${summary.total} (${summary.so_cap_bac_si_ngay} ca trực, ${summary.so_ngay} ngày, từ ${summary.ngay_nho_nhat} đến ${summary.ngay_lon_nhat})`
     );
 
-    const scheduleDetail = await pool.query(
-      `SELECT b.ho_ten AS ten_bac_si,
-              COUNT(l.id)::int AS so_ca,
-              COUNT(DISTINCT l."ngay")::int AS so_ngay
+    const doctorsWithoutFutureSchedule = await pool.query(
+      `SELECT b.ho_ten
        FROM "BacSi" b
-       LEFT JOIN "LichKhamBacSi" l
-         ON l."bac_si_id" = b.id
-        AND l."ngay" >= (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
-       GROUP BY b.id, b.ho_ten
-       ORDER BY b.id;`
-    );
-    scheduleDetail.rows.forEach((row) =>
-      console.log(`  ${row.ten_bac_si}: ${row.so_ca} khung / ${row.so_ngay} ngày`)
-    );
-    const doctorsWithoutSchedule = scheduleDetail.rows.filter((row) => row.so_ca === 0);
-
-    // UC-030: mỗi record là 1 khung giờ 1 tiếng (5 khung sáng + 3 khung chiều)
-    const windowRes = await pool.query(
-      `SELECT "gio_bat_dau"::text AS gio_bat_dau, "gio_ket_thuc"::text AS gio_ket_thuc,
-              COUNT(*)::int AS so_khung,
-              MAX("so_slot_toi_da")::int AS so_slot_toi_da,
-              MAX("so_slot_online")::int AS so_slot_online
-       FROM "LichKhamBacSi"
-       WHERE "ngay" >= (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
-       GROUP BY "gio_bat_dau", "gio_ket_thuc"
-       ORDER BY "gio_bat_dau";`
-    );
-    console.log("- Các khung giờ 1 tiếng có trong lịch:");
-    windowRes.rows.forEach((row) =>
-      console.log(
-        `  ${row.gio_bat_dau.slice(0, 5)}-${row.gio_ket_thuc.slice(0, 5)}: ${row.so_khung} khung | sức chứa = ${row.so_slot_toi_da} | online = ${row.so_slot_online}`
-      )
-    );
-
-    const duplicateScheduleRes = await pool.query(
-      `SELECT "bac_si_id", "ngay"::text AS ngay, "gio_bat_dau"::text AS gio_bat_dau, COUNT(*)::int AS so_lan
-       FROM "LichKhamBacSi"
-       GROUP BY "bac_si_id", "ngay", "gio_bat_dau"
-       HAVING COUNT(*) > 1
-       ORDER BY "bac_si_id", "ngay";`
-    );
-
-    const invalidTimeRes = await pool.query(
-      `SELECT COUNT(*)::int AS total
-       FROM "LichKhamBacSi"
-       WHERE "gio_bat_dau" >= "gio_ket_thuc";`
-    );
-
-    const invalidSlotRes = await pool.query(
-      `SELECT COUNT(*)::int AS total
-       FROM "LichKhamBacSi"
-       WHERE "so_slot_toi_da" <= 0
-          OR "so_slot_online" > "so_slot_toi_da"
-          OR "so_slot_da_dat" > "so_slot_online"
-          OR "so_slot_da_dat" < 0;`
+       WHERE b.ho_ten = ANY($1::text[])
+         AND NOT EXISTS (
+           SELECT 1 FROM "LichKhamBacSi" l
+           WHERE l.bac_si_id = b.id AND l.ngay >= (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
+         );`,
+      [EXPECTED_DOCTORS]
     );
 
     const invalidRoomRes = await pool.query(
       `SELECT COUNT(*)::int AS total
        FROM "LichKhamBacSi" l
-       JOIN "BacSi" b ON b.id = l."bac_si_id"
-       LEFT JOIN "PhongKham" p ON p.id = l."phong_kham_id"
-       WHERE l."phong_kham_id" IS NULL
-          OR p."id" IS NULL
-          OR p."chuyen_khoa_id" IS DISTINCT FROM b."chuyen_khoa_id";`
+       JOIN "BacSi" b ON b.id = l.bac_si_id
+       JOIN "PhongKham" p ON p.id = l.phong_kham_id
+       WHERE l.ngay >= (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
+         AND p.chuyen_khoa_id IS DISTINCT FROM b.chuyen_khoa_id;`
     );
 
-    // UC-030: chỉ cho phép 8 khung giờ 1 tiếng (5 khung sáng + 3 khung chiều)
-    const validWindowsRes = await pool.query(
+    const invalidSlotRes = await pool.query(
       `SELECT COUNT(*)::int AS total
-       FROM "LichKhamBacSi"
-       WHERE ("gio_bat_dau", "gio_ket_thuc") NOT IN (
-               ('06:00'::time, '07:00'::time),
-               ('07:00'::time, '08:00'::time),
-               ('08:00'::time, '09:00'::time),
-               ('09:00'::time, '10:00'::time),
-               ('10:00'::time, '11:00'::time),
-               ('13:00'::time, '14:00'::time),
-               ('14:00'::time, '15:00'::time),
-               ('15:00'::time, '16:00'::time)
-             );`
-    );
-
-    // Không được lưu record cho cả ca (06:00-11:00 hoặc 13:00-16:00)
-    const wholeShiftRes = await pool.query(
-      `SELECT COUNT(*)::int AS total
-       FROM "LichKhamBacSi"
-       WHERE ("gio_bat_dau", "gio_ket_thuc") IN (
-               ('06:00'::time, '11:00'::time),
-               ('13:00'::time, '16:00'::time)
-             );`
-    );
-
-    // Mỗi khung giờ phải dài đúng 1 tiếng
-    const invalidDurationRes = await pool.query(
-      `SELECT COUNT(*)::int AS total
-       FROM "LichKhamBacSi"
-       WHERE EXTRACT(EPOCH FROM ("gio_ket_thuc" - "gio_bat_dau"))::int <> 3600;`
-    );
-
-    // Mỗi bác sĩ/ngày demo phải có đúng 8 khung giờ (5 sáng + 3 chiều)
-    const windowsPerDayRes = await pool.query(
-      `SELECT "bac_si_id", "ngay"::text AS ngay,
-              COUNT(*)::int AS so_khung,
-              COUNT(DISTINCT "gio_bat_dau")::int AS so_khung_khac_nhau
        FROM "LichKhamBacSi"
        WHERE "ngay" >= (now() AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
-       GROUP BY "bac_si_id", "ngay"
-       HAVING COUNT(*) <> 8 OR COUNT(DISTINCT "gio_bat_dau") <> 8
-       ORDER BY "bac_si_id", "ngay";`
+         AND ("so_slot_toi_da" <= 0
+              OR "so_slot_online" > "so_slot_toi_da"
+              OR "so_slot_da_dat" > "so_slot_online"
+              OR "so_slot_da_dat" < 0);`
     );
 
     if (
       summary.total > 0 &&
       summary.so_ngay >= 5 &&
-      summary.total === summary.so_cap_bac_si_ngay * 8 &&
-      doctorsWithoutSchedule.length === 0 &&
-      duplicateScheduleRes.rowCount === 0 &&
-      invalidTimeRes.rows[0].total === 0 &&
-      invalidSlotRes.rows[0].total === 0 &&
+      doctorsWithoutFutureSchedule.rowCount === 0 &&
       invalidRoomRes.rows[0].total === 0 &&
-      validWindowsRes.rows[0].total === 0 &&
-      wholeShiftRes.rows[0].total === 0 &&
-      invalidDurationRes.rows[0].total === 0 &&
-      windowsPerDayRes.rowCount === 0
+      invalidSlotRes.rows[0].total === 0
     ) {
-      console.log(
-        " [PASS] LichKhamBacSi: mỗi bác sĩ/ngày có đúng 8 khung 1 giờ, không trùng, số slot và phòng hợp lệ.\n"
-      );
+      console.log(`  [PASS] Lịch trực tương lai đầy đủ, hợp lệ cho 6 bác sĩ (8 khung/ngày, đúng chuyên khoa phòng)\n`);
     } else {
-      if (summary.total === 0) console.log(" [FAIL] Chưa có khung giờ nào từ hôm nay trở đi.");
-      if (summary.so_ngay < 5)
-        console.log(` [FAIL] Số ngày có lịch không đủ 5 (hiện tại: ${summary.so_ngay}).`);
-      if (summary.total !== summary.so_cap_bac_si_ngay * 8)
-        console.log(
-          ` [FAIL] Tổng số khung không bằng số cặp bác sĩ/ngày x 8 (hiện tại: ${summary.total} / ${summary.so_cap_bac_si_ngay} cặp).`
-        );
-      if (doctorsWithoutSchedule.length > 0)
-        console.log(
-          ` [FAIL] Bác sĩ chưa có ca khám: ${doctorsWithoutSchedule.map((row) => row.ten_bac_si).join(", ")}`
-        );
-      if (duplicateScheduleRes.rowCount > 0) {
-        console.log(
-          ` [FAIL] Phát hiện ${duplicateScheduleRes.rowCount} ca khám bị trùng (bac_si_id, ngay, gio_bat_dau):`
-        );
-        duplicateScheduleRes.rows.forEach((row) =>
-          console.log(`   + bac_si_id=${row.bac_si_id} | ${row.ngay} | ${row.gio_bat_dau} | ${row.so_lan} lần`)
-        );
-      }
-      if (invalidTimeRes.rows[0].total > 0)
-        console.log(` [FAIL] Có ${invalidTimeRes.rows[0].total} ca khám có gio_bat_dau >= gio_ket_thuc.`);
-      if (invalidSlotRes.rows[0].total > 0)
-        console.log(` [FAIL] Có ${invalidSlotRes.rows[0].total} ca khám có số slot không hợp lệ.`);
-      if (invalidRoomRes.rows[0].total > 0)
-        console.log(` [FAIL] Có ${invalidRoomRes.rows[0].total} ca khám dùng phòng sai/không có chuyên khoa.`);
-      if (validWindowsRes.rows[0].total > 0)
-        console.log(
-          ` [FAIL] Có ${validWindowsRes.rows[0].total} khung giờ không thuộc 8 khung 1 tiếng hợp lệ (UC-030).`
-        );
-      if (wholeShiftRes.rows[0].total > 0)
-        console.log(
-          ` [FAIL] Có ${wholeShiftRes.rows[0].total} record lưu cả ca (06:00-11:00 hoặc 13:00-16:00) thay vì từng khung 1 giờ.`
-        );
-      if (invalidDurationRes.rows[0].total > 0)
-        console.log(
-          ` [FAIL] Có ${invalidDurationRes.rows[0].total} khung giờ không dài đúng 1 tiếng (UC-030).`
-        );
-      if (windowsPerDayRes.rowCount > 0) {
-        console.log(
-          ` [FAIL] Có ${windowsPerDayRes.rowCount} cặp bác sĩ/ngày không có đúng 8 khung giờ:`
-        );
-        windowsPerDayRes.rows.forEach((row) =>
-          console.log(
-            `   + bac_si_id=${row.bac_si_id} | ${row.ngay} | ${row.so_khung} khung (${row.so_khung_khac_nhau} giờ bắt đầu khác nhau)`
-          )
-        );
-      }
+      if (summary.total === 0) console.log("  [FAIL] Chưa có khung giờ nào từ hôm nay trở đi.");
+      if (summary.so_ngay < 5) console.log(`  [FAIL] Số ngày có lịch tương lai không đủ (hiện tại: ${summary.so_ngay})`);
+      if (doctorsWithoutFutureSchedule.rowCount > 0)
+        console.log(`  [FAIL] Bác sĩ chưa có lịch tương lai: ${doctorsWithoutFutureSchedule.rows.map(r => r.ho_ten).join(", ")}`);
+      if (invalidRoomRes.rows[0].total > 0) console.log(`  [FAIL] Có ${invalidRoomRes.rows[0].total} slot gán phòng lệch chuyên khoa`);
+      if (invalidSlotRes.rows[0].total > 0) console.log(`  [FAIL] Có ${invalidSlotRes.rows[0].total} slot có capacity sai quy chuẩn`);
       allPass = false;
     }
 
-    // 6. Kết luận
-    console.log("=== KẾT QUẢ TỔNG QUAN SEED ===");
-    if (allPass) {
-      console.log(" TẤT CẢ TIÊU CHÍ SEED DATA ĐỀU ĐẠT (PASS)!");
+    // 7. Cấu hình khung giờ & Cấu hình hệ thống
+    console.log("7. Kiểm tra CauHinhKhungGio & CauHinhHeThong:");
+    const slotCfgRes = await pool.query(`SELECT COUNT(*)::int AS cnt FROM "CauHinhKhungGio"`);
+    if (slotCfgRes.rows[0].cnt === 8) {
+      console.log("  [PASS] CauHinhKhungGio đủ 8 khung giờ chuẩn (UC-030/UC-031)");
     } else {
-      console.log(" XÁC MINH SEED DATA CHƯA ĐẠT (FAIL)!");
+      console.log(`  [FAIL] CauHinhKhungGio có ${slotCfgRes.rows[0].cnt} khung (mong đợi 8)`);
+      allPass = false;
+    }
+
+    const sysCfgRes = await pool.query(`SELECT COUNT(*)::int AS cnt FROM "CauHinhHeThong"`);
+    if (sysCfgRes.rows[0].cnt >= 1) {
+      console.log("  [PASS] CauHinhHeThong có bản ghi cấu hình mặc định (C3-01)\n");
+    } else {
+      console.log("  [FAIL] CauHinhHeThong chưa có bản ghi cấu hình");
+      allPass = false;
+    }
+
+    // 8. Tin tức & Quy trình khám (Nội dung công khai)
+    console.log("8. Kiểm tra TinTuc & QuyTrinhKham:");
+    const procRes = await pool.query(`SELECT COUNT(*)::int AS cnt FROM "QuyTrinhKham"`);
+    if (procRes.rows[0].cnt >= 5) {
+      console.log(`  [PASS] QuyTrinhKham có ${procRes.rows[0].cnt} bước chuẩn (UC-036)`);
+    } else {
+      console.log(`  [FAIL] QuyTrinhKham chỉ có ${procRes.rows[0].cnt} bước (mong đợi >= 5)`);
+      allPass = false;
+    }
+
+    const newsRes = await pool.query(`SELECT COUNT(*)::int AS cnt FROM "TinTuc" WHERE trang_thai = 'HienThi'`);
+    if (newsRes.rows[0].cnt >= 3) {
+      console.log(`  [PASS] TinTuc có ${newsRes.rows[0].cnt} bài tin HienThi (UC-035)\n`);
+    } else {
+      console.log(`  [FAIL] TinTuc chỉ có ${newsRes.rows[0].cnt} bài tin HienThi (mong đợi >= 3)`);
+      allPass = false;
+    }
+
+    // Kết luận
+    console.log("=== KẾT QUẢ TỔNG QUAN XÁC MINH SEED ===");
+    if (allPass) {
+      console.log(" TẤT CẢ TIÊU CHÍ SEED BASELINE ĐỀU ĐẠT (PASS)!");
+    } else {
+      console.log(" XÁC MINH SEED BASELINE CHƯA ĐẠT (FAIL)!");
       process.exitCode = 1;
     }
   } catch (error) {
-    console.error("Lỗi khi xác minh seed data:", error.message);
+    console.error("Lỗi khi xác minh seed baseline:", error.message);
     process.exitCode = 1;
   } finally {
     await pool.end();

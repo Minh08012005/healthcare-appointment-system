@@ -6,6 +6,8 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test:db": "node scripts/test-db.js",
+    "test:baseline-smoke": "node scripts/test-baseline-smoke.js",
+    "db:clean": "node scripts/clean-junk-data.js",
     "db:schema": "node scripts/run-schema.js",
     "db:migrate:c3-01": "node scripts/migrate-c3-01.js",
     "db:migrate:c3-09": "node scripts/migrate-c3-09.js",

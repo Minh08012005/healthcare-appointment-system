@@ -18,12 +18,14 @@ const EXPECTED_TABLES = [
   "QuyTrinhKham",
   "CauHinhHeThong",
   "ThongBao", // C5-05
+  "CauHinhKhungGio", // C6-06
 ];
 
 const REQUIRED_FOREIGN_KEYS = [
   { sourceTable: "TaiKhoan", sourceColumn: "vai_tro_id", targetTable: "VaiTro", targetColumn: "id" },
   { sourceTable: "BenhNhan", sourceColumn: "tai_khoan_id", targetTable: "TaiKhoan", targetColumn: "id" },
   { sourceTable: "BacSi", sourceColumn: "chuyen_khoa_id", targetTable: "ChuyenKhoa", targetColumn: "id" },
+  { sourceTable: "BacSi", sourceColumn: "tai_khoan_id", targetTable: "TaiKhoan", targetColumn: "id" },
   { sourceTable: "DatLichKham", sourceColumn: "benh_nhan_id", targetTable: "BenhNhan", targetColumn: "id" },
   { sourceTable: "HangDoi", sourceColumn: "dat_lich_id", targetTable: "DatLichKham", targetColumn: "id" },
   { sourceTable: "HoSoBenhAn", sourceColumn: "hang_doi_id", targetTable: "HangDoi", targetColumn: "id" },
