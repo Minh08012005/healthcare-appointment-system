@@ -1,89 +1,17 @@
-.queue-settings {
-  display: grid;
-  gap: 20px;
-  max-width: 900px;
-}
-
-.queue-settings__header p {
-  margin: 8px 0 0;
-  color: var(--text-secondary);
-}
-
-.queue-settings__notice {
-  padding: 12px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
-.queue-settings__notice--success {
-  color: #176b3a;
-  background: #eaf7ef;
-  border-color: #b7e2c6;
-}
-
-.queue-settings__notice--error {
-  color: #9e2929;
-  background: #fff0f0;
-  border-color: #f0c1c1;
-}
-
 .queue-settings__form {
-  display: grid;
-  gap: 20px;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: var(--radius-card, 12px);
   padding: 24px;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .queue-settings__fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-}
-
-.queue-settings__field {
-  display: grid;
-  align-content: start;
-  gap: 6px;
-}
-
-.queue-settings__label {
-  font-weight: 600;
-}
-
-.queue-settings__description {
-  min-height: 40px;
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.queue-settings__field input {
-  box-sizing: border-box;
-  width: 100%;
-  min-height: 40px;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  font: inherit;
-}
-
-.queue-settings__save {
-  justify-self: start;
-  min-height: 40px;
-  padding: 8px 18px;
-  color: #fff;
-  background: var(--primary);
-  border: 0;
-  border-radius: var(--radius);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.queue-settings__save:disabled {
-  cursor: wait;
-  opacity: 0.65;
+  gap: 20px 24px;
 }
 
 @media (max-width: 640px) {
@@ -92,6 +20,6 @@
   }
 
   .queue-settings__form {
-    padding: 18px;
+    padding: 16px;
   }
 }

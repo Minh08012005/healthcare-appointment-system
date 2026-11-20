@@ -53,12 +53,16 @@ const buildWeekDays = (monday) => {
   });
 };
 
-function Modal({ title, onClose, disabled, children, footer }) {
+function Modal({ title, onClose, disabled, children, footer, maxWidth = "680px" }) {
   return (
-    <div className="admin-modal-backdrop" onClick={onClose} role="presentation">
+    <div
+      className="admin-modal-backdrop"
+      onClick={disabled ? undefined : onClose}
+      role="presentation"
+    >
       <div
         className="admin-modal"
-        style={{ maxWidth: "680px" }}
+        style={{ maxWidth }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -115,7 +119,7 @@ export default function AdminSchedulesPage() {
   const { data: timeSlotData } = useFetch(adminTimeSlotPaths.list());
   const timeSlots = timeSlotData?.items || [];
 
-  // Modal phân công lịch trực (UC-030)
+  // Modal phân công lịch trực
   const [showModal, setShowModal] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
   const [selectedRoomId, setSelectedRoomId] = useState("");
@@ -231,29 +235,50 @@ export default function AdminSchedulesPage() {
     }
   };
 
-  // Xóa lịch trực (chỉ khi chưa có bệnh nhân đặt hẹn)
-  const handleDeleteSchedule = async (schedule) => {
+  // Modal xác nhận xóa lịch trực
+  const [scheduleToDelete, setScheduleToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const requestDeleteSchedule = (schedule) => {
     if (schedule.so_slot_da_dat > 0) {
-      alert("Lịch trực đã có bệnh nhân đặt hẹn, không thể xóa.");
+      setFlash({
+        type: "error",
+        message: "Lịch trực đã có bệnh nhân đặt hẹn, không thể xóa.",
+      });
       return;
     }
-    const confirmDelete = window.confirm(
-      `Xác nhận xóa ca trực ${schedule.gio_bat_dau} - ${schedule.gio_ket_thuc} ngày ${formatDisplayDate(schedule.ngay)} của BS. ${schedule.bac_si?.ho_ten}?`
-    );
-    if (!confirmDelete) return;
+    setScheduleToDelete(schedule);
+  };
 
+  const handleCancelDelete = () => {
+    if (deleteLoading) return;
+    setScheduleToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!scheduleToDelete || deleteLoading) return;
+
+    setDeleteLoading(true);
     try {
-      await adminScheduleApi.delete(schedule.id);
+      await adminScheduleApi.delete(scheduleToDelete.id);
       setFlash({
         type: "success",
         message: "Đã xóa lịch trực thành công.",
       });
+      setScheduleToDelete(null);
       reloadSchedules();
     } catch (err) {
+      const errMsg =
+        err?.code === "SCHEDULE_HAS_BOOKINGS"
+          ? "Lịch trực đã có bệnh nhân đặt hẹn, không thể xóa."
+          : err?.message || "Không thể xóa lịch trực.";
       setFlash({
         type: "error",
-        message: err.message || "Không thể xóa lịch trực.",
+        message: errMsg,
       });
+      setScheduleToDelete(null);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -270,7 +295,7 @@ export default function AdminSchedulesPage() {
       <header className="admin-header">
         <div className="admin-header__title-row">
           <div>
-            <span className="admin-header__badge">Scheduling Core (C6-07)</span>
+            <span className="admin-header__badge">Phân công Lịch trực</span>
             <h1 className="admin-header__title">Phân công Lịch trực Bác sĩ</h1>
             <p className="admin-header__desc">
               Phân công ca khám và phòng trực cho bác sĩ theo tuần và ngày. Capacity được lấy tự động từ cấu hình khung giờ.
@@ -460,7 +485,7 @@ export default function AdminSchedulesPage() {
                             ? "Đã có bệnh nhân đặt hẹn trong ca này, không thể xóa"
                             : "Xóa ca trực này"
                         }
-                        onClick={() => handleDeleteSchedule(s)}
+                        onClick={() => requestDeleteSchedule(s)}
                       >
                         Xóa
                       </button>
@@ -473,10 +498,10 @@ export default function AdminSchedulesPage() {
         </div>
       )}
 
-      {/* Modal Phân công Lịch trực (UC-030) */}
+      {/* Modal Phân công Lịch trực */}
       {showModal && (
         <Modal
-          title="Phân công Lịch trực Bác sĩ (UC-030)"
+          title="Phân công Lịch trực Bác sĩ"
           onClose={() => !modalSaving && setShowModal(false)}
           disabled={modalSaving}
           footer={
@@ -596,7 +621,7 @@ export default function AdminSchedulesPage() {
             <div className="admin-form-group">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
                 <span className="admin-form-label" style={{ margin: 0 }}>
-                  Khung giờ khám (Cấu hình C6-06) <span style={{ color: "var(--danger)" }}>*</span>
+                  Khung giờ khám <span style={{ color: "var(--danger)" }}>*</span>
                 </span>
                 <div style={{ display: "flex", gap: "6px" }}>
                   <button
@@ -723,6 +748,46 @@ export default function AdminSchedulesPage() {
               )}
             </div>
           </form>
+        </Modal>
+      )}
+
+      {/* Modal Xác nhận xóa lịch trực */}
+      {scheduleToDelete && (
+        <Modal
+          title="Xác nhận xóa lịch trực"
+          onClose={handleCancelDelete}
+          disabled={deleteLoading}
+          maxWidth="520px"
+          footer={
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={deleteLoading}
+                onClick={handleCancelDelete}
+              >
+                Hủy
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                loading={deleteLoading}
+                disabled={deleteLoading}
+                onClick={handleConfirmDelete}
+              >
+                Xóa lịch trực
+              </Button>
+            </>
+          }
+        >
+          <p style={{ margin: 0, fontSize: "14px", lineHeight: "1.6", color: "var(--text-primary)" }}>
+            Bạn có chắc muốn xóa ca trực{" "}
+            <strong>
+              {scheduleToDelete.gio_bat_dau} – {scheduleToDelete.gio_ket_thuc}
+            </strong>{" "}
+            ngày <strong>{formatDisplayDate(scheduleToDelete.ngay)}</strong> của{" "}
+            <strong>BS. {scheduleToDelete.bac_si?.ho_ten}</strong>?
+          </p>
         </Modal>
       )}
     </div>

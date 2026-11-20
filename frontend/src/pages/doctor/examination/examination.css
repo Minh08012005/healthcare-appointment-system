@@ -537,14 +537,21 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    gap: 16px;
     border-bottom: 2px solid #222;
     padding-bottom: 12px;
     margin-bottom: 16px;
   }
 
+  .ex-print__hospital {
+    flex: 1;
+    min-width: 0;
+  }
+
   .ex-print__hospital h2 {
     margin: 0;
     font-size: 16px;
+    line-height: 1.3;
     text-transform: uppercase;
   }
 
@@ -554,10 +561,16 @@
     color: #444;
   }
 
+  .ex-print__meta {
+    flex-shrink: 0;
+    text-align: right;
+  }
+
   .ex-print__meta p {
     margin: 2px 0;
     font-size: 13px;
     text-align: right;
+    white-space: nowrap;
   }
 
   .ex-print__title {

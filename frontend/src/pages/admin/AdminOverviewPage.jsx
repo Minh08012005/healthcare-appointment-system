@@ -144,7 +144,7 @@ export default function AdminOverviewPage() {
       <header className="admin-header">
         <div className="admin-header__title-row">
           <div>
-            <span className="admin-header__badge">Scheduling Overview (C6-07 — UC-033)</span>
+            <span className="admin-header__badge">Tổng quan Lịch khám</span>
             <h1 className="admin-header__title">Tổng quan Lịch khám Toàn viện</h1>
             <p className="admin-header__desc">
               Bức tranh tổng thể lịch khám của tất cả bác sĩ theo ngày hoặc tuần. Giúp điều phối nguồn lực y tế và theo dõi tỉ lệ đặt chỗ.

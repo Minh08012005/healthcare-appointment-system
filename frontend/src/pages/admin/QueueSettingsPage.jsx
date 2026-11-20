@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { queueSettingsApi } from "../../api/queueSettings";
+import Button from "../../components/ui/Button";
+import "./admin.css";
 import "./queueSettings.css";
 
 const FIELDS = [
@@ -125,33 +128,47 @@ function QueueSettingsPage() {
   };
 
   return (
-    <section className="queue-settings">
-      <header className="queue-settings__header">
-        <div>
-          <h1>Cấu hình hàng đợi</h1>
-          <p>Điều chỉnh các tham số dùng cho hàng đợi, check-in và gọi bệnh nhân.</p>
-        </div>
-      </header>
+    <div className="admin-page">
+      <Link to="/admin" className="admin-back-link">
+        ← Quay lại Trang quản trị
+      </Link>
+
+      <div className="admin-header">
+        <span className="admin-header__badge">Cấu hình hệ thống</span>
+        <h1 className="admin-header__title">Cấu hình tham số hàng đợi</h1>
+        <p className="admin-header__desc">
+          Điều chỉnh các tham số dùng cho điều phối hàng đợi, check-in và gọi khám bệnh nhân.
+        </p>
+      </div>
 
       {notice && (
         <div
-          className={`queue-settings__notice queue-settings__notice--${notice.type}`}
+          className={`admin-flash admin-flash--${notice.type}`}
           role={notice.type === "error" ? "alert" : "status"}
         >
-          {notice.text}
+          <span>{notice.text}</span>
         </div>
       )}
 
       {loading ? (
-        <p role="status">Đang tải cấu hình...</p>
+        <div className="admin-state-box">
+          <div className="admin-spinner" />
+          <span>Đang tải cấu hình hệ thống...</span>
+        </div>
       ) : values ? (
         <form className="queue-settings__form" onSubmit={handleSubmit}>
           <div className="queue-settings__fields">
             {FIELDS.map(({ name, label, description }) => (
-              <label className="queue-settings__field" key={name}>
-                <span className="queue-settings__label">{label}</span>
-                <span className="queue-settings__description">{description}</span>
+              <div className="admin-form-group" key={name}>
+                <label className="admin-label admin-label--required" htmlFor={`qs-${name}`}>
+                  {label}
+                </label>
+                <span className="admin-form-hint" style={{ minHeight: "36px" }}>
+                  {description}
+                </span>
                 <input
+                  id={`qs-${name}`}
+                  className="admin-input"
                   type="number"
                   name={name}
                   min="1"
@@ -161,21 +178,26 @@ function QueueSettingsPage() {
                   value={values[name]}
                   onChange={handleChange}
                 />
-              </label>
+              </div>
             ))}
           </div>
-          <button
-            className="queue-settings__save"
-            type="submit"
-            disabled={saving}
-          >
-            {saving ? "Đang lưu..." : "Lưu cấu hình"}
-          </button>
+          <div>
+            <Button
+              type="submit"
+              variant="primary"
+              loading={saving}
+              disabled={saving}
+            >
+              Lưu cấu hình
+            </Button>
+          </div>
         </form>
       ) : (
-        <p>Không thể hiển thị cấu hình. Vui lòng tải lại trang.</p>
+        <div className="admin-state-box">
+          <span>Không thể hiển thị cấu hình. Vui lòng tải lại trang.</span>
+        </div>
       )}
-    </section>
+    </div>
   );
 }
 

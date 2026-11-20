@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useFetch } from "../../api/useFetch";
 import { adminContentApi, adminContentPaths } from "../../api/adminContent";
 import Button from "../../components/ui/Button";
@@ -315,11 +316,15 @@ export default function AdminContentPage() {
 
   return (
     <div className="admin-page">
+      <Link to="/admin" className="admin-back-link">
+        ← Quay lại Trang quản trị
+      </Link>
+
       {/* Header */}
       <div className="admin-header">
         <div className="admin-header__title-row">
           <div>
-            <span className="admin-header__badge">QUẢN TRỊ VIÊN</span>
+            <span className="admin-header__badge">Quản lý nội dung</span>
             <h1 className="admin-header__title">Quản lý nội dung</h1>
             <p className="admin-header__desc">
               Quản lý danh sách tin tức bệnh viện và các bước trong quy trình khám bệnh.
@@ -530,7 +535,7 @@ export default function AdminContentPage() {
         <>
           <div className="admin-toolbar">
             <div className="admin-form-hint">
-              Quy trình khám bệnh được hiển thị tăng dần theo số thứ tự (C6-10 sẽ hiển thị theo đúng thứ tự này).
+              Quy trình khám bệnh được hiển thị tăng dần theo số thứ tự trên Cổng thông tin người bệnh.
             </div>
             <div className="admin-form-hint">
               Tổng số: {stepsList.length} bước

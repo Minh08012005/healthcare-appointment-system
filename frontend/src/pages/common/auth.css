@@ -100,6 +100,18 @@
   border: 1px solid rgba(11, 31, 51, 0.15);
 }
 
+.auth__portal-badge--error {
+  background: #FDF2F2;
+  color: #D64545;
+  border: 1px solid rgba(214, 69, 69, 0.25);
+}
+
+.auth__portal-badge--warning {
+  background: #FEF8EC;
+  color: #9A6214;
+  border: 1px solid rgba(242, 169, 59, 0.3);
+}
+
 /* ── Typography ──────────────────────────────────────────────────── */
 .auth__eyebrow {
   margin: 16px 0 0;
@@ -269,6 +281,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 @media (max-width: 600px) {
@@ -528,3 +542,39 @@
 .auth__actions .auth__switch {
   margin-top: 0;
 }
+
+/* ── Auth Loading State ───────────────────────────────────────────── */
+.auth__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.auth__loading-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #6D706F;
+  font-size: 14.5px;
+}
+
+.auth__spinner {
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid #EAE6DE;
+  border-top-color: #1E88E5;
+  border-radius: 50%;
+  animation: authSpin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes authSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

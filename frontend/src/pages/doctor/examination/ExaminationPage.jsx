@@ -393,7 +393,7 @@ function ExaminationPage() {
       <div className="ex-print-sheet" aria-hidden="true">
         <div className="ex-print__header">
           <div className="ex-print__hospital">
-            <h2>PHÒNG KHÁM ĐA KHOA</h2>
+            <h2>BỆNH VIỆN ĐA KHOA QUỐC TẾ MEDICARE</h2>
             <p>{roomLabel ? `Phòng khám: ${roomLabel}` : "Hệ thống khám chữa bệnh"}</p>
           </div>
           <div className="ex-print__meta">

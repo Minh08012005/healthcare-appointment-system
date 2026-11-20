@@ -125,7 +125,7 @@ export default function AdminTimeSlotsPage() {
 
       {!loading && !error && items.length === 0 && (
         <div className="admin-state-box">
-          <p>Chưa có cấu hình khung giờ. Hãy chạy migration C6-06 (npm run db:migrate:c6-06).</p>
+          <p>Chưa có cấu hình khung giờ trong hệ thống.</p>
         </div>
       )}
 
